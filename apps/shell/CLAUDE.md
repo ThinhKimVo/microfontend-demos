@@ -56,7 +56,8 @@ remotes: {
 
 ### Key Files
 
-- `src/components/Layout/Shell.tsx` - Main layout with collapsible sidebar
+- `src/components/Layout/Shell.tsx` - Main layout with sticky header and back navigation
+- `src/pages/Home.tsx` - Home page with searchable demo cards
 - `src/components/RemoteWrapper/*` - Wrapper components for each remote framework
 - `src/components/RemoteWrapper/ErrorBoundary.tsx` - Catches remote loading failures
 - `src/App.tsx` - Route definitions

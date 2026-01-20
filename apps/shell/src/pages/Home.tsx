@@ -1,182 +1,240 @@
-import React from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+const SearchIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+);
+
+const ReactIcon = () => (
+  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 10.11c1.03 0 1.87.84 1.87 1.89 0 1-.84 1.85-1.87 1.85-1.03 0-1.87-.85-1.87-1.85 0-1.05.84-1.89 1.87-1.89M7.37 20c.63.38 2.01-.2 3.6-1.7-.52-.59-1.03-1.23-1.51-1.9-.82-.08-1.63-.2-2.4-.36-.51 2.14-.32 3.61.31 3.96m.71-5.74l-.29-.51c-.11.29-.22.58-.29.86.27.06.57.11.88.16l-.3-.51m6.54-.76l.81-1.5-.81-1.5c-.3-.53-.62-1-.91-1.47C13.17 9 12.6 9 12 9c-.6 0-1.17 0-1.71.03-.29.47-.61.94-.91 1.47L8.57 12l.81 1.5c.3.53.62 1 .91 1.47.54.03 1.11.03 1.71.03.6 0 1.17 0 1.71-.03.29-.47.61-.94.91-1.47M12 6.78c-.19.22-.39.45-.59.72h1.18c-.2-.27-.4-.5-.59-.72m0 10.44c.19-.22.39-.45.59-.72h-1.18c.2.27.4.5.59.72M16.62 4c-.62-.38-2 .2-3.59 1.7.52.59 1.03 1.23 1.51 1.9.82.08 1.63.2 2.4.36.51-2.14.32-3.61-.32-3.96m-.7 5.74l.29.51c.11-.29.22-.58.29-.86-.27-.06-.57-.11-.88-.16l.3.51m1.45-7.05c1.47.84 1.63 3.05 1.01 5.63 2.54.75 4.37 1.99 4.37 3.68 0 1.69-1.83 2.93-4.37 3.68.62 2.58.46 4.79-1.01 5.63-1.46.84-3.45-.12-5.37-1.95-1.92 1.83-3.91 2.79-5.38 1.95-1.46-.84-1.62-3.05-1-5.63-2.54-.75-4.37-1.99-4.37-3.68 0-1.69 1.83-2.93 4.37-3.68-.62-2.58-.46-4.79 1-5.63 1.47-.84 3.46.12 5.38 1.95 1.92-1.83 3.91-2.79 5.37-1.95M17.08 12c.34.75.64 1.5.89 2.26 2.1-.63 3.28-1.53 3.28-2.26 0-.73-1.18-1.63-3.28-2.26-.25.76-.55 1.51-.89 2.26M6.92 12c-.34-.75-.64-1.5-.89-2.26-2.1.63-3.28 1.53-3.28 2.26 0 .73 1.18 1.63 3.28 2.26.25-.76.55-1.51.89-2.26m9 2.26l-.3.51c.31-.05.61-.1.88-.16-.07-.28-.18-.57-.29-.86l-.29.51m-2.89 4.04c1.59 1.5 2.97 2.08 3.59 1.7.64-.35.83-1.82.32-3.96-.77.16-1.58.28-2.4.36-.48.67-.99 1.31-1.51 1.9M8.08 9.74l.3-.51c-.31.05-.61.1-.88.16.07.28.18.57.29.86l.29-.51m2.89-4.04C9.38 4.2 8 3.62 7.37 4c-.63.35-.82 1.82-.31 3.96.77-.16 1.58-.28 2.4-.36.48-.67.99-1.31 1.51-1.9z" />
+  </svg>
+);
+
+const VueIcon = () => (
+  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M2 3h3.5L12 15l6.5-12H22L12 21 2 3m4.5 0h3L12 7.58 14.5 3h3L12 13.08 6.5 3z" />
+  </svg>
+);
+
+const AngularIcon = () => (
+  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2L2 7l1.63 14.27L12 22l8.37-5.73L22 7L12 2zm0 2.1l6.85 2.14-1.26 10.97L12 19.77l-5.59-2.56-1.26-10.97L12 4.1zM8 16h2.14l.68-1.7h2.36l.68 1.7H16l-4-10-4 10zm3.44-3.48L12 11l.56 1.52h-1.12z" />
+  </svg>
+);
+
+const ArrowIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+  </svg>
+);
+
+const ExternalLinkIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+  </svg>
+);
+
+const SHELL_PORT = 3100;
 
 const demos = [
   {
     name: 'React Remote',
-    port: 3101,
+    path: '/react',
     framework: 'React',
-    color: 'bg-sky-500',
-    hoverColor: 'hover:bg-sky-600',
+    icon: ReactIcon,
+    gradient: 'from-sky-500 to-blue-600',
+    bgGradient: 'from-sky-50 to-blue-50',
     borderColor: 'border-sky-200',
-    textColor: 'text-sky-600',
-    bgLight: 'bg-sky-50',
+    textColor: 'text-sky-700',
     description: 'E-commerce components with Product List and Cart Widget',
     features: ['Product Catalog', 'Shopping Cart', 'Add to Cart'],
   },
   {
     name: 'Vue Remote',
-    port: 3102,
+    path: '/vue',
     framework: 'Vue',
-    color: 'bg-emerald-500',
-    hoverColor: 'hover:bg-emerald-600',
+    icon: VueIcon,
+    gradient: 'from-emerald-500 to-green-600',
+    bgGradient: 'from-emerald-50 to-green-50',
     borderColor: 'border-emerald-200',
-    textColor: 'text-emerald-600',
-    bgLight: 'bg-emerald-50',
+    textColor: 'text-emerald-700',
     description: 'Analytics dashboard with interactive charts and stats',
     features: ['Dashboard', 'Charts', 'Statistics'],
   },
   {
     name: 'Angular Remote',
-    port: 3103,
+    path: '/angular',
     framework: 'Angular',
-    color: 'bg-rose-500',
-    hoverColor: 'hover:bg-rose-600',
+    icon: AngularIcon,
+    gradient: 'from-rose-500 to-red-600',
+    bgGradient: 'from-rose-50 to-red-50',
     borderColor: 'border-rose-200',
-    textColor: 'text-rose-600',
-    bgLight: 'bg-rose-50',
+    textColor: 'text-rose-700',
     description: 'Settings and user profile management modules',
     features: ['Settings', 'Profile', 'Preferences'],
   },
-  {
-    name: 'Hopefull Admin',
-    port: 3104,
-    framework: 'React',
-    color: 'bg-violet-500',
-    hoverColor: 'hover:bg-violet-600',
-    borderColor: 'border-violet-200',
-    textColor: 'text-violet-600',
-    bgLight: 'bg-violet-50',
-    description: 'Admin dashboard with user management capabilities',
-    features: ['Dashboard', 'Users', 'Admin Tools'],
-  },
 ];
 
-const ExternalLinkIcon = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-    />
-  </svg>
-);
-
-
 export default function Home() {
+  const [search, setSearch] = useState('');
+
+  const filteredDemos = demos.filter((demo) => {
+    const query = search.toLowerCase();
+    return (
+      demo.name.toLowerCase().includes(query) ||
+      demo.framework.toLowerCase().includes(query) ||
+      demo.description.toLowerCase().includes(query) ||
+      demo.features.some((f) => f.toLowerCase().includes(query))
+    );
+  });
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 text-white">
-        <div className="flex items-center gap-2 text-sm text-slate-400 mb-4">
-          <span className="w-2 h-2 bg-green-400 rounded-full motion-safe:animate-pulse" aria-hidden="true"></span>
-          <span>All services running</span>
-        </div>
-        <h1 className="text-3xl font-bold mb-3 text-balance">
+      <div className="text-center py-8">
+        <h1 className="text-4xl font-bold text-slate-900 mb-4 text-balance">
           Microfrontend Demo Platform
         </h1>
-        <p className="text-slate-300 max-w-2xl leading-relaxed">
+        <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
           Explore Webpack 5 Module Federation with cross-framework microfrontends.
           Each remote application runs independently and integrates seamlessly at runtime.
         </p>
+
+        {/* Search Bar */}
+        <div className="mt-8 max-w-md mx-auto">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <SearchIcon />
+            </div>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search demos by name, framework, or feature..."
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              aria-label="Search demos"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+                aria-label="Clear search"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {search && (
+            <p className="mt-2 text-sm text-slate-500">
+              {filteredDemos.length} {filteredDemos.length === 1 ? 'result' : 'results'} found
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Demo Apps Section */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Demo Applications</h2>
-          <span className="text-sm text-gray-500">{demos.length} apps available</span>
+      {/* Cards Grid */}
+      {filteredDemos.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <SearchIcon />
+          </div>
+          <h3 className="text-lg font-medium text-slate-900 mb-1">No demos found</h3>
+          <p className="text-slate-500">Try adjusting your search terms</p>
         </div>
+      ) : (
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredDemos.map((demo) => (
+          <article
+            key={demo.path}
+            className={`group relative bg-gradient-to-br ${demo.bgGradient} rounded-2xl border ${demo.borderColor} overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1`}
+          >
+            {/* Card Header */}
+            <div className={`bg-gradient-to-r ${demo.gradient} p-6 text-white`}>
+              <div className="flex items-start justify-between">
+                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <demo.icon />
+                </div>
+                <span className="text-xs font-mono bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">
+                  :{SHELL_PORT}
+                </span>
+              </div>
+              <h2 className="text-xl font-bold mt-4 text-balance">{demo.name}</h2>
+              <p className="text-sm text-white/80 mt-1">{demo.framework} Application</p>
+            </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <table className="w-full" aria-label="Demo applications">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Application
-                </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Framework
-                </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Port
-                </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Features
-                </th>
-                <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {demos.map((demo) => (
-                <tr
-                  key={demo.port}
-                  className="hover:bg-gray-50 transition-colors"
+            {/* Card Body */}
+            <div className="p-6">
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                {demo.description}
+              </p>
+
+              {/* Features */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {demo.features.map((feature) => (
+                  <span
+                    key={feature}
+                    className={`text-xs font-medium ${demo.textColor} bg-white px-2.5 py-1 rounded-full border ${demo.borderColor}`}
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3">
+                <Link
+                  to={demo.path}
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${demo.gradient} text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
                 >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-10 h-10 ${demo.color} rounded-lg flex items-center justify-center`}
-                      >
-                        <span className="text-white font-bold text-sm">
-                          {demo.framework[0]}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{demo.name}</p>
-                        <p className="text-sm text-gray-500">{demo.description}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${demo.bgLight} ${demo.textColor}`}
-                    >
-                      {demo.framework}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <code className="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">
-                      :{demo.port}
-                    </code>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {demo.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end">
-                      <a
-                        href={`http://localhost:${demo.port}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white ${demo.color} ${demo.hoverColor} rounded-lg transition-colors`}
-                      >
-                        Open
-                        <ExternalLinkIcon />
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  Open App
+                  <ArrowIcon />
+                </Link>
+                <a
+                  href={`http://localhost:${SHELL_PORT}${demo.path}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`p-2.5 border ${demo.borderColor} rounded-xl ${demo.textColor} hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
+                  aria-label={`Open ${demo.name} in new tab`}
+                >
+                  <ExternalLinkIcon />
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      )}
+
+      {/* Info Section */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 mt-8">
+        <h3 className="text-lg font-semibold text-slate-900 mb-3">How it works</h3>
+        <div className="grid sm:grid-cols-3 gap-4 text-sm">
+          <div className="flex gap-3">
+            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">1</div>
+            <div>
+              <p className="font-medium text-slate-900">Shell Host</p>
+              <p className="text-slate-500">Loads remotes dynamically at runtime</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">2</div>
+            <div>
+              <p className="font-medium text-slate-900">Module Federation</p>
+              <p className="text-slate-500">Webpack 5 shares dependencies</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">3</div>
+            <div>
+              <p className="font-medium text-slate-900">Cross-Framework</p>
+              <p className="text-slate-500">React, Vue, and Angular together</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
