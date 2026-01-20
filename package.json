@@ -1,0 +1,23 @@
+{
+  "name": "@mfe/root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n shell,react,vue,angular -c blue,green,yellow,magenta \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/react-remote dev\" \"pnpm --filter @mfe/vue-remote dev\" \"pnpm --filter @mfe/angular-remote dev\"",
+    "dev:shell": "pnpm --filter @mfe/shell dev",
+    "dev:react": "pnpm --filter @mfe/react-remote dev",
+    "dev:vue": "pnpm --filter @mfe/vue-remote dev",
+    "dev:angular": "pnpm --filter @mfe/angular-remote dev",
+    "dev:adapter": "pnpm --filter @mfe/hopefull-adapter dev",
+    "build": "pnpm -r build",
+    "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
