@@ -76,6 +76,18 @@ const demos = [
     description: 'Settings and user profile management modules',
     features: ['Settings', 'Profile', 'Preferences'],
   },
+  {
+    name: 'HopefullAdapter Remote',
+    path: '/hopefull-adapter',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-sky-500 to-blue-600',
+    bgGradient: 'from-sky-50 to-blue-50',
+    borderColor: 'border-sky-200',
+    textColor: 'text-sky-700',
+    description: 'Admin dashboard adapter',
+    features: ['Dashboard', 'Users'],
+  },
 ];
 
 export default function Home() {

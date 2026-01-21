@@ -8,9 +8,9 @@
     "dev:react": "pnpm --filter @mfe/react-remote dev",
     "dev:vue": "pnpm --filter @mfe/vue-remote dev",
     "dev:angular": "pnpm --filter @mfe/angular-remote dev",
-    "dev:adapter": "pnpm --filter @mfe/hopefull-adapter dev",
     "build": "pnpm -r build",
-    "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules"
+    "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
+    "dev:hopefulladapter": "pnpm --filter @mfe/hopefull-adapter dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

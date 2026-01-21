@@ -13,6 +13,10 @@ pnpm dev:shell    # Shell host at http://localhost:3100
 pnpm dev:react    # React remote at http://localhost:3101
 pnpm dev:vue      # Vue remote at http://localhost:3102
 pnpm dev:angular  # Angular remote at http://localhost:3103
+pnpm dev:adapter  # Hopefull adapter at http://localhost:3104
+
+# Integrate a new remote
+pnpm integrate
 
 # Build all apps
 pnpm build
@@ -33,6 +37,7 @@ This is a **Webpack 5 Module Federation** microfrontend monorepo. The shell app 
 | react-remote | 3101 | React 18 | Exposes ProductList, CartWidget, App |
 | vue-remote | 3102 | Vue 3 | Exposes mount function, Dashboard, Charts |
 | angular-remote | 3103 | Angular 17 | Exposes mount function, SettingsComponent |
+| hopefull-adapter | 3104 | React 18 | Bridge to external Hopefull Admin app |
 
 ### Module Federation Pattern
 
@@ -42,10 +47,29 @@ remotes: {
   reactRemote: 'reactRemote@http://localhost:3101/remoteEntry.js',
   vueRemote: 'vueRemote@http://localhost:3102/remoteEntry.js',
   angularRemote: 'angularRemote@http://localhost:3103/remoteEntry.js',
+  hopefullAdapter: 'hopefullAdapter@http://localhost:3104/remoteEntry.js',
 }
 ```
 
 **Remote type declarations:** `src/federation/types.d.ts`
+
+### Adding New Remotes
+
+Use the integration script to automate adding new remotes:
+
+```bash
+pnpm integrate
+# Or with options:
+node scripts/integrate-remote.js --name my-app --port 3105 --framework react
+```
+
+The script updates:
+- `webpack.config.js` - Adds remote entry
+- `src/federation/types.d.ts` - Adds type declarations
+- `src/components/RemoteWrapper/` - Creates wrapper component
+- `src/App.tsx` - Adds route
+- `src/pages/Home.tsx` - Adds demo card
+- Root `package.json` - Adds dev script
 
 ### Cross-Framework Integration
 
@@ -61,7 +85,9 @@ remotes: {
 - `src/components/RemoteWrapper/*` - Wrapper components for each remote framework
 - `src/components/RemoteWrapper/ErrorBoundary.tsx` - Catches remote loading failures
 - `src/App.tsx` - Route definitions
+- `src/federation/types.d.ts` - TypeScript declarations for remote modules
 - `webpack.config.js` - Module federation configuration
+- `../../scripts/integrate-remote.js` - Script to integrate new remotes
 
 ### Shared Dependencies
 

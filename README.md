@@ -8,7 +8,8 @@ A demonstration of cross-framework microfrontends using Webpack 5 Module Federat
 Shell (Host) - React          → http://localhost:3100
 ├── React Remote              → http://localhost:3101
 ├── Vue Remote                → http://localhost:3102
-└── Angular Remote            → http://localhost:3103
+├── Angular Remote            → http://localhost:3103
+└── Hopefull Adapter          → http://localhost:3104
 ```
 
 ## Features
@@ -65,11 +66,99 @@ microfrontend/
 │   ├── shell/              # Host application (React)
 │   ├── react-remote/       # React microfrontend
 │   ├── vue-remote/         # Vue microfrontend
-│   └── angular-remote/     # Angular microfrontend
+│   ├── angular-remote/     # Angular microfrontend
+│   └── hopefull-adapter/   # Adapter for external apps
 ├── packages/
 │   └── shared/             # Shared utilities (EventBus, types)
 └── scripts/
-    └── start-all.sh
+    ├── start-all.sh
+    └── integrate-remote.js # Integration automation script
+```
+
+## Integrating New Remotes
+
+Use the integration script to automatically add a new remote to the shell:
+
+### Quick Start
+
+```bash
+pnpm integrate
+```
+
+### Command-Line Options
+
+```bash
+node scripts/integrate-remote.js --name my-app --port 3105 --framework react
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name` | Remote name (kebab-case, e.g., `user-dashboard`) |
+| `--port` | Dev server port (e.g., `3105`) |
+| `--framework` | `react`, `vue`, `angular`, or `other` |
+| `--description` | Short description for the home page |
+| `--features` | Comma-separated feature list |
+
+### What the Script Does
+
+1. Updates `shell/webpack.config.js` with new remote entry
+2. Adds TypeScript declarations to `federation/types.d.ts`
+3. Creates wrapper component (`{Name}RemoteWrapper.tsx`)
+4. Adds route to `shell/src/App.tsx`
+5. Updates root `package.json` with dev script
+6. Adds demo card to home page
+7. Creates new remote app from template (optional)
+
+### Manual Integration
+
+If integrating an existing project manually:
+
+1. **Add Module Federation to your webpack.config.js:**
+
+```javascript
+new ModuleFederationPlugin({
+  name: 'yourRemote',
+  filename: 'remoteEntry.js',
+  exposes: {
+    './App': './src/App',
+    './mount': './src/expose/mount',  // For non-React frameworks
+  },
+  shared: {
+    react: { singleton: true, requiredVersion: deps.react },
+    'react-dom': { singleton: true, requiredVersion: deps['react-dom'] },
+  },
+})
+```
+
+2. **Add remote to shell's webpack.config.js:**
+
+```javascript
+remotes: {
+  yourRemote: 'yourRemote@http://localhost:YOUR_PORT/remoteEntry.js',
+}
+```
+
+3. **Add type declarations** in `shell/src/federation/types.d.ts`
+
+4. **Create wrapper component** in `shell/src/components/RemoteWrapper/`
+
+5. **Add route** in `shell/src/App.tsx`
+
+### Mount Pattern for Non-React Frameworks
+
+For Vue, Angular, or other frameworks, create a mount function:
+
+```typescript
+// src/expose/mount.ts
+export default function mount(el: HTMLElement): { unmount: () => void } {
+  // Mount your app to the element
+  const app = createApp(YourComponent);
+  app.mount(el);
+
+  return {
+    unmount: () => app.unmount(),
+  };
+}
 ```
 
 ## How It Works
@@ -123,6 +212,10 @@ new ModuleFederationPlugin({
 
 ### Angular Remote
 - SettingsComponent: User settings panel
+
+### Hopefull Adapter
+- Dashboard: Admin dashboard bridge
+- UsersList: User management bridge
 
 ## Production Build
 
