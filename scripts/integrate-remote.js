@@ -344,6 +344,45 @@ function updateRootPackageJson(config) {
 
   pkg.scripts[devScriptKey] = `pnpm --filter ${filterName} dev`;
 
+  // Update main dev script to include new remote
+  const devScript = pkg.scripts.dev || '';
+  if (devScript.includes('concurrently')) {
+    // Parse existing concurrently command
+    // Format: concurrently -n name1,name2 -c color1,color2 "cmd1" "cmd2"
+    const namesMatch = devScript.match(/-n\s+([^\s]+)/);
+    const colorsMatch = devScript.match(/-c\s+([^\s]+)/);
+    const commandsMatch = devScript.match(/"pnpm[^"]+"/g) || [];
+
+    if (namesMatch && colorsMatch) {
+      const names = namesMatch[1].split(',');
+      const colors = colorsMatch[1].split(',');
+
+      // Available colors for concurrently (expanded list)
+      const availableColors = [
+        'blue', 'green', 'yellow', 'magenta', 'cyan', 'white', 'gray', 'red',
+        'blueBright', 'greenBright', 'yellowBright', 'magentaBright', 'cyanBright',
+        'redBright', 'bgBlue', 'bgGreen', 'bgYellow', 'bgMagenta', 'bgCyan', 'bgRed'
+      ];
+      const usedColors = colors.map(c => c.toLowerCase());
+      // Find unused color, or cycle through colors if all used
+      let newColor = availableColors.find(c => !usedColors.includes(c.toLowerCase()));
+      if (!newColor) {
+        // Cycle: use color based on position (skip first 5 reserved for core apps)
+        const colorIndex = (names.length) % availableColors.length;
+        newColor = availableColors[colorIndex];
+      }
+
+      // Add new remote
+      names.push(shortName);
+      colors.push(newColor);
+      commandsMatch.push(`"pnpm --filter ${filterName} dev"`);
+
+      // Rebuild dev script
+      pkg.scripts.dev = `concurrently -n ${names.join(',')} -c ${colors.join(',')} ${commandsMatch.join(' ')}`;
+      logSuccess(`Added ${shortName} to main dev script (color: ${newColor})`);
+    }
+  }
+
   fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2) + '\n');
   logSuccess(`Added dev:${shortName} script to root package.json`);
   return true;
