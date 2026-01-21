@@ -32,7 +32,13 @@ declare module 'angularRemote/SettingsModule' {
   export default SettingsModule;
 }
 
-declare module 'hopefullAdapter/mount' {
+// Hopefull Admin Remote
+declare module 'hopefullAdmin/App' {
+  const App: React.ComponentType;
+  export default App;
+}
+
+declare module 'hopefullAdmin/mount' {
   interface MountOptions {
     initialPath?: string;
   }
@@ -40,12 +46,3 @@ declare module 'hopefullAdapter/mount' {
   export default mount;
 }
 
-declare module 'hopefullAdapter/Dashboard' {
-  const Dashboard: React.ComponentType;
-  export default Dashboard;
-}
-
-declare module 'hopefullAdapter/UsersList' {
-  const UsersList: React.ComponentType;
-  export default UsersList;
-}

@@ -77,16 +77,16 @@ const demos = [
     features: ['Settings', 'Profile', 'Preferences'],
   },
   {
-    name: 'HopefullAdapter Remote',
-    path: '/hopefull-adapter',
+    name: 'Hopefull Admin',
+    path: '/hopefull-admin',
     framework: 'React',
     icon: ReactIcon,
     gradient: 'from-sky-500 to-blue-600',
     bgGradient: 'from-sky-50 to-blue-50',
     borderColor: 'border-sky-200',
     textColor: 'text-sky-700',
-    description: 'Admin dashboard adapter',
-    features: ['Dashboard', 'Users'],
+    description: 'Hopefull Admin dashboard microfrontend',
+    features: ['Dashboard', 'Users', 'Analytics'],
   },
 ];
 

@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n shell,react,vue,angular -c blue,green,yellow,magenta \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/react-remote dev\" \"pnpm --filter @mfe/vue-remote dev\" \"pnpm --filter @mfe/angular-remote dev\"",
+    "dev": "concurrently -n shell,react,vue,angular,hopefull-admin -c blue,green,yellow,magenta,cyan \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/react-remote dev\" \"pnpm --filter @mfe/vue-remote dev\" \"pnpm --filter @mfe/angular-remote dev\" \"pnpm --filter @mfe/hopefull-admin dev\"",
     "dev:shell": "pnpm --filter @mfe/shell dev",
     "dev:react": "pnpm --filter @mfe/react-remote dev",
     "dev:vue": "pnpm --filter @mfe/vue-remote dev",
     "dev:angular": "pnpm --filter @mfe/angular-remote dev",
     "build": "pnpm -r build",
     "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:hopefulladapter": "pnpm --filter @mfe/hopefull-adapter dev"
+    "dev:hopefull-admin": "pnpm --filter @mfe/hopefull-admin dev",
+    "integrate": "node scripts/integrate-remote.js",
+    "integrate:scan": "node scripts/integrate-remote.js --scan"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

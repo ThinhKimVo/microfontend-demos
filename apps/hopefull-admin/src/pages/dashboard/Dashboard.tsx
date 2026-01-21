@@ -1,5 +1,5 @@
-import React from 'react';
 import { Users, Stethoscope, Calendar, DollarSign, TrendingUp, Clock } from 'lucide-react';
+import { formatCurrency } from '../../lib/utils';
 
 const stats = [
   { name: 'Total Users', value: '12,345', icon: Users, change: '+12%', color: 'bg-blue-500' },
@@ -22,18 +22,18 @@ const pendingVerifications = [
   { id: 3, name: 'Dr. Lisa Chen', email: 'lisa.chen@email.com', date: '2024-01-06' },
 ];
 
-export default function DashboardBridge() {
+export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Hopefull Dashboard</h1>
-        <p className="text-sm text-gray-500">Integrated from Hopefull Admin Panel</p>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500">Welcome back! Here's what's happening.</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.name} className="card">
+          <div key={stat.name} className="card p-6">
             <div className="flex items-center justify-between">
               <div className={`${stat.color} p-3 rounded-lg`}>
                 <stat.icon className="h-6 w-6 text-white" />
@@ -53,7 +53,7 @@ export default function DashboardBridge() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Recent Activity */}
-        <div className="card p-0">
+        <div className="card">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
           </div>
@@ -78,7 +78,7 @@ export default function DashboardBridge() {
         </div>
 
         {/* Pending Verifications */}
-        <div className="card p-0">
+        <div className="card">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
               Pending Therapist Verifications

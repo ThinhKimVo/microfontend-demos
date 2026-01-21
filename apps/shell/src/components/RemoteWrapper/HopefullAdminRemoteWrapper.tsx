@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const HopefullAdapterRemoteWrapper: React.FC = () => {
+const HopefullAdminRemoteWrapper: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const unmountRef = useRef<(() => void) | null>(null);
 
@@ -9,11 +9,11 @@ const HopefullAdapterRemoteWrapper: React.FC = () => {
       if (!containerRef.current) return;
 
       try {
-        const { default: mount } = await import('hopefullAdapter/mount');
+        const { default: mount } = await import('hopefullAdmin/mount');
         const { unmount } = mount(containerRef.current);
         unmountRef.current = unmount;
       } catch (error) {
-        console.error('Failed to load hopefull-adapter remote:', error);
+        console.error('Failed to load hopefull-admin remote:', error);
       }
     };
 
@@ -26,7 +26,7 @@ const HopefullAdapterRemoteWrapper: React.FC = () => {
     };
   }, []);
 
-  return <div ref={containerRef} className="hopefull-adapter-remote-container" />;
+  return <div ref={containerRef} className="hopefull-admin-remote-container" />;
 };
 
-export default HopefullAdapterRemoteWrapper;
+export default HopefullAdminRemoteWrapper;

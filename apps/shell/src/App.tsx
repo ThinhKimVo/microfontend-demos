@@ -7,7 +7,7 @@ import ErrorBoundary from './components/RemoteWrapper/ErrorBoundary';
 const ReactRemoteWrapper = lazy(() => import('./components/RemoteWrapper/ReactRemoteWrapper'));
 const VueRemoteWrapper = lazy(() => import('./components/RemoteWrapper/VueRemoteWrapper'));
 const AngularRemoteWrapper = lazy(() => import('./components/RemoteWrapper/AngularRemoteWrapper'));
-const HopefullAdapterRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HopefullAdapterRemoteWrapper'));
+const HopefullAdminRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HopefullAdminRemoteWrapper'));
 
 const Loading = () => (
   <div className="flex items-center justify-center h-64" role="status" aria-label="Loading">
@@ -26,7 +26,7 @@ export default function App() {
             <Route path="/react/*" element={<ReactRemoteWrapper />} />
             <Route path="/vue/*" element={<VueRemoteWrapper />} />
             <Route path="/angular/*" element={<AngularRemoteWrapper />} />
-            <Route path="/hopefull-adapter/*" element={<HopefullAdapterRemoteWrapper />} />
+            <Route path="/hopefull-admin/*" element={<HopefullAdminRemoteWrapper />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>

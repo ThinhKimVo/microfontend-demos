@@ -8,6 +8,7 @@
  * Usage:
  *   node scripts/integrate-remote.js
  *   node scripts/integrate-remote.js --name myApp --port 3105 --framework react
+ *   node scripts/integrate-remote.js --scan    # Auto-integrate all new apps from /apps
  */
 
 const fs = require('fs');
@@ -55,7 +56,7 @@ function parseArgs() {
       const key = args[i].slice(2);
       const value = args[i + 1];
       // Boolean flags (no value)
-      if (key === 'skipCreate' || key === 'yes' || key === 'y' || key === 'force') {
+      if (key === 'skipCreate' || key === 'yes' || key === 'y' || key === 'force' || key === 'scan') {
         config[key] = true;
       } else if (value && !value.startsWith('--')) {
         config[key] = value;
@@ -131,20 +132,26 @@ function updateShellWebpack(config) {
   const remoteName = toCamelCase(config.name);
   const remoteEntry = `        ${remoteName}: '${remoteName}@http://localhost:${config.port}/remoteEntry.js',`;
 
-  // Find the remotes object and add the new entry
-  const remotesRegex = /(remotes:\s*\{[\s\S]*?)((\s*}\s*,\s*shared))/;
-  const match = content.match(remotesRegex);
+  // Check if already exists
+  if (content.includes(`${remoteName}:`)) {
+    logError(`Remote "${remoteName}" already exists in webpack.config.js`);
+    return false;
+  }
+
+  // Find the last remote entry and add new one after it
+  const lastRemotePattern = /(remotes:\s*\{[\s\S]*?'[^']+\/remoteEntry\.js',?)(\s*)(},?\s*shared)/;
+  const match = content.match(lastRemotePattern);
 
   if (match) {
-    // Check if already exists
-    if (content.includes(`${remoteName}:`)) {
-      logError(`Remote "${remoteName}" already exists in webpack.config.js`);
-      return false;
+    // Ensure the last entry has a comma and add new entry on next line
+    let lastEntry = match[1];
+    if (!lastEntry.endsWith(',')) {
+      lastEntry += ',';
     }
 
     const newContent = content.replace(
-      remotesRegex,
-      `$1${remoteEntry}\n$2`
+      lastRemotePattern,
+      `${lastEntry}\n${remoteEntry}\n      $3`
     );
     fs.writeFileSync(webpackPath, newContent);
     logSuccess(`Updated shell webpack.config.js with ${remoteName} remote`);
@@ -704,6 +711,200 @@ export default function mount(el: HTMLElement): { unmount: () => void } {
   return true;
 }
 
+// Get list of already integrated remotes from shell webpack config
+function getIntegratedRemotes() {
+  const webpackPath = path.join(SHELL_DIR, 'webpack.config.js');
+  const content = fs.readFileSync(webpackPath, 'utf-8');
+  const remoteMatches = content.match(/(\w+):\s*['"](\w+)@http:\/\/localhost:(\d+)/g) || [];
+
+  return remoteMatches.map(match => {
+    const parts = match.match(/(\w+):\s*['"](\w+)@http:\/\/localhost:(\d+)/);
+    return {
+      key: parts[1],
+      name: parts[2],
+      port: parseInt(parts[3], 10)
+    };
+  });
+}
+
+// Check if an app has Module Federation configured
+function hasModuleFederation(appDir) {
+  const webpackPath = path.join(appDir, 'webpack.config.js');
+
+  if (!fs.existsSync(webpackPath)) {
+    return { valid: false, reason: 'No webpack.config.js found (Vite/other build tool)' };
+  }
+
+  const content = fs.readFileSync(webpackPath, 'utf-8');
+
+  if (!content.includes('ModuleFederationPlugin')) {
+    return { valid: false, reason: 'No ModuleFederationPlugin configured' };
+  }
+
+  if (!content.includes('remoteEntry.js')) {
+    return { valid: false, reason: 'No remoteEntry.js configured' };
+  }
+
+  return { valid: true };
+}
+
+// Scan an app directory to detect its configuration
+function scanAppConfig(appName) {
+  const appDir = path.join(APPS_DIR, appName);
+
+  if (!fs.existsSync(appDir)) return null;
+
+  // Skip shell directory
+  if (appName === 'shell') return null;
+
+  // Check for Module Federation
+  const mfCheck = hasModuleFederation(appDir);
+  if (!mfCheck.valid) {
+    return { skip: true, name: appName, reason: mfCheck.reason };
+  }
+
+  const config = {
+    name: appName,
+    port: null,
+    framework: 'react',
+    description: `${toPascalCase(appName)} microfrontend`,
+    features: ['App'],
+  };
+
+  // Try to read webpack.config.js for port
+  const webpackPath = path.join(appDir, 'webpack.config.js');
+  if (fs.existsSync(webpackPath)) {
+    const webpackContent = fs.readFileSync(webpackPath, 'utf-8');
+    const portMatch = webpackContent.match(/port:\s*(\d+)/);
+    if (portMatch) {
+      config.port = portMatch[1];
+    }
+
+    // Detect framework from webpack config
+    if (webpackContent.includes('vue-loader') || webpackContent.includes("'vue'")) {
+      config.framework = 'vue';
+    } else if (webpackContent.includes('@angular') || webpackContent.includes('angular-remote')) {
+      config.framework = 'angular';
+    }
+  }
+
+  // Try to read package.json for framework detection
+  const packagePath = path.join(appDir, 'package.json');
+  if (fs.existsSync(packagePath)) {
+    const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+
+    if (deps['vue'] || deps['@vue/cli']) {
+      config.framework = 'vue';
+    } else if (deps['@angular/core']) {
+      config.framework = 'angular';
+    }
+  }
+
+  return config;
+}
+
+// Scan all apps and integrate missing ones
+async function scanAndIntegrateAll() {
+  log('\n' + '='.repeat(60), 'bright');
+  log('  Scanning /apps for new remotes to integrate', 'blue');
+  log('='.repeat(60) + '\n', 'bright');
+
+  // Get all apps
+  const allApps = fs.readdirSync(APPS_DIR).filter(name => {
+    const appPath = path.join(APPS_DIR, name);
+    return fs.statSync(appPath).isDirectory() && name !== 'shell';
+  });
+
+  // Get already integrated remotes
+  const integrated = getIntegratedRemotes();
+  const integratedNames = integrated.map(r => r.name.toLowerCase());
+
+  log('Apps found:', 'yellow');
+  const skippedApps = [];
+
+  allApps.forEach(app => {
+    const remoteName = toCamelCase(app);
+    const isIntegrated = integratedNames.includes(remoteName.toLowerCase());
+    const appDir = path.join(APPS_DIR, app);
+    const mfCheck = hasModuleFederation(appDir);
+
+    if (isIntegrated) {
+      log(`  ${app} - ✓ integrated`, 'green');
+    } else if (!mfCheck.valid) {
+      log(`  ${app} - ⊘ skipped (${mfCheck.reason})`, 'yellow');
+      skippedApps.push({ name: app, reason: mfCheck.reason });
+    } else {
+      log(`  ${app} - ○ not integrated`, 'cyan');
+    }
+  });
+
+  // Find apps that need integration (only those with Module Federation)
+  const toIntegrate = allApps.filter(app => {
+    const remoteName = toCamelCase(app);
+    if (integratedNames.includes(remoteName.toLowerCase())) return false;
+
+    const config = scanAppConfig(app);
+    return config && !config.skip;
+  });
+
+  if (toIntegrate.length === 0) {
+    log('\nAll apps are already integrated!', 'green');
+    return;
+  }
+
+  log(`\nIntegrating ${toIntegrate.length} new app(s)...`, 'cyan');
+
+  // Get next available port
+  let nextPort = Math.max(...integrated.map(r => r.port), 3100) + 1;
+
+  for (const appName of toIntegrate) {
+    log('\n' + '-'.repeat(40), 'reset');
+    log(`Integrating: ${appName}`, 'blue');
+
+    const config = scanAppConfig(appName);
+    if (!config || config.skip) {
+      logError(`Could not scan ${appName}, skipping`);
+      continue;
+    }
+
+    // Assign port if not found
+    if (!config.port) {
+      config.port = nextPort.toString();
+      nextPort++;
+    }
+
+    log(`  Port: ${config.port}`, 'reset');
+    log(`  Framework: ${config.framework}`, 'reset');
+
+    // Run integration steps
+    updateShellWebpack(config);
+    addTypeDeclarations(config);
+    createWrapperComponent(config);
+    updateAppRoutes(config);
+    updateRootPackageJson(config);
+    updateHomePage(config);
+  }
+
+  log('\n' + '='.repeat(60), 'bright');
+  log('Scan Complete!', 'green');
+  log('='.repeat(60), 'bright');
+
+  if (toIntegrate.length > 0) {
+    log(`\nIntegrated ${toIntegrate.length} new app(s): ${toIntegrate.join(', ')}`, 'cyan');
+  }
+
+  if (skippedApps.length > 0) {
+    log('\nSkipped apps (no Module Federation):', 'yellow');
+    skippedApps.forEach(({ name, reason }) => {
+      log(`  - ${name}: ${reason}`, 'reset');
+    });
+    log('\nTo integrate these apps, add Webpack + ModuleFederationPlugin first.', 'reset');
+  }
+
+  log('\nRun `pnpm dev` to start all apps.\n', 'yellow');
+}
+
 // Print summary
 function printSummary(config) {
   const kebabName = toKebabCase(config.name);
@@ -742,11 +943,18 @@ function printSummary(config) {
 
 // Main function
 async function main() {
+  const cliArgs = parseArgs();
+
+  // Check for scan mode first
+  if (cliArgs.scan) {
+    await scanAndIntegrateAll();
+    return;
+  }
+
   log('\n' + '='.repeat(60), 'bright');
   log('  Microfrontend Remote Integration Script', 'blue');
   log('='.repeat(60) + '\n', 'bright');
 
-  const cliArgs = parseArgs();
   const rl = createPrompt();
 
   try {

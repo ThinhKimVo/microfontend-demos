@@ -9,7 +9,8 @@ Shell (Host) - React          → http://localhost:3100
 ├── React Remote              → http://localhost:3101
 ├── Vue Remote                → http://localhost:3102
 ├── Angular Remote            → http://localhost:3103
-└── Hopefull Adapter          → http://localhost:3104
+├── Hopefull Adapter          → http://localhost:3104
+└── Admin                     → http://localhost:3105
 ```
 
 ## Features
@@ -67,7 +68,7 @@ microfrontend/
 │   ├── react-remote/       # React microfrontend
 │   ├── vue-remote/         # Vue microfrontend
 │   ├── angular-remote/     # Angular microfrontend
-│   └── hopefull-adapter/   # Adapter for external apps
+│   └── hopefull-admin/     # Hopefull Admin dashboard microfrontend
 ├── packages/
 │   └── shared/             # Shared utilities (EventBus, types)
 └── scripts/
@@ -82,13 +83,18 @@ Use the integration script to automatically add a new remote to the shell:
 ### Quick Start
 
 ```bash
+# Interactive mode - add single remote
 pnpm integrate
+
+# Scan mode - auto-integrate all new apps from /apps
+pnpm integrate:scan
 ```
 
 ### Command-Line Options
 
 ```bash
 node scripts/integrate-remote.js --name my-app --port 3105 --framework react
+node scripts/integrate-remote.js --scan
 ```
 
 | Option | Description |
@@ -98,6 +104,33 @@ node scripts/integrate-remote.js --name my-app --port 3105 --framework react
 | `--framework` | `react`, `vue`, `angular`, or `other` |
 | `--description` | Short description for the home page |
 | `--features` | Comma-separated feature list |
+| `--scan` | Auto-detect and integrate all new apps from `/apps` |
+| `--force` | Continue even if port is already in use (for partial integrations) |
+| `--skipCreate` | Skip creating new remote app from template |
+| `--yes` | Auto-confirm app creation |
+
+### Scan Mode
+
+The `--scan` option automatically integrates all new apps that have Module Federation configured:
+
+```bash
+pnpm integrate:scan
+```
+
+**Output:**
+```
+Apps found:
+  hopefull-admin - ○ not integrated        # Will be integrated
+  my-new-app - ⊘ skipped (No webpack.config.js)  # Skipped
+  react-remote - ✓ integrated     # Already done
+```
+
+**Requirements for auto-integration:**
+- App must have `webpack.config.js`
+- Must include `ModuleFederationPlugin`
+- Must have `remoteEntry.js` configured
+
+Apps using Vite or other build tools will be skipped with a helpful message.
 
 ### What the Script Does
 

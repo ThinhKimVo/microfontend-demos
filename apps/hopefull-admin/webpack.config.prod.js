@@ -4,24 +4,22 @@ const path = require('path');
 
 const deps = require('./package.json').dependencies;
 
+// Production host configuration
+const REMOTE_HOST = process.env.REMOTE_HOST || 'http://10.30.10.18';
+
 module.exports = {
   entry: './src/index.tsx',
-  mode: process.env.NODE_ENV || 'development',
-  devServer: {
-    port: 3100,
-    hot: true,
-    historyApiFallback: true,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
-  },
+  mode: 'production',
   output: {
-    publicPath: 'auto',
+    publicPath: `${REMOTE_HOST}:3105/`,
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
   },
   module: {
     rules: [
@@ -47,24 +45,20 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'shell',
+      name: 'hopefullAdmin',
       filename: 'remoteEntry.js',
-      remotes: {
-        reactRemote: 'reactRemote@http://localhost:3101/remoteEntry.js',
-        vueRemote: 'vueRemote@http://localhost:3102/remoteEntry.js',
-        angularRemote: 'angularRemote@http://localhost:3103/remoteEntry.js',
-        hopefullAdmin: 'hopefullAdmin@http://localhost:3105/remoteEntry.js',
+      exposes: {
+        './App': './src/App',
+        './mount': './src/expose/mount',
       },
       shared: {
         react: {
           singleton: true,
           requiredVersion: deps.react,
-          eager: true,
         },
         'react-dom': {
           singleton: true,
           requiredVersion: deps['react-dom'],
-          eager: true,
         },
         'react-router-dom': {
           singleton: true,
@@ -76,4 +70,7 @@ module.exports = {
       template: './public/index.html',
     }),
   ],
+  optimization: {
+    minimize: true,
+  },
 };

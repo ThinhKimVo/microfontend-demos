@@ -142,7 +142,6 @@ export class SettingsComponent {
   }
 
   saveProfile() {
-    console.log('Profile saved:', this.profile);
     alert('Profile saved successfully!');
   }
 }

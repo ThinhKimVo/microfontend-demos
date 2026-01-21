@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import DashboardBridge from '../components/DashboardBridge';
-import UsersListBridge from '../components/UsersListBridge';
-import '../styles.css';
+import App from '../App';
+import '../index.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,11 +30,7 @@ export default function mount(
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[initialPath]}>
-          <Routes>
-            <Route path="/" element={<DashboardBridge />} />
-            <Route path="/users" element={<UsersListBridge />} />
-            <Route path="*" element={<DashboardBridge />} />
-          </Routes>
+          <App />
         </MemoryRouter>
       </QueryClientProvider>
     </React.StrictMode>

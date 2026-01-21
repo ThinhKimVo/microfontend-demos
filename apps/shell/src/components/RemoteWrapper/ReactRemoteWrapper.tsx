@@ -11,14 +11,10 @@ const Loading: React.FC = () => (
 );
 
 export const ReactProductList: React.FC = () => {
-  const handleProductClick = (productId: string) => {
-    console.log('Product clicked:', productId);
-  };
-
   return (
     <ErrorBoundary>
       <Suspense fallback={<Loading />}>
-        <ProductList onProductClick={handleProductClick} />
+        <ProductList />
       </Suspense>
     </ErrorBoundary>
   );
