@@ -35,18 +35,20 @@ const props = withDefaults(
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const normalizedData = computed(() => {
+const normalizedData = computed((): number[] => {
   const max = Math.max(...props.data);
-  return props.data.map((value) => (value / max) * 100);
+  return props.data.map((value: number): number => (value / max) * 100);
 });
 
-const colorClass = computed(() => {
-  const colors = {
+type ColorKey = 'blue' | 'green' | 'purple' | 'orange';
+
+const colorClass = computed((): string => {
+  const colors: Record<ColorKey, string> = {
     blue: 'bg-blue-500',
     green: 'bg-green-500',
     purple: 'bg-purple-500',
     orange: 'bg-orange-500',
   };
-  return colors[props.color];
+  return colors[props.color as ColorKey];
 });
 </script>
