@@ -11,7 +11,7 @@ module.exports = {
   entry: './src/index.tsx',
   mode: 'production',
   output: {
-    publicPath: `${REMOTE_HOST}:3105/`,
+    publicPath: `${REMOTE_HOST}:3101/`,
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
