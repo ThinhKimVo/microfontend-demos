@@ -9,8 +9,7 @@ Shell (Host) - React          → http://localhost:3100
 ├── React Remote              → http://localhost:3101
 ├── Vue Remote                → http://localhost:3102
 ├── Angular Remote            → http://localhost:3103
-├── Hopefull Adapter          → http://localhost:3104
-└── Admin                     → http://localhost:3105
+└── Hopefull Admin            → http://localhost:3105
 ```
 
 ## Features
@@ -20,6 +19,7 @@ Shell (Host) - React          → http://localhost:3100
 - **Independent Deployment**: Each remote can be deployed separately
 - **Runtime Integration**: Components loaded dynamically at runtime
 - **Framework Adapters**: Vue and Angular components wrapped for React host
+- **Cloudflare Tunnel**: Free HTTPS access without port forwarding
 
 ## Getting Started
 
@@ -31,7 +31,6 @@ Shell (Host) - React          → http://localhost:3100
 ### Installation
 
 ```bash
-cd /Users/thinh.vo/sts/microfrontend
 pnpm install
 ```
 
@@ -46,18 +45,20 @@ pnpm dev
 Or start individual applications:
 
 ```bash
-pnpm dev:shell      # Shell only
-pnpm dev:react      # React remote only
-pnpm dev:vue        # Vue remote only
-pnpm dev:angular    # Angular remote only
+pnpm dev:shell           # Shell only
+pnpm dev:react           # React remote only
+pnpm dev:vue             # Vue remote only
+pnpm dev:angular         # Angular remote only
+pnpm dev:hopefull-admin  # Hopefull Admin only
 ```
 
-### Access
+### Access (Development)
 
 - Shell (main app): http://localhost:3100
 - React Remote: http://localhost:3101
 - Vue Remote: http://localhost:3102
 - Angular Remote: http://localhost:3103
+- Hopefull Admin: http://localhost:3105
 
 ## Project Structure
 
@@ -68,12 +69,86 @@ microfrontend/
 │   ├── react-remote/       # React microfrontend
 │   ├── vue-remote/         # Vue microfrontend
 │   ├── angular-remote/     # Angular microfrontend
-│   └── hopefull-admin/     # Hopefull Admin dashboard microfrontend
-├── packages/
-│   └── shared/             # Shared utilities (EventBus, types)
-└── scripts/
-    ├── start-all.sh
-    └── integrate-remote.js # Integration automation script
+│   └── hopefull-admin/     # Hopefull Admin dashboard
+├── scripts/
+│   ├── integrate-remote.js # Integration automation script
+│   ├── deploy-pm2.sh       # PM2 deployment script
+│   └── deploy.sh           # Docker deployment script
+├── docker/                 # Docker configuration
+├── nginx/                  # Nginx configuration
+└── ecosystem.config.js     # PM2 process configuration
+```
+
+## Deployment
+
+### Option 1: PM2 with Cloudflare Tunnel (Recommended, No Sudo Required)
+
+Deploy to a server with PM2 and get a free HTTPS URL via Cloudflare Tunnel:
+
+```bash
+# Build and deploy
+./scripts/deploy-pm2.sh deploy
+
+# Check status
+./scripts/deploy-pm2.sh status
+
+# View logs
+./scripts/deploy-pm2.sh logs
+
+# Stop services
+./scripts/deploy-pm2.sh stop
+```
+
+After deployment, get your public URL:
+```bash
+ssh user@server "pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare"
+```
+
+This gives you a URL like: `https://random-words.trycloudflare.com`
+
+### Option 2: Docker Deployment
+
+```bash
+# Build and start with Docker Compose
+pnpm docker:build
+pnpm docker:up
+
+# Stop
+pnpm docker:down
+
+# View logs
+pnpm docker:logs
+```
+
+### Option 3: Manual PM2 Deployment
+
+On your server:
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build for production
+pnpm build:prod
+
+# Start with PM2
+pm2 start ecosystem.config.js
+pm2 save
+```
+
+### Server Requirements
+
+- Node.js 18+
+- PM2 (`npm install -g pm2`)
+- (Optional) Nginx for port 80 reverse proxy
+- (Optional) Docker & Docker Compose
+
+### Environment Variables
+
+Create `.env` file based on `.env.example`:
+
+```bash
+REMOTE_HOST=http://your-server-ip
 ```
 
 ## Integrating New Remotes
@@ -93,106 +168,28 @@ pnpm integrate:scan
 ### Command-Line Options
 
 ```bash
-node scripts/integrate-remote.js --name my-app --port 3105 --framework react
+node scripts/integrate-remote.js --name my-app --port 3106 --framework react
 node scripts/integrate-remote.js --scan
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--name` | Remote name (kebab-case, e.g., `user-dashboard`) |
-| `--port` | Dev server port (e.g., `3105`) |
+| `--port` | Dev server port (e.g., `3106`) |
 | `--framework` | `react`, `vue`, `angular`, or `other` |
 | `--description` | Short description for the home page |
 | `--features` | Comma-separated feature list |
 | `--scan` | Auto-detect and integrate all new apps from `/apps` |
-| `--force` | Continue even if port is already in use (for partial integrations) |
+| `--force` | Continue even if port is already in use |
 | `--skipCreate` | Skip creating new remote app from template |
-| `--yes` | Auto-confirm app creation |
 
-### Scan Mode
+### Requirements for Auto-Integration
 
-The `--scan` option automatically integrates all new apps that have Module Federation configured:
-
-```bash
-pnpm integrate:scan
-```
-
-**Output:**
-```
-Apps found:
-  hopefull-admin - ○ not integrated        # Will be integrated
-  my-new-app - ⊘ skipped (No webpack.config.js)  # Skipped
-  react-remote - ✓ integrated     # Already done
-```
-
-**Requirements for auto-integration:**
 - App must have `webpack.config.js`
 - Must include `ModuleFederationPlugin`
 - Must have `remoteEntry.js` configured
 
 Apps using Vite or other build tools will be skipped with a helpful message.
-
-### What the Script Does
-
-1. Updates `shell/webpack.config.js` with new remote entry
-2. Adds TypeScript declarations to `federation/types.d.ts`
-3. Creates wrapper component (`{Name}RemoteWrapper.tsx`)
-4. Adds route to `shell/src/App.tsx`
-5. Updates root `package.json` with dev script
-6. Adds demo card to home page
-7. Creates new remote app from template (optional)
-
-### Manual Integration
-
-If integrating an existing project manually:
-
-1. **Add Module Federation to your webpack.config.js:**
-
-```javascript
-new ModuleFederationPlugin({
-  name: 'yourRemote',
-  filename: 'remoteEntry.js',
-  exposes: {
-    './App': './src/App',
-    './mount': './src/expose/mount',  // For non-React frameworks
-  },
-  shared: {
-    react: { singleton: true, requiredVersion: deps.react },
-    'react-dom': { singleton: true, requiredVersion: deps['react-dom'] },
-  },
-})
-```
-
-2. **Add remote to shell's webpack.config.js:**
-
-```javascript
-remotes: {
-  yourRemote: 'yourRemote@http://localhost:YOUR_PORT/remoteEntry.js',
-}
-```
-
-3. **Add type declarations** in `shell/src/federation/types.d.ts`
-
-4. **Create wrapper component** in `shell/src/components/RemoteWrapper/`
-
-5. **Add route** in `shell/src/App.tsx`
-
-### Mount Pattern for Non-React Frameworks
-
-For Vue, Angular, or other frameworks, create a mount function:
-
-```typescript
-// src/expose/mount.ts
-export default function mount(el: HTMLElement): { unmount: () => void } {
-  // Mount your app to the element
-  const app = createApp(YourComponent);
-  app.mount(el);
-
-  return {
-    unmount: () => app.unmount(),
-  };
-}
-```
 
 ## How It Works
 
@@ -223,14 +220,15 @@ new ModuleFederationPlugin({
     reactRemote: 'reactRemote@http://localhost:3101/remoteEntry.js',
     vueRemote: 'vueRemote@http://localhost:3102/remoteEntry.js',
     angularRemote: 'angularRemote@http://localhost:3103/remoteEntry.js',
+    hopefullAdmin: 'hopefullAdmin@http://localhost:3105/remoteEntry.js',
   },
 })
 ```
 
 ### Cross-Framework Integration
 
-- **Vue in React**: VueWrapper component mounts Vue apps
-- **Angular in React**: AngularWrapper component bootstraps Angular modules
+- **React Remotes**: Direct lazy imports with Suspense
+- **Vue/Angular Remotes**: Mount/unmount pattern via exposed `mount` function
 
 ## Demo Components
 
@@ -239,21 +237,53 @@ new ModuleFederationPlugin({
 - CartWidget: Shopping cart summary
 
 ### Vue Remote
-- Dashboard: Analytics dashboard
+- Dashboard: Analytics dashboard with charts
 - StatsWidget: Statistics cards
-- AnalyticsChart: Bar charts
 
 ### Angular Remote
-- SettingsComponent: User settings panel
+- SettingsComponent: User settings and profile management
 
-### Hopefull Adapter
-- Dashboard: Admin dashboard bridge
-- UsersList: User management bridge
+### Hopefull Admin
+- Dashboard: Admin analytics dashboard
+- UsersList: User management
 
-## Production Build
+## Scripts Reference
 
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all apps in development |
+| `pnpm build` | Build all apps |
+| `pnpm build:prod` | Build for production |
+| `pnpm integrate` | Interactive remote integration |
+| `pnpm integrate:scan` | Auto-integrate new apps |
+| `pnpm deploy:pm2` | Deploy with PM2 + Cloudflare Tunnel |
+| `pnpm docker:up` | Start with Docker Compose |
+
+## Troubleshooting
+
+### Remote Loading Failed
+- Check if all remotes are running
+- Verify port numbers in webpack config
+- Check browser console for CORS errors
+
+### Cloudflare Tunnel Not Working
 ```bash
-pnpm build
+# Check tunnel status
+pm2 logs cloudflare-tunnel
+
+# Restart tunnel
+pm2 restart cloudflare-tunnel
 ```
 
-Each app builds to its `dist/` folder with `remoteEntry.js` for federation.
+### Port Already in Use
+```bash
+# Find process using port
+lsof -i :3100
+
+# Kill process
+kill -9 <PID>
+```
+
+## License
+
+MIT

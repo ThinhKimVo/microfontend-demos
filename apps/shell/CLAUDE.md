@@ -100,3 +100,36 @@ The script updates:
 ### Shared Dependencies
 
 React, ReactDOM, and React Router are configured as singletons to prevent duplicate instances across remotes. The shell eagerly loads these dependencies.
+
+## Deployment
+
+### PM2 with Cloudflare Tunnel (No Sudo Required)
+
+```bash
+# Deploy all apps with Cloudflare Tunnel
+./scripts/deploy-pm2.sh deploy
+
+# Check status
+./scripts/deploy-pm2.sh status
+
+# View logs
+./scripts/deploy-pm2.sh logs
+
+# Get Cloudflare Tunnel URL
+ssh user@server "pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare"
+```
+
+### Production Build
+
+```bash
+# Build all apps for production
+pnpm build:prod
+
+# Build shell only
+pnpm --filter @mfe/shell build:prod
+```
+
+### Production Webpack Config
+
+The `webpack.config.prod.js` uses environment variables:
+- `REMOTE_HOST` - Base URL for remote apps (default: `http://10.30.10.18`)
