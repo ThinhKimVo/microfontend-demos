@@ -2,9 +2,13 @@ import React, { useEffect, useRef } from 'react';
 
 const CmmsRemoteWrapper: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(false);
   const unmountRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
     const loadRemote = async () => {
       if (!containerRef.current) return;
 
@@ -21,7 +25,12 @@ const CmmsRemoteWrapper: React.FC = () => {
 
     return () => {
       if (unmountRef.current) {
-        unmountRef.current();
+        try {
+          unmountRef.current();
+        } catch (e) {
+          // Ignore unmount errors
+        }
+        unmountRef.current = null;
       }
     };
   }, []);
