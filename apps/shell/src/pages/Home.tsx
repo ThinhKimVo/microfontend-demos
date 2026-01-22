@@ -25,7 +25,8 @@ const ExternalLinkIcon = () => (
   </svg>
 );
 
-const SHELL_PORT = 3100;
+// Use current origin for external links (works in dev and prod)
+const getBaseUrl = () => window.location.origin;
 
 const demos = [
   {
@@ -203,13 +204,8 @@ export default function Home() {
           >
             {/* Card Header */}
             <div className={`bg-gradient-to-r ${demo.gradient} p-6 text-white`}>
-              <div className="flex items-start justify-between">
-                <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                  <demo.icon />
-                </div>
-                <span className="text-xs font-mono bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">
-                  :{SHELL_PORT}
-                </span>
+              <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm w-fit">
+                <demo.icon />
               </div>
               <h2 className="text-xl font-bold mt-4 text-balance">{demo.name}</h2>
               <p className="text-sm text-white/80 mt-1">{demo.framework} Application</p>
@@ -243,7 +239,7 @@ export default function Home() {
                   <ArrowIcon />
                 </Link>
                 <a
-                  href={`http://localhost:${SHELL_PORT}${demo.path}`}
+                  href={`${getBaseUrl()}${demo.path}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`p-2.5 border ${demo.borderColor} rounded-xl ${demo.textColor} hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}

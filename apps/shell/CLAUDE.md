@@ -101,6 +101,46 @@ All remotes use the mount/unmount pattern:
 - Mount function is called in `useEffect` with container ref
 - Returns cleanup function for unmount
 
+**Important:** Remote wrappers should always import the `mount` function, not the `App` component directly. This is because:
+- The mount function uses `MemoryRouter` internally (isolated routing)
+- The App component typically has its own `BrowserRouter`
+- Importing App directly causes "Router inside Router" errors
+
+**RemoteWrapper pattern with StrictMode handling:**
+```tsx
+const RemoteWrapper: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(false);  // Prevents double-mount in StrictMode
+  const unmountRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
+    const loadRemote = async () => {
+      if (!containerRef.current) return;
+      try {
+        const { default: mount } = await import('remoteName/mount');
+        const { unmount } = mount(containerRef.current);
+        unmountRef.current = unmount;
+      } catch (error) {
+        console.error('Failed to load remote:', error);
+      }
+    };
+    loadRemote();
+
+    return () => {
+      if (unmountRef.current) {
+        try { unmountRef.current(); } catch (e) {}
+        unmountRef.current = null;
+      }
+    };
+  }, []);
+
+  return <div ref={containerRef} className="remote-container" />;
+};
+```
+
 ### Key Files
 
 - `src/components/Layout/Shell.tsx` - Main layout with sticky header and back navigation
@@ -116,6 +156,11 @@ All remotes use the mount/unmount pattern:
 
 React, ReactDOM, and React Router are configured as singletons to prevent duplicate instances across remotes. The shell eagerly loads these dependencies.
 
+**Version compatibility is critical:** All remotes must use compatible versions of shared singleton packages. For example:
+- `react-router-dom` v6.x is not compatible with v7.x
+- If a remote uses a different major version, you'll see "Unsatisfied version" warnings and routing failures
+- Always check the shell's versions and match them in remote apps
+
 ## Deployment
 
 ### PM2 with Cloudflare Tunnel (No Sudo Required)
@@ -124,10 +169,30 @@ React, ReactDOM, and React Router are configured as singletons to prevent duplic
 # Deploy all apps with Cloudflare Tunnel
 ./scripts/deploy-pm2.sh deploy
 
+# Deploy a single app only
+./scripts/deploy-pm2.sh deploy:app shell
+./scripts/deploy-pm2.sh deploy:app hopefull-admin
+./scripts/deploy-pm2.sh deploy:app assest-management
+./scripts/deploy-pm2.sh deploy:app cmms
+./scripts/deploy-pm2.sh deploy:app family-fun
+./scripts/deploy-pm2.sh deploy:app booking-guest-portal
+./scripts/deploy-pm2.sh deploy:app booking-host-portal
+./scripts/deploy-pm2.sh deploy:app elearning-admin-portal
+./scripts/deploy-pm2.sh deploy:app elearning-student-portal
+
+# Restart a single app
+./scripts/deploy-pm2.sh restart:app shell
+
+# View logs for a single app
+./scripts/deploy-pm2.sh logs:app hopefull-admin
+
+# List all managed apps
+./scripts/deploy-pm2.sh list
+
 # Check status
 ./scripts/deploy-pm2.sh status
 
-# View logs
+# View all logs
 ./scripts/deploy-pm2.sh logs
 
 # Get Cloudflare Tunnel URL
