@@ -139,17 +139,67 @@ build_local() {
     print_status "Building all apps for production..."
     export REMOTE_HOST="http://${SERVER_IP}"
 
-    # Build each app
-    for app in shell react-remote vue-remote angular-remote hopefull-admin; do
-        print_status "Building ${app}..."
-        cd "apps/${app}"
-        if [ -f "webpack.config.prod.js" ]; then
-            npx webpack --config webpack.config.prod.js
-        else
-            npm run build
-        fi
-        cd "$PROJECT_ROOT"
-    done
+    # Build shell
+    print_status "Building shell..."
+    cd "apps/shell"
+    if [ -f "webpack.config.prod.js" ]; then
+        npx webpack --config webpack.config.prod.js
+    else
+        npm run build
+    fi
+    cd "$PROJECT_ROOT"
+
+    # Build hopefull-admin
+    print_status "Building hopefull-admin..."
+    cd "apps/hopefull-admin"
+    if [ -f "webpack.config.prod.js" ]; then
+        npx webpack --config webpack.config.prod.js
+    else
+        npx webpack --mode production
+    fi
+    cd "$PROJECT_ROOT"
+
+    # Build assest-management
+    print_status "Building assest-management..."
+    cd "apps/assest-management"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
+
+    # Build cmms
+    print_status "Building cmms..."
+    cd "apps/cmms"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
+
+    # Build FamilyFun
+    print_status "Building FamilyFun..."
+    cd "apps/FamilyFun/frontend"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
+
+    # Build BookingSystem guest-portal
+    print_status "Building booking-guest-portal..."
+    cd "apps/BookingSystem/packages/guest-portal"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
+
+    # Build BookingSystem host-portal
+    print_status "Building booking-host-portal..."
+    cd "apps/BookingSystem/packages/host-portal"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
+
+    # Build elearning admin-portal
+    print_status "Building elearning-admin-portal..."
+    cd "apps/elearning/admin-portal"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
+
+    # Build elearning student-portal
+    print_status "Building elearning-student-portal..."
+    cd "apps/elearning/student-portal"
+    npx webpack --mode production
+    cd "$PROJECT_ROOT"
 
     print_success "Build completed"
 }
@@ -172,15 +222,23 @@ create_package() {
         --exclude='.git' \
         --exclude='*.log' \
         apps/shell/dist \
-        apps/react-remote/dist \
-        apps/vue-remote/dist \
-        apps/angular-remote/dist \
         apps/hopefull-admin/dist \
+        apps/assest-management/dist \
+        apps/cmms/dist \
+        apps/FamilyFun/frontend/dist \
+        apps/BookingSystem/packages/guest-portal/dist \
+        apps/BookingSystem/packages/host-portal/dist \
+        apps/elearning/admin-portal/dist \
+        apps/elearning/student-portal/dist \
         apps/shell/package.json \
-        apps/react-remote/package.json \
-        apps/vue-remote/package.json \
-        apps/angular-remote/package.json \
         apps/hopefull-admin/package.json \
+        apps/assest-management/package.json \
+        apps/cmms/package.json \
+        apps/FamilyFun/frontend/package.json \
+        apps/BookingSystem/packages/guest-portal/package.json \
+        apps/BookingSystem/packages/host-portal/package.json \
+        apps/elearning/admin-portal/package.json \
+        apps/elearning/student-portal/package.json \
         ecosystem.config.js \
         package.json
 
@@ -212,10 +270,18 @@ cd ~/microfrontend
 pm2 delete all 2>/dev/null || true
 
 # Backup old dist folders
-for app in shell react-remote vue-remote angular-remote hopefull-admin; do
+for app in shell hopefull-admin assest-management cmms; do
     if [ -d "apps/\${app}/dist" ]; then
         rm -rf "apps/\${app}/dist.backup" 2>/dev/null || true
         mv "apps/\${app}/dist" "apps/\${app}/dist.backup" 2>/dev/null || true
+    fi
+done
+
+# Backup nested app dist folders
+for nested_app in "FamilyFun/frontend" "BookingSystem/packages/guest-portal" "BookingSystem/packages/host-portal" "elearning/admin-portal" "elearning/student-portal"; do
+    if [ -d "apps/\${nested_app}/dist" ]; then
+        rm -rf "apps/\${nested_app}/dist.backup" 2>/dev/null || true
+        mv "apps/\${nested_app}/dist" "apps/\${nested_app}/dist.backup" 2>/dev/null || true
     fi
 done
 
@@ -224,8 +290,14 @@ tar -xzf deploy.tar.gz
 rm deploy.tar.gz
 
 # Install serve package for each app
-for app in shell react-remote vue-remote angular-remote hopefull-admin; do
+for app in shell hopefull-admin assest-management cmms; do
     cd ~/microfrontend/apps/\${app}
+    npm install serve --save-dev 2>/dev/null || true
+done
+
+# Install serve for nested apps
+for nested_app in "FamilyFun/frontend" "BookingSystem/packages/guest-portal" "BookingSystem/packages/host-portal" "elearning/admin-portal" "elearning/student-portal"; do
+    cd ~/microfrontend/apps/\${nested_app}
     npm install serve --save-dev 2>/dev/null || true
 done
 
@@ -265,7 +337,7 @@ pm2 list
 
 echo ""
 echo "=== Checking ports ==="
-for port in 3100 3101 3102 3103 3105; do
+for port in 3100 3101 3102 3103 3104 3105 3106 3107 3108; do
     if netstat -tuln 2>/dev/null | grep -q ":\${port} " || ss -tuln 2>/dev/null | grep -q ":\${port} "; then
         echo "Port \${port}: OK"
     else
@@ -300,11 +372,16 @@ full_deploy() {
     echo "  Local:            http://${SERVER_IP}:3100"
     echo "  Cloudflare:       Check tunnel URL with: ssh ${SERVER_USER}@${SERVER_IP} 'pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare'"
     echo ""
-    echo "Remote apps (for internal use):"
-    echo "  React Remote:     http://${SERVER_IP}:3101"
-    echo "  Vue Remote:       http://${SERVER_IP}:3102"
-    echo "  Angular Remote:   http://${SERVER_IP}:3103"
-    echo "  Hopefull Admin:   http://${SERVER_IP}:3105"
+    echo "Remote apps (ports 3100-3108):"
+    echo "  Shell:              http://${SERVER_IP}:3100"
+    echo "  Hopefull Admin:     http://${SERVER_IP}:3101"
+    echo "  Asset Management:   http://${SERVER_IP}:3102"
+    echo "  CMMS:               http://${SERVER_IP}:3103"
+    echo "  FamilyFun:          http://${SERVER_IP}:3104"
+    echo "  Booking Guest:      http://${SERVER_IP}:3105"
+    echo "  Booking Host:       http://${SERVER_IP}:3106"
+    echo "  E-Learning Admin:   http://${SERVER_IP}:3107"
+    echo "  E-Learning Student: http://${SERVER_IP}:3108"
     echo ""
 }
 
@@ -320,7 +397,7 @@ pm2 list 2>/dev/null || echo "PM2 not running"
 
 echo ""
 echo "=== Port Status ==="
-for port in 3100 3101 3102 3103 3105; do
+for port in 3100 3101 3102 3103 3104 3105 3106 3107 3108; do
     if netstat -tuln 2>/dev/null | grep -q ":\${port} " || ss -tuln 2>/dev/null | grep -q ":\${port} "; then
         echo "Port \${port}: LISTENING"
     else
@@ -449,62 +526,6 @@ server {
         add_header 'Access-Control-Allow-Origin' '*' always;
         add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
         add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
-    }
-}
-
-# React Remote - port 3101
-server {
-    listen 3101;
-    server_name _;
-
-    location / {
-        proxy_pass http://127.0.0.1:3101;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        add_header 'Access-Control-Allow-Origin' '*' always;
-    }
-}
-
-# Vue Remote - port 3102
-server {
-    listen 3102;
-    server_name _;
-
-    location / {
-        proxy_pass http://127.0.0.1:3102;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        add_header 'Access-Control-Allow-Origin' '*' always;
-    }
-}
-
-# Angular Remote - port 3103
-server {
-    listen 3103;
-    server_name _;
-
-    location / {
-        proxy_pass http://127.0.0.1:3103;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        add_header 'Access-Control-Allow-Origin' '*' always;
-    }
-}
-
-# Hopefull Admin - port 3105
-server {
-    listen 3105;
-    server_name _;
-
-    location / {
-        proxy_pass http://127.0.0.1:3105;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        add_header 'Access-Control-Allow-Origin' '*' always;
     }
 }
 NGINX_EOF

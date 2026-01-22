@@ -13,37 +13,73 @@ module.exports = {
       },
     },
     {
-      name: 'mfe-react-remote',
-      script: 'npx',
-      args: 'serve dist -p 3101 -s --cors',
-      cwd: './apps/react-remote',
-      env: {
-        NODE_ENV: 'production',
-      },
-    },
-    {
-      name: 'mfe-vue-remote',
-      script: 'npx',
-      args: 'serve dist -p 3102 -s --cors',
-      cwd: './apps/vue-remote',
-      env: {
-        NODE_ENV: 'production',
-      },
-    },
-    {
-      name: 'mfe-angular-remote',
-      script: 'npx',
-      args: 'serve dist -p 3103 -s --cors',
-      cwd: './apps/angular-remote',
-      env: {
-        NODE_ENV: 'production',
-      },
-    },
-    {
       name: 'mfe-hopefull-admin',
       script: 'npx',
-      args: 'serve dist -p 3105 -s --cors',
+      args: 'serve dist -p 3101 -s --cors',
       cwd: './apps/hopefull-admin',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-assest-management',
+      script: 'npx',
+      args: 'serve dist -p 3102 -s --cors',
+      cwd: './apps/assest-management',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-cmms',
+      script: 'npx',
+      args: 'serve dist -p 3103 -s --cors',
+      cwd: './apps/cmms',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-family-fun',
+      script: 'npx',
+      args: 'serve dist -p 3104 -s --cors',
+      cwd: './apps/FamilyFun/frontend',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-booking-guest',
+      script: 'npx',
+      args: 'serve dist -p 3105 -s --cors',
+      cwd: './apps/BookingSystem/packages/guest-portal',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-booking-host',
+      script: 'npx',
+      args: 'serve dist -p 3106 -s --cors',
+      cwd: './apps/BookingSystem/packages/host-portal',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-elearning-admin',
+      script: 'npx',
+      args: 'serve dist -p 3107 -s --cors',
+      cwd: './apps/elearning/admin-portal',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-elearning-student',
+      script: 'npx',
+      args: 'serve dist -p 3108 -s --cors',
+      cwd: './apps/elearning/student-portal',
       env: {
         NODE_ENV: 'production',
       },
