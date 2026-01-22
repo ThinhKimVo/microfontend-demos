@@ -14,42 +14,53 @@ SERVER_USER="${SERVER_USER:-honghoang}"
 PROJECT_NAME="microfrontend"
 REMOTE_DIR="\$HOME/${PROJECT_NAME}"
 
-# App configuration: name -> "path:port:pm2_name"
-declare -A APPS=(
-    ["shell"]="apps/shell:3100:mfe-shell"
-    ["hopefull-admin"]="apps/hopefull-admin:3101:mfe-hopefull-admin"
-    ["assest-management"]="apps/assest-management:3102:mfe-assest-management"
-    ["cmms"]="apps/cmms:3103:mfe-cmms"
-    ["family-fun"]="apps/FamilyFun/frontend:3104:mfe-family-fun"
-    ["booking-guest"]="apps/BookingSystem/packages/guest-portal:3105:mfe-booking-guest"
-    ["booking-host"]="apps/BookingSystem/packages/host-portal:3106:mfe-booking-host"
-    ["elearning-admin"]="apps/elearning/admin-portal:3107:mfe-elearning-admin"
-    ["elearning-student"]="apps/elearning/student-portal:3108:mfe-elearning-student"
-)
+# App configuration using functions (bash 3.x compatible)
+get_app_config() {
+    local app_name="$1"
+    case "$app_name" in
+        shell)              echo "apps/shell:3100:mfe-shell" ;;
+        hopefull-admin)     echo "apps/hopefull-admin:3101:mfe-hopefull-admin" ;;
+        assest-management)  echo "apps/assest-management:3102:mfe-assest-management" ;;
+        cmms)               echo "apps/cmms:3103:mfe-cmms" ;;
+        family-fun)         echo "apps/FamilyFun/frontend:3104:mfe-family-fun" ;;
+        booking-guest)      echo "apps/BookingSystem/packages/guest-portal:3105:mfe-booking-guest" ;;
+        booking-host)       echo "apps/BookingSystem/packages/host-portal:3106:mfe-booking-host" ;;
+        elearning-admin)    echo "apps/elearning/admin-portal:3107:mfe-elearning-admin" ;;
+        elearning-student)  echo "apps/elearning/student-portal:3108:mfe-elearning-student" ;;
+        *)                  echo "" ;;
+    esac
+}
+
+# All app names
+ALL_APPS="shell hopefull-admin assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
 
 # Get app path
 get_app_path() {
-    echo "${APPS[$1]}" | cut -d: -f1
+    get_app_config "$1" | cut -d: -f1
 }
 
 # Get app port
 get_app_port() {
-    echo "${APPS[$1]}" | cut -d: -f2
+    get_app_config "$1" | cut -d: -f2
 }
 
 # Get app PM2 name
 get_app_pm2_name() {
-    echo "${APPS[$1]}" | cut -d: -f3
+    get_app_config "$1" | cut -d: -f3
+}
+
+# Check if app exists
+app_exists() {
+    [ -n "$(get_app_config "$1")" ]
 }
 
 # List available apps
 list_apps() {
     echo "Available apps:"
-    for app in "${!APPS[@]}"; do
-        local path=$(get_app_path "$app")
+    for app in $ALL_APPS; do
         local port=$(get_app_port "$app")
         printf "  %-20s (port %s)\n" "$app" "$port"
-    done | sort
+    done
 }
 
 # Colors for output
@@ -246,7 +257,7 @@ build_local() {
 build_single_app() {
     local app_name="$1"
 
-    if [ -z "${APPS[$app_name]}" ]; then
+    if ! app_exists "$app_name"; then
         print_error "Unknown app: $app_name"
         list_apps
         exit 1
@@ -738,7 +749,7 @@ ENDSSH
 restart_single_app() {
     local app_name="$1"
 
-    if [ -z "${APPS[$app_name]}" ]; then
+    if ! app_exists "$app_name"; then
         print_error "Unknown app: $app_name"
         list_apps
         exit 1
@@ -759,7 +770,7 @@ ENDSSH
 logs_single_app() {
     local app_name="$1"
 
-    if [ -z "${APPS[$app_name]}" ]; then
+    if ! app_exists "$app_name"; then
         print_error "Unknown app: $app_name"
         list_apps
         exit 1
