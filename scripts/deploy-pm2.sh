@@ -234,8 +234,29 @@ cd ~/microfrontend
 # Start with PM2
 pm2 start ecosystem.config.js
 
+# Setup Cloudflare Tunnel (no sudo required)
+echo ""
+echo "=== Setting up Cloudflare Tunnel ==="
+if [ ! -f ~/cloudflared ]; then
+    echo "Downloading cloudflared..."
+    curl -sL -o ~/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+    chmod +x ~/cloudflared
+    echo "cloudflared installed"
+else
+    echo "cloudflared already installed"
+fi
+
+# Stop existing tunnel if running
+pm2 delete cloudflare-tunnel 2>/dev/null || true
+
+# Start tunnel with PM2
+pm2 start ~/cloudflared --name "cloudflare-tunnel" -- tunnel --url http://localhost:3100
+
 # Save PM2 process list
 pm2 save
+
+# Wait for tunnel to start
+sleep 3
 
 # Show status
 echo ""
@@ -251,6 +272,11 @@ for port in 3100 3101 3102 3103 3105; do
         echo "Port \${port}: NOT LISTENING (may take a moment to start)"
     fi
 done
+
+echo ""
+echo "=== Cloudflare Tunnel URL ==="
+sleep 2
+pm2 logs cloudflare-tunnel --lines 20 --nostream 2>/dev/null | grep -o 'https://[^[:space:]]*\.trycloudflare\.com' | tail -1 || echo "Check tunnel URL with: pm2 logs cloudflare-tunnel"
 ENDSSH
 
     # Cleanup
@@ -271,13 +297,15 @@ full_deploy() {
     print_success "Deployment successful!"
     echo ""
     echo "Access your application at:"
-    echo "  Shell (Main):     http://${SERVER_IP}:3100"
+    echo "  Local:            http://${SERVER_IP}:3100"
+    echo "  Cloudflare:       Check tunnel URL with: ssh ${SERVER_USER}@${SERVER_IP} 'pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare'"
+    echo ""
+    echo "Remote apps (for internal use):"
     echo "  React Remote:     http://${SERVER_IP}:3101"
     echo "  Vue Remote:       http://${SERVER_IP}:3102"
     echo "  Angular Remote:   http://${SERVER_IP}:3103"
     echo "  Hopefull Admin:   http://${SERVER_IP}:3105"
     echo ""
-    echo "To enable port 80 access, run: $0 setup-nginx"
 }
 
 # Show status
