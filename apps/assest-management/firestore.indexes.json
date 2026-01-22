@@ -1,0 +1,45 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "maintenance_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "assetId", "order": "ASCENDING" },
+        { "fieldPath": "scheduledDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenance_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "scheduledDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenance_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "scheduledDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenance_schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "assetId", "order": "ASCENDING" },
+        { "fieldPath": "nextDue", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenance_schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "nextDue", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

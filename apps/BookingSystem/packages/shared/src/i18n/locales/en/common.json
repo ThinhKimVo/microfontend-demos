@@ -1,0 +1,617 @@
+{
+  "app": {
+    "name": "StayGCC",
+    "hostPortalName": "StayGCC Host",
+    "tagline": "Your Home Away From Home"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "trips": "Trips",
+    "wishlists": "Wishlists",
+    "messages": "Messages",
+    "profile": "Profile",
+    "settings": "Settings",
+    "login": "Log in",
+    "signup": "Sign up",
+    "logout": "Log out",
+    "becomeHost": "Become a Host",
+    "help": "Help",
+    "about": "About",
+    "howItWorks": "How It Works",
+    "contact": "Contact Us",
+    "faq": "FAQ",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "trustSafety": "Trust & Safety"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "apply": "Apply",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "seeLess": "See Less",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "download": "Download",
+    "upload": "Upload",
+    "required": "Required",
+    "optional": "Optional",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "noResults": "No results found",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All"
+  },
+  "dates": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "nights": "nights",
+    "night": "night",
+    "days": "days",
+    "day": "day",
+    "addDates": "Add dates",
+    "selectDates": "Select dates",
+    "flexible": "Flexible dates"
+  },
+  "guests": {
+    "guests": "Guests",
+    "guest": "Guest",
+    "adults": "Adults",
+    "adult": "Adult",
+    "children": "Children",
+    "child": "Child",
+    "infants": "Infants",
+    "infant": "Infant",
+    "addGuests": "Add guests",
+    "adultsDescription": "Age 13+",
+    "childrenDescription": "Ages 2-12",
+    "infantsDescription": "Under 2"
+  },
+  "currency": {
+    "SAR": "Saudi Riyal",
+    "AED": "UAE Dirham",
+    "KWD": "Kuwaiti Dinar",
+    "BHD": "Bahraini Dinar",
+    "OMR": "Omani Rial",
+    "QAR": "Qatari Riyal"
+  },
+  "countries": {
+    "SA": "Saudi Arabia",
+    "AE": "United Arab Emirates",
+    "KW": "Kuwait",
+    "BH": "Bahrain",
+    "OM": "Oman",
+    "QA": "Qatar"
+  },
+  "destinations": {
+    "riyadh": "Riyadh",
+    "dubai": "Dubai",
+    "jeddah": "Jeddah",
+    "abuDhabi": "Abu Dhabi",
+    "saudiArabia": "Saudi Arabia",
+    "uae": "UAE"
+  },
+  "language": {
+    "en": "English",
+    "ar": "Arabic",
+    "selectLanguage": "Select Language"
+  },
+  "socialProviders": {
+    "google": "Google",
+    "apple": "Apple"
+  },
+  "placeholders": {
+    "phoneNumber": "+966 5XX XXX XXX",
+    "phoneNumberShort": "5XX XXX XXX",
+    "otpCode": "XXXXXX"
+  },
+  "footer": {
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "safetyInfo": "Safety Information",
+    "cancellationOptions": "Cancellation Options",
+    "reportConcern": "Report a Concern",
+    "hosting": "Hosting",
+    "hostYourHome": "Host Your Home",
+    "hostResources": "Resources for Hosts",
+    "communityForum": "Community Forum",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "press": "Press",
+    "copyright": "© {{year}} StayGCC. All rights reserved.",
+    "followUs": "Follow Us",
+    "tryHosting": "Try Hosting",
+    "howItWorks": "How It Works",
+    "responsibleHosting": "Responsible Hosting",
+    "about": "About",
+    "allRightsReserved": "All rights reserved",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPhone": "Please enter a valid phone number",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be no more than {{max}} characters",
+    "passwordMismatch": "Passwords do not match",
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later.",
+    "notFound": "Not found",
+    "unauthorized": "Please log in to continue",
+    "forbidden": "You do not have permission to perform this action"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "verified": "Verified",
+    "unverified": "Unverified"
+  },
+  "actions": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "login": "Log in",
+    "logout": "Log out",
+    "message": "Message",
+    "save": "Save",
+    "saveAsDraft": "Save as Draft",
+    "search": "Search",
+    "signUp": "Sign up",
+    "viewAll": "View All"
+  },
+  "navigation": {
+    "explore": "Explore",
+    "messages": "Messages",
+    "profile": "Profile",
+    "trips": "Trips",
+    "wishlists": "Wishlists"
+  },
+  "messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Search conversations...",
+    "noConversations": "No conversations yet",
+    "typePlaceholder": "Type a message...",
+    "selectConversation": "Select a conversation to start chatting"
+  },
+  "labels": {
+    "night": "night",
+    "nights": "nights"
+  },
+  "search": {
+    "allTypes": "All Types",
+    "amenities": "Amenities",
+    "any": "Any",
+    "applyFilters": "Apply Filters",
+    "bedrooms": "Bedrooms",
+    "checkIn": "Check-in",
+    "filters": "Filters",
+    "guests": "Guests",
+    "instantBook": "Instant Book",
+    "noResults": "No properties found",
+    "priceRange": "Price Range",
+    "propertyType": "Property Type",
+    "searchPlaceholder": "Search destinations...",
+    "searching": "Searching...",
+    "tryAdjustingFilters": "Try adjusting your filters or search in a different area",
+    "whereTo": "Where to?"
+  },
+  "home": {
+    "heroTitle": "Find Your Perfect Stay in the Gulf",
+    "heroSubtitle": "Discover unique homes and experiences across the GCC",
+    "discoverPlaces": "Discover Places",
+    "featuredProperties": "Featured Properties",
+    "popularDestinations": "Popular Destinations",
+    "handpickedStays": "Handpicked Stays",
+    "whyChooseUs": "Why Choose StayGCC",
+    "whyChooseUsSubtitle": "Experience the best of Gulf hospitality",
+    "verifiedProperties": "Verified Properties",
+    "verifiedPropertiesDesc": "All properties are verified for quality and accuracy",
+    "support247": "24/7 Support",
+    "support247Desc": "Round-the-clock customer support in Arabic and English",
+    "bestPrices": "Best Prices",
+    "bestPricesDesc": "Competitive prices with no hidden fees",
+    "becomeHost": "Become a Host",
+    "becomeHostDesc": "Earn money by sharing your space",
+    "startHosting": "Start Hosting"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Simple steps to book your perfect stay",
+    "startSearching": "Start Searching",
+    "exploreProperties": "Explore Properties",
+    "becomeHost": "Become a Host",
+    "guest": {
+      "title": "For Guests",
+      "subtitle": "Find and book your perfect stay",
+      "step1": {
+        "title": "Search",
+        "description": "Browse thousands of verified properties across the GCC"
+      },
+      "step2": {
+        "title": "Book",
+        "description": "Book instantly or send a request to the host"
+      },
+      "step3": {
+        "title": "Pay",
+        "description": "Secure payment with multiple options including Mada and Apple Pay"
+      },
+      "step4": {
+        "title": "Enjoy",
+        "description": "Check in and enjoy your stay with 24/7 support"
+      }
+    },
+    "host": {
+      "title": "For Hosts",
+      "subtitle": "Start earning by sharing your space",
+      "step1": {
+        "title": "List Your Property",
+        "description": "Create your listing in minutes with photos and details"
+      },
+      "step2": {
+        "title": "Set Your Price",
+        "description": "You control your pricing, availability, and house rules"
+      },
+      "step3": {
+        "title": "Welcome Guests",
+        "description": "Receive bookings and welcome guests to your property"
+      },
+      "step4": {
+        "title": "Get Paid",
+        "description": "Receive payments directly to your bank account"
+      }
+    },
+    "features": {
+      "title": "Why Choose Us",
+      "subtitle": "We make hosting and traveling easy",
+      "verified": {
+        "title": "Verified Properties",
+        "description": "All properties are verified for quality"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Customer support in Arabic and English"
+      },
+      "payment": {
+        "title": "Secure Payments",
+        "description": "Multiple payment options with buyer protection"
+      }
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Join thousands of guests and hosts on StayGCC"
+    }
+  },
+  "about": {
+    "title": "About StayGCC",
+    "subtitle": "Your trusted platform for short-term rentals in the Gulf",
+    "story": {
+      "title": "Our Story",
+      "paragraph1": "StayGCC was founded with a simple mission: to make finding and booking short-term accommodations in the Gulf region easy, safe, and enjoyable.",
+      "paragraph2": "We understand the unique needs of travelers and hosts in the GCC, from family-friendly accommodations to cultural considerations.",
+      "paragraph3": "Today, we connect thousands of guests with verified hosts across Saudi Arabia, UAE, Kuwait, Bahrain, Oman, and Qatar."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "To provide a trusted platform that connects travelers with unique accommodations while empowering property owners to share their spaces."
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "What drives us every day",
+      "trust": {
+        "title": "Trust",
+        "description": "Building trust through verification, reviews, and secure payments"
+      },
+      "safety": {
+        "title": "Safety",
+        "description": "Ensuring safe stays for guests and hosts alike"
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "Continuously improving our platform with new features"
+      },
+      "global": {
+        "title": "Local Expertise",
+        "description": "Deep understanding of Gulf culture and hospitality"
+      }
+    },
+    "stats": {
+      "properties": "Properties",
+      "guests": "Happy Guests",
+      "hosts": "Trusted Hosts",
+      "countries": "GCC Countries"
+    },
+    "team": {
+      "title": "Our Team",
+      "subtitle": "Meet the people behind StayGCC",
+      "ceo": "CEO & Founder",
+      "cto": "Chief Technology Officer",
+      "coo": "Chief Operating Officer",
+      "head_of_customer": "Head of Customer Experience"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're here to help",
+    "form": {
+      "title": "Send us a message",
+      "subtitle": "Fill out the form and we'll get back to you within 24 hours",
+      "name": "Your Name",
+      "email": "Email Address",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send Message"
+    },
+    "subjects": {
+      "general": "General Inquiry",
+      "booking": "Booking Support",
+      "hosting": "Hosting Questions",
+      "technical": "Technical Support",
+      "feedback": "Feedback"
+    },
+    "info": {
+      "email": {
+        "title": "Email",
+        "description": "Send us an email anytime"
+      },
+      "phone": {
+        "title": "Phone",
+        "description": "Call us during business hours"
+      },
+      "address": {
+        "title": "Address",
+        "description": "Visit our office",
+        "value": "Riyadh, Saudi Arabia"
+      },
+      "hours": {
+        "title": "Business Hours",
+        "description": "When we're available",
+        "value": "Sunday - Thursday, 9AM - 6PM (AST)"
+      }
+    },
+    "findUs": "Find Us",
+    "findUsDescription": "Our headquarters is located in Riyadh, Saudi Arabia",
+    "mapPlaceholder": "Map loading...",
+    "successMessage": "Thank you! Your message has been sent. We'll get back to you soon."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions",
+    "searchPlaceholder": "Search questions...",
+    "noResults": "No questions found matching your search",
+    "stillHaveQuestions": "Still have questions?",
+    "contactUs": "Contact Us",
+    "tabs": {
+      "guests": "For Guests",
+      "hosts": "For Hosts",
+      "payments": "Payments"
+    },
+    "guest": {
+      "q1": {
+        "question": "How do I book a property?",
+        "answer": "Simply search for your destination, select your dates and guests, browse available properties, and click 'Book Now' or 'Request to Book'. Follow the checkout process to complete your reservation."
+      },
+      "q2": {
+        "question": "Is my payment secure?",
+        "answer": "Yes, all payments are processed through secure, encrypted channels. We support various payment methods including credit cards, Mada, and Apple Pay."
+      },
+      "q3": {
+        "question": "What is the cancellation policy?",
+        "answer": "Each property has its own cancellation policy set by the host. You can find this information on the property listing page before booking."
+      },
+      "q4": {
+        "question": "How do I contact the host?",
+        "answer": "Once your booking is confirmed, you can message the host directly through our messaging system to coordinate check-in details."
+      },
+      "q5": {
+        "question": "What if there's an issue during my stay?",
+        "answer": "Our 24/7 customer support team is available to help resolve any issues. You can reach us through the app or by calling our support line."
+      },
+      "q6": {
+        "question": "Are the properties family-friendly?",
+        "answer": "Many properties are family-friendly. Look for the 'Family Only' badge or check the property's house rules to ensure it meets your needs."
+      }
+    },
+    "host": {
+      "q1": {
+        "question": "How do I list my property?",
+        "answer": "Create a host account, click 'Add New Listing', and follow the step-by-step process to add your property details, photos, pricing, and house rules."
+      },
+      "q2": {
+        "question": "How much does it cost to list?",
+        "answer": "Listing your property is free. We only charge a service fee when you receive a booking, which is deducted from the payout."
+      },
+      "q3": {
+        "question": "How do I get paid?",
+        "answer": "Payments are transferred to your bank account within 24 hours after guest check-out. You can set up your payout preferences in your account settings."
+      },
+      "q4": {
+        "question": "Can I set my own house rules?",
+        "answer": "Yes, you have full control over your house rules, including check-in/out times, guest policies, and whether to allow pets or smoking."
+      },
+      "q5": {
+        "question": "How do I become a Superhost?",
+        "answer": "Superhosts are experienced hosts who provide exceptional hospitality. Maintain a high rating, respond quickly to messages, and avoid cancellations to qualify."
+      }
+    },
+    "payment": {
+      "q1": {
+        "question": "What payment methods are accepted?",
+        "answer": "We accept Visa, Mastercard, Mada, Apple Pay, and various local payment methods. Some properties also offer pay-later options through Tabby or Tamara."
+      },
+      "q2": {
+        "question": "When am I charged?",
+        "answer": "For instant bookings, you're charged immediately upon confirmation. For request-to-book properties, you're charged once the host accepts your request."
+      },
+      "q3": {
+        "question": "How do refunds work?",
+        "answer": "Refunds are processed according to the property's cancellation policy. Once approved, refunds typically take 5-10 business days to appear in your account."
+      },
+      "q4": {
+        "question": "Is there a security deposit?",
+        "answer": "Some hosts require a security deposit. This will be clearly shown before you book. Deposits are refunded after check-out if there's no damage."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last Updated: January 2024",
+    "intro": "Please read these terms carefully before using StayGCC.",
+    "contact": "If you have questions, contact us at legal@staygcc.com",
+    "sections": {
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "content": "By accessing or using StayGCC, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services."
+      },
+      "eligibility": {
+        "title": "Eligibility",
+        "content": "You must be at least 18 years old to use StayGCC. By using our services, you represent that you meet this requirement."
+      },
+      "account": {
+        "title": "Account Registration",
+        "content": "You must provide accurate information when creating an account. You are responsible for maintaining the security of your account credentials."
+      },
+      "booking": {
+        "title": "Booking and Payments",
+        "content": "When you book a property, you agree to pay all charges including the nightly rate, fees, and applicable taxes. Payments are processed securely through our platform."
+      },
+      "cancellation": {
+        "title": "Cancellation Policy",
+        "content": "Cancellation policies vary by property. Please review the specific cancellation policy before booking. Refunds are processed according to the applicable policy."
+      },
+      "guestResponsibilities": {
+        "title": "Guest Responsibilities",
+        "content": "Guests must respect the property and follow all house rules. You are responsible for any damage caused during your stay."
+      },
+      "hostResponsibilities": {
+        "title": "Host Responsibilities",
+        "content": "Hosts must provide accurate listing information and maintain their property in a safe, clean condition. Hosts must honor confirmed bookings."
+      },
+      "payment": {
+        "title": "Payment Terms",
+        "content": "All payments are processed in the currency displayed at booking. Exchange rates may apply for international transactions."
+      },
+      "liability": {
+        "title": "Limitation of Liability",
+        "content": "StayGCC serves as a platform connecting guests and hosts. We are not responsible for the actions of users or the condition of properties."
+      },
+      "disputes": {
+        "title": "Dispute Resolution",
+        "content": "In case of disputes, we encourage users to communicate directly. Our support team can help mediate if needed."
+      },
+      "modifications": {
+        "title": "Modifications",
+        "content": "We may update these terms from time to time. Continued use of StayGCC after changes constitutes acceptance of the new terms."
+      },
+      "governingLaw": {
+        "title": "Governing Law",
+        "content": "These terms are governed by the laws of the Kingdom of Saudi Arabia. Any disputes shall be resolved in the courts of Riyadh."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated: January 2024",
+    "intro": "This Privacy Policy explains how StayGCC collects, uses, and protects your personal information.",
+    "contact": "For privacy-related inquiries, contact us at privacy@staygcc.com",
+    "sections": {
+      "collection": {
+        "title": "Information We Collect",
+        "content": "We collect information you provide directly, such as name, email, phone number, and payment details. We also collect usage data and device information automatically."
+      },
+      "usage": {
+        "title": "How We Use Your Information",
+        "content": "We use your information to provide our services, process bookings, communicate with you, and improve our platform. We may also use it for marketing with your consent."
+      },
+      "sharing": {
+        "title": "Information Sharing",
+        "content": "We share information with hosts/guests as needed for bookings, with service providers who assist our operations, and when required by law."
+      },
+      "security": {
+        "title": "Data Security",
+        "content": "We implement industry-standard security measures to protect your data, including encryption and secure servers."
+      },
+      "cookies": {
+        "title": "Cookies and Tracking",
+        "content": "We use cookies and similar technologies to enhance your experience and analyze usage. You can manage cookie preferences in your browser settings."
+      },
+      "rights": {
+        "title": "Your Rights",
+        "content": "You have the right to access, correct, or delete your personal data. You can also opt out of marketing communications at any time."
+      },
+      "retention": {
+        "title": "Data Retention",
+        "content": "We retain your data as long as your account is active or as needed to provide services. We may retain certain information as required by law."
+      },
+      "international": {
+        "title": "International Transfers",
+        "content": "Your data may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place."
+      },
+      "children": {
+        "title": "Children's Privacy",
+        "content": "Our services are not intended for children under 18. We do not knowingly collect information from children."
+      },
+      "changes": {
+        "title": "Changes to This Policy",
+        "content": "We may update this policy from time to time. We will notify you of significant changes through the app or email."
+      }
+    }
+  },
+  "trips": {
+    "noTrips": "No trips yet",
+    "noTripsDescription": "When you book a trip, it will appear here",
+    "startExploring": "Start Exploring",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "cancelled": "Cancelled"
+  },
+  "profile": {
+    "verified": "Verified",
+    "personalInfo": "Personal Information",
+    "preferences": "Preferences",
+    "language": "Language",
+    "currency": "Currency",
+    "notifications": "Notifications",
+    "emailNotifications": "Email Notifications",
+    "smsNotifications": "SMS Notifications",
+    "pushNotifications": "Push Notifications",
+    "marketingEmails": "Marketing Emails",
+    "security": "Security",
+    "changePassword": "Change Password",
+    "twoFactorAuth": "Two-Factor Authentication",
+    "linkedAccounts": "Linked Accounts",
+    "deleteAccount": "Delete Account",
+    "updateSuccess": "Profile updated successfully"
+  }
+}

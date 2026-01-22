@@ -1,0 +1,24 @@
+{
+  "name": "staygcc-platform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:guest": "pnpm --filter guest-portal dev",
+    "dev:host": "pnpm --filter host-portal dev",
+    "build:guest": "pnpm --filter guest-portal build",
+    "build:host": "pnpm --filter host-portal build",
+    "build:all": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "preview:guest": "pnpm --filter guest-portal preview",
+    "preview:host": "pnpm --filter host-portal preview"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

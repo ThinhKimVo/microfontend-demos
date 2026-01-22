@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "saigon-technology-solutions"
+  },
+  "targets": {
+    "saigon-technology-solutions": {
+      "hosting": {
+        "student": ["elearning-student-sts-demo"],
+        "portal": ["elearning-portal-sts-demo"]
+      }
+    }
+  }
+}
