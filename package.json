@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n shell,react,vue,angular,hopefull-admin -c blue,green,yellow,magenta,cyan \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/react-remote dev\" \"pnpm --filter @mfe/vue-remote dev\" \"pnpm --filter @mfe/angular-remote dev\" \"pnpm --filter @mfe/hopefull-admin dev\"",
+    "predev": "bash scripts/pre-dev.sh",
+    "dev": "pnpm predev && concurrently -n shell,hopefull-admin,assestmanagement,cmms,familyfun,booking-guest,booking-host,elearn-admin,elearn-student -c blue,cyan,white,gray,blueBright,greenBright,yellowBright,magentaBright,cyanBright \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/hopefull-admin dev\" \"pnpm --filter @mfe/assest-management dev\" \"pnpm --filter @mfe/cmms dev\" \"pnpm --filter @mfe/family-fun dev\" \"pnpm --filter @mfe/booking-guest-portal dev\" \"pnpm --filter @mfe/booking-host-portal dev\" \"pnpm --filter @mfe/elearning-admin-portal dev\" \"pnpm --filter @mfe/elearning-student-portal dev\"",
+    "dev:clean": "pnpm predev",
+    "validate": "node scripts/validate-versions.js",
     "dev:shell": "pnpm --filter @mfe/shell dev",
-    "dev:react": "pnpm --filter @mfe/react-remote dev",
-    "dev:vue": "pnpm --filter @mfe/vue-remote dev",
-    "dev:angular": "pnpm --filter @mfe/angular-remote dev",
     "build": "pnpm -r build",
     "build:prod": "pnpm -r build:prod",
     "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
@@ -25,7 +25,14 @@
     "deploy:pm2": "bash scripts/deploy-pm2.sh deploy",
     "deploy:pm2:status": "bash scripts/deploy-pm2.sh status",
     "deploy:pm2:stop": "bash scripts/deploy-pm2.sh stop",
-    "deploy:pm2:logs": "bash scripts/deploy-pm2.sh logs"
+    "deploy:pm2:logs": "bash scripts/deploy-pm2.sh logs",
+    "dev:assestmanagement": "pnpm --filter @mfe/assest-management dev",
+    "dev:cmms": "pnpm --filter @mfe/cmms dev",
+    "dev:familyfun": "pnpm --filter @mfe/family-fun dev",
+    "dev:booking-guest": "pnpm --filter @mfe/booking-guest-portal dev",
+    "dev:booking-host": "pnpm --filter @mfe/booking-host-portal dev",
+    "dev:elearn-admin": "pnpm --filter @mfe/elearning-admin-portal dev",
+    "dev:elearn-student": "pnpm --filter @mfe/elearning-student-portal dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

@@ -727,6 +727,53 @@ function getIntegratedRemotes() {
   });
 }
 
+// Get shell's React version as baseline
+function getShellReactVersion() {
+  const shellPkgPath = path.join(SHELL_DIR, 'package.json');
+  const pkg = JSON.parse(fs.readFileSync(shellPkgPath, 'utf-8'));
+  return pkg.dependencies?.react || '^18.3.1';
+}
+
+// Get major version from version string
+function getMajorVersion(version) {
+  if (!version) return null;
+  const match = version.match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
+}
+
+// Check if an app has compatible React version
+function checkVersionCompatibility(appDir) {
+  const pkgPath = path.join(appDir, 'package.json');
+  if (!fs.existsSync(pkgPath)) {
+    return { compatible: true, warnings: [] };
+  }
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+  const deps = pkg.dependencies || {};
+  const warnings = [];
+
+  const shellReact = getShellReactVersion();
+  const shellMajor = getMajorVersion(shellReact);
+
+  // Check React version
+  if (deps.react) {
+    const appMajor = getMajorVersion(deps.react);
+    if (shellMajor && appMajor && shellMajor !== appMajor) {
+      warnings.push(`React version mismatch: app uses ${deps.react}, shell uses ${shellReact}`);
+    }
+  }
+
+  // Check React DOM version
+  if (deps['react-dom']) {
+    const appMajor = getMajorVersion(deps['react-dom']);
+    if (shellMajor && appMajor && shellMajor !== appMajor) {
+      warnings.push(`React DOM version mismatch: app uses ${deps['react-dom']}, shell uses ${shellReact}`);
+    }
+  }
+
+  return { compatible: warnings.length === 0, warnings };
+}
+
 // Check if an app has Module Federation configured
 function hasModuleFederation(appDir) {
   const webpackPath = path.join(appDir, 'webpack.config.js');
@@ -743,6 +790,12 @@ function hasModuleFederation(appDir) {
 
   if (!content.includes('remoteEntry.js')) {
     return { valid: false, reason: 'No remoteEntry.js configured' };
+  }
+
+  // Check version compatibility
+  const versionCheck = checkVersionCompatibility(appDir);
+  if (!versionCheck.compatible) {
+    return { valid: true, warnings: versionCheck.warnings };
   }
 
   return { valid: true };
@@ -836,6 +889,12 @@ async function scanAndIntegrateAll() {
       skippedApps.push({ name: app, reason: mfCheck.reason });
     } else {
       log(`  ${app} - ○ not integrated`, 'cyan');
+      // Show version warnings if any
+      if (mfCheck.warnings && mfCheck.warnings.length > 0) {
+        mfCheck.warnings.forEach(warning => {
+          log(`      ⚠ ${warning}`, 'yellow');
+        });
+      }
     }
   });
 

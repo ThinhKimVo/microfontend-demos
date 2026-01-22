@@ -49,6 +49,13 @@ module.exports = {
         vueRemote: `vueRemote@${REMOTE_HOST}:3102/remoteEntry.js`,
         angularRemote: `angularRemote@${REMOTE_HOST}:3103/remoteEntry.js`,
         hopefullAdmin: `hopefullAdmin@${REMOTE_HOST}:3105/remoteEntry.js`,
+        assestManagement: `assestManagement@${REMOTE_HOST}:3106/remoteEntry.js`,
+        cmms: `cmms@${REMOTE_HOST}:3107/remoteEntry.js`,
+        familyFun: `familyFun@${REMOTE_HOST}:3108/remoteEntry.js`,
+        bookingGuestPortal: `bookingGuestPortal@${REMOTE_HOST}:3109/remoteEntry.js`,
+        bookingHostPortal: `bookingHostPortal@${REMOTE_HOST}:3110/remoteEntry.js`,
+        elearningAdminPortal: `elearningAdminPortal@${REMOTE_HOST}:3111/remoteEntry.js`,
+        elearningStudentPortal: `elearningStudentPortal@${REMOTE_HOST}:3112/remoteEntry.js`,
       },
       shared: {
         react: {

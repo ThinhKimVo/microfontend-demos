@@ -13,18 +13,6 @@ const ReactIcon = () => (
   </svg>
 );
 
-const VueIcon = () => (
-  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M2 3h3.5L12 15l6.5-12H22L12 21 2 3m4.5 0h3L12 7.58 14.5 3h3L12 13.08 6.5 3z" />
-  </svg>
-);
-
-const AngularIcon = () => (
-  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 2L2 7l1.63 14.27L12 22l8.37-5.73L22 7L12 2zm0 2.1l6.85 2.14-1.26 10.97L12 19.77l-5.59-2.56-1.26-10.97L12 4.1zM8 16h2.14l.68-1.7h2.36l.68 1.7H16l-4-10-4 10zm3.44-3.48L12 11l.56 1.52h-1.12z" />
-  </svg>
-);
-
 const ArrowIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -41,42 +29,6 @@ const SHELL_PORT = 3100;
 
 const demos = [
   {
-    name: 'React Remote',
-    path: '/react',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-sky-500 to-blue-600',
-    bgGradient: 'from-sky-50 to-blue-50',
-    borderColor: 'border-sky-200',
-    textColor: 'text-sky-700',
-    description: 'E-commerce components with Product List and Cart Widget',
-    features: ['Product Catalog', 'Shopping Cart', 'Add to Cart'],
-  },
-  {
-    name: 'Vue Remote',
-    path: '/vue',
-    framework: 'Vue',
-    icon: VueIcon,
-    gradient: 'from-emerald-500 to-green-600',
-    bgGradient: 'from-emerald-50 to-green-50',
-    borderColor: 'border-emerald-200',
-    textColor: 'text-emerald-700',
-    description: 'Analytics dashboard with interactive charts and stats',
-    features: ['Dashboard', 'Charts', 'Statistics'],
-  },
-  {
-    name: 'Angular Remote',
-    path: '/angular',
-    framework: 'Angular',
-    icon: AngularIcon,
-    gradient: 'from-rose-500 to-red-600',
-    bgGradient: 'from-rose-50 to-red-50',
-    borderColor: 'border-rose-200',
-    textColor: 'text-rose-700',
-    description: 'Settings and user profile management modules',
-    features: ['Settings', 'Profile', 'Preferences'],
-  },
-  {
     name: 'Hopefull Admin',
     path: '/hopefull-admin',
     framework: 'React',
@@ -87,6 +39,90 @@ const demos = [
     textColor: 'text-sky-700',
     description: 'Hopefull Admin dashboard microfrontend',
     features: ['Dashboard', 'Users', 'Analytics'],
+  },
+  {
+    name: 'AssestManagement Remote',
+    path: '/assest-management',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-sky-500 to-blue-600',
+    bgGradient: 'from-sky-50 to-blue-50',
+    borderColor: 'border-sky-200',
+    textColor: 'text-sky-700',
+    description: 'AssestManagement microfrontend',
+    features: ['App'],
+  },
+  {
+    name: 'Cmms Remote',
+    path: '/cmms',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-sky-500 to-blue-600',
+    bgGradient: 'from-sky-50 to-blue-50',
+    borderColor: 'border-sky-200',
+    textColor: 'text-sky-700',
+    description: 'Cmms microfrontend',
+    features: ['App'],
+  },
+  {
+    name: 'FamilyFun',
+    path: '/family-fun',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-purple-500 to-indigo-600',
+    bgGradient: 'from-purple-50 to-indigo-50',
+    borderColor: 'border-purple-200',
+    textColor: 'text-purple-700',
+    description: 'Family events and activities platform',
+    features: ['Events', 'Merchant Portal', 'Admin'],
+  },
+  {
+    name: 'Booking Guest Portal',
+    path: '/booking-guest-portal',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-amber-500 to-orange-600',
+    bgGradient: 'from-amber-50 to-orange-50',
+    borderColor: 'border-amber-200',
+    textColor: 'text-amber-700',
+    description: 'Guest booking and property search',
+    features: ['Search', 'Booking', 'Wishlists'],
+  },
+  {
+    name: 'Booking Host Portal',
+    path: '/booking-host-portal',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-teal-500 to-cyan-600',
+    bgGradient: 'from-teal-50 to-cyan-50',
+    borderColor: 'border-teal-200',
+    textColor: 'text-teal-700',
+    description: 'Host dashboard for property management',
+    features: ['Listings', 'Calendar', 'Earnings'],
+  },
+  {
+    name: 'E-Learning Admin',
+    path: '/elearning-admin-portal',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-fuchsia-500 to-pink-600',
+    bgGradient: 'from-fuchsia-50 to-pink-50',
+    borderColor: 'border-fuchsia-200',
+    textColor: 'text-fuchsia-700',
+    description: 'Teacher and admin course management',
+    features: ['Courses', 'Analytics', 'Students'],
+  },
+  {
+    name: 'E-Learning Student',
+    path: '/elearning-student-portal',
+    framework: 'React',
+    icon: ReactIcon,
+    gradient: 'from-lime-500 to-green-600',
+    bgGradient: 'from-lime-50 to-green-50',
+    borderColor: 'border-lime-200',
+    textColor: 'text-lime-700',
+    description: 'Student learning platform',
+    features: ['Explore', 'My Courses', 'Certificates'],
   },
 ];
 
@@ -243,8 +279,8 @@ export default function Home() {
           <div className="flex gap-3">
             <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">3</div>
             <div>
-              <p className="font-medium text-slate-900">Cross-Framework</p>
-              <p className="text-slate-500">React, Vue, and Angular together</p>
+              <p className="font-medium text-slate-900">Independent Apps</p>
+              <p className="text-slate-500">Each app deploys independently</p>
             </div>
           </div>
         </div>

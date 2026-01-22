@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.tsx',
   mode: process.env.NODE_ENV || 'development',
   devServer: {
-    port: 3100,
+    port: 3105,
     hot: true,
     historyApiFallback: true,
     headers: {
@@ -47,28 +47,20 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'shell',
+      name: 'bookingGuestPortal',
       filename: 'remoteEntry.js',
-      remotes: {
-        hopefullAdmin: 'hopefullAdmin@http://localhost:3101/remoteEntry.js',
-        assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
-        cmms: 'cmms@http://localhost:3103/remoteEntry.js',
-        familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',
-        bookingGuestPortal: 'bookingGuestPortal@http://localhost:3105/remoteEntry.js',
-        bookingHostPortal: 'bookingHostPortal@http://localhost:3106/remoteEntry.js',
-        elearningAdminPortal: 'elearningAdminPortal@http://localhost:3107/remoteEntry.js',
-        elearningStudentPortal: 'elearningStudentPortal@http://localhost:3108/remoteEntry.js',
+      exposes: {
+        './App': './src/App',
+        './mount': './src/expose/mount',
       },
       shared: {
         react: {
           singleton: true,
           requiredVersion: deps.react,
-          eager: true,
         },
         'react-dom': {
           singleton: true,
           requiredVersion: deps['react-dom'],
-          eager: true,
         },
         'react-router-dom': {
           singleton: true,
@@ -77,7 +69,7 @@ module.exports = {
       },
     }),
     new HtmlWebpackPlugin({
-      template: './public/index.html',
+      template: './index.html',
     }),
   ],
 };

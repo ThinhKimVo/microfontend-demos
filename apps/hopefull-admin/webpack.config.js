@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/index.tsx',
   mode: process.env.NODE_ENV || 'development',
   devServer: {
-    port: 3105,
+    port: 3101,
     hot: true,
     historyApiFallback: true,
     headers: {

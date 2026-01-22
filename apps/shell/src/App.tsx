@@ -4,10 +4,14 @@ import Shell from './components/Layout/Shell';
 import Home from './pages/Home';
 import ErrorBoundary from './components/RemoteWrapper/ErrorBoundary';
 
-const ReactRemoteWrapper = lazy(() => import('./components/RemoteWrapper/ReactRemoteWrapper'));
-const VueRemoteWrapper = lazy(() => import('./components/RemoteWrapper/VueRemoteWrapper'));
-const AngularRemoteWrapper = lazy(() => import('./components/RemoteWrapper/AngularRemoteWrapper'));
 const HopefullAdminRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HopefullAdminRemoteWrapper'));
+const AssestManagementRemoteWrapper = lazy(() => import('./components/RemoteWrapper/AssestManagementRemoteWrapper'));
+const CmmsRemoteWrapper = lazy(() => import('./components/RemoteWrapper/CmmsRemoteWrapper'));
+const FamilyFunRemoteWrapper = lazy(() => import('./components/RemoteWrapper/FamilyFunRemoteWrapper'));
+const BookingGuestPortalRemoteWrapper = lazy(() => import('./components/RemoteWrapper/BookingGuestPortalRemoteWrapper'));
+const BookingHostPortalRemoteWrapper = lazy(() => import('./components/RemoteWrapper/BookingHostPortalRemoteWrapper'));
+const ElearningAdminPortalRemoteWrapper = lazy(() => import('./components/RemoteWrapper/ElearningAdminPortalRemoteWrapper'));
+const ElearningStudentPortalRemoteWrapper = lazy(() => import('./components/RemoteWrapper/ElearningStudentPortalRemoteWrapper'));
 
 const Loading = () => (
   <div className="flex items-center justify-center h-64" role="status" aria-label="Loading">
@@ -23,10 +27,14 @@ export default function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/react/*" element={<ReactRemoteWrapper />} />
-            <Route path="/vue/*" element={<VueRemoteWrapper />} />
-            <Route path="/angular/*" element={<AngularRemoteWrapper />} />
             <Route path="/hopefull-admin/*" element={<HopefullAdminRemoteWrapper />} />
+            <Route path="/assest-management/*" element={<AssestManagementRemoteWrapper />} />
+            <Route path="/cmms/*" element={<CmmsRemoteWrapper />} />
+            <Route path="/family-fun/*" element={<FamilyFunRemoteWrapper />} />
+            <Route path="/booking-guest-portal/*" element={<BookingGuestPortalRemoteWrapper />} />
+            <Route path="/booking-host-portal/*" element={<BookingHostPortalRemoteWrapper />} />
+            <Route path="/elearning-admin-portal/*" element={<ElearningAdminPortalRemoteWrapper />} />
+            <Route path="/elearning-student-portal/*" element={<ElearningStudentPortalRemoteWrapper />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>

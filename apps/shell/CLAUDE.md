@@ -9,15 +9,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm dev
 
 # Start individual apps
-pnpm dev:shell    # Shell host at http://localhost:3100
-pnpm dev:react    # React remote at http://localhost:3101
-pnpm dev:vue      # Vue remote at http://localhost:3102
-pnpm dev:angular  # Angular remote at http://localhost:3103
-pnpm dev:hopefull-admin    # Hopefull Admin app at http://localhost:3105
+pnpm dev:shell              # Shell host at http://localhost:3100
+pnpm dev:hopefull-admin     # Hopefull Admin at http://localhost:3101
+pnpm dev:assestmanagement   # Asset Management at http://localhost:3102
+pnpm dev:cmms               # CMMS at http://localhost:3103
+pnpm dev:familyfun          # FamilyFun at http://localhost:3104
+pnpm dev:booking-guest      # Booking Guest Portal at http://localhost:3105
+pnpm dev:booking-host       # Booking Host Portal at http://localhost:3106
+pnpm dev:elearn-admin       # E-Learning Admin at http://localhost:3107
+pnpm dev:elearn-student     # E-Learning Student at http://localhost:3108
 
 # Integrate a new remote
 pnpm integrate           # Interactive mode
 pnpm integrate:scan      # Auto-integrate all new apps from /apps
+
+# Validate React versions
+pnpm validate            # Check version compatibility
 
 # Build all apps
 pnpm build
@@ -35,20 +42,28 @@ This is a **Webpack 5 Module Federation** microfrontend monorepo. The shell app 
 | App | Port | Framework | Role |
 |-----|------|-----------|------|
 | shell | 3100 | React 18 | Host application with routing and layout |
-| react-remote | 3101 | React 18 | Exposes ProductList, CartWidget, App |
-| vue-remote | 3102 | Vue 3 | Exposes mount function, Dashboard, Charts |
-| angular-remote | 3103 | Angular 17 | Exposes mount function, SettingsComponent |
-| hopefull-admin | 3105 | React 18 | Hopefull Admin dashboard with users, analytics |
+| hopefull-admin | 3101 | React 18 | Hopefull Admin dashboard |
+| assest-management | 3102 | React 18 | Asset Management app |
+| cmms | 3103 | React 18 | CMMS app |
+| family-fun | 3104 | React 18 | Family events platform |
+| booking-guest-portal | 3105 | React 18 | Guest booking portal |
+| booking-host-portal | 3106 | React 18 | Host property management |
+| elearning-admin-portal | 3107 | React 18 | E-Learning admin portal |
+| elearning-student-portal | 3108 | React 18 | E-Learning student portal |
 
 ### Module Federation Pattern
 
 **Shell consumes remotes via webpack config:**
 ```javascript
 remotes: {
-  reactRemote: 'reactRemote@http://localhost:3101/remoteEntry.js',
-  vueRemote: 'vueRemote@http://localhost:3102/remoteEntry.js',
-  angularRemote: 'angularRemote@http://localhost:3103/remoteEntry.js',
-  hopefullAdmin: 'hopefullAdmin@http://localhost:3105/remoteEntry.js',
+  hopefullAdmin: 'hopefullAdmin@http://localhost:3101/remoteEntry.js',
+  assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
+  cmms: 'cmms@http://localhost:3103/remoteEntry.js',
+  familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',
+  bookingGuestPortal: 'bookingGuestPortal@http://localhost:3105/remoteEntry.js',
+  bookingHostPortal: 'bookingHostPortal@http://localhost:3106/remoteEntry.js',
+  elearningAdminPortal: 'elearningAdminPortal@http://localhost:3107/remoteEntry.js',
+  elearningStudentPortal: 'elearningStudentPortal@http://localhost:3108/remoteEntry.js',
 }
 ```
 
@@ -66,7 +81,7 @@ pnpm integrate
 pnpm integrate:scan
 
 # With CLI options
-node scripts/integrate-remote.js --name my-app --port 3106 --framework react
+node scripts/integrate-remote.js --name my-app --port 3109 --framework react
 ```
 
 **Scan mode** auto-detects and integrates all apps in `/apps` that have Module Federation configured. Apps using Vite or without `ModuleFederationPlugin` are skipped with a message.
@@ -79,12 +94,12 @@ The script updates:
 - `src/pages/Home.tsx` - Adds demo card
 - Root `package.json` - Adds dev script and updates main `dev` command
 
-### Cross-Framework Integration
+### Remote Integration
 
-- **React remotes**: Direct lazy imports with Suspense
-- **Vue/Angular remotes**: Manual mount/unmount pattern via exposed `mount` function
-  - Mount function called in `useEffect` with container ref
-  - Returns cleanup function for unmount
+All remotes use the mount/unmount pattern:
+- Each remote exposes a `mount` function that takes an HTML element
+- Mount function is called in `useEffect` with container ref
+- Returns cleanup function for unmount
 
 ### Key Files
 
