@@ -19,11 +19,26 @@ declare module 'assestManagement/App' {
   export default App;
 }
 
+declare module 'assestManagement/mount' {
+  interface MountOptions {
+    initialPath?: string;
+  }
+  const mount: (el: HTMLElement, options?: MountOptions) => { unmount: () => void };
+  export default mount;
+}
 
 // Cmms Remote
 declare module 'cmms/App' {
   const App: React.ComponentType;
   export default App;
+}
+
+declare module 'cmms/mount' {
+  interface MountOptions {
+    initialPath?: string;
+  }
+  const mount: (el: HTMLElement, options?: MountOptions) => { unmount: () => void };
+  export default mount;
 }
 
 // FamilyFun Remote

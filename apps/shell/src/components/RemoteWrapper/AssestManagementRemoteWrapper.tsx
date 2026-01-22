@@ -1,22 +1,32 @@
-import React, { Suspense, lazy } from 'react';
-import ErrorBoundary from './ErrorBoundary';
-
-const App = lazy(() => import('assestManagement/App'));
-
-const Loading: React.FC = () => (
-  <div className="flex items-center justify-center h-32">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600"></div>
-  </div>
-);
+import React, { useEffect, useRef } from 'react';
 
 const AssestManagementRemoteWrapper: React.FC = () => {
-  return (
-    <ErrorBoundary>
-      <Suspense fallback={<Loading />}>
-        <App />
-      </Suspense>
-    </ErrorBoundary>
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const unmountRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    const loadRemote = async () => {
+      if (!containerRef.current) return;
+
+      try {
+        const { default: mount } = await import('assestManagement/mount');
+        const { unmount } = mount(containerRef.current);
+        unmountRef.current = unmount;
+      } catch (error) {
+        console.error('Failed to load assest-management remote:', error);
+      }
+    };
+
+    loadRemote();
+
+    return () => {
+      if (unmountRef.current) {
+        unmountRef.current();
+      }
+    };
+  }, []);
+
+  return <div ref={containerRef} className="assest-management-remote-container" />;
 };
 
 export default AssestManagementRemoteWrapper;
