@@ -14,6 +14,44 @@ SERVER_USER="${SERVER_USER:-honghoang}"
 PROJECT_NAME="microfrontend"
 REMOTE_DIR="\$HOME/${PROJECT_NAME}"
 
+# App configuration: name -> "path:port:pm2_name"
+declare -A APPS=(
+    ["shell"]="apps/shell:3100:mfe-shell"
+    ["hopefull-admin"]="apps/hopefull-admin:3101:mfe-hopefull-admin"
+    ["assest-management"]="apps/assest-management:3102:mfe-assest-management"
+    ["cmms"]="apps/cmms:3103:mfe-cmms"
+    ["family-fun"]="apps/FamilyFun/frontend:3104:mfe-family-fun"
+    ["booking-guest"]="apps/BookingSystem/packages/guest-portal:3105:mfe-booking-guest"
+    ["booking-host"]="apps/BookingSystem/packages/host-portal:3106:mfe-booking-host"
+    ["elearning-admin"]="apps/elearning/admin-portal:3107:mfe-elearning-admin"
+    ["elearning-student"]="apps/elearning/student-portal:3108:mfe-elearning-student"
+)
+
+# Get app path
+get_app_path() {
+    echo "${APPS[$1]}" | cut -d: -f1
+}
+
+# Get app port
+get_app_port() {
+    echo "${APPS[$1]}" | cut -d: -f2
+}
+
+# Get app PM2 name
+get_app_pm2_name() {
+    echo "${APPS[$1]}" | cut -d: -f3
+}
+
+# List available apps
+list_apps() {
+    echo "Available apps:"
+    for app in "${!APPS[@]}"; do
+        local path=$(get_app_path "$app")
+        local port=$(get_app_port "$app")
+        printf "  %-20s (port %s)\n" "$app" "$port"
+    done | sort
+}
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -202,6 +240,144 @@ build_local() {
     cd "$PROJECT_ROOT"
 
     print_success "Build completed"
+}
+
+# Build single app
+build_single_app() {
+    local app_name="$1"
+
+    if [ -z "${APPS[$app_name]}" ]; then
+        print_error "Unknown app: $app_name"
+        list_apps
+        exit 1
+    fi
+
+    local app_path=$(get_app_path "$app_name")
+
+    print_status "Building $app_name..."
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+    cd "$PROJECT_ROOT"
+
+    # Install dependencies if needed
+    if [ ! -d "node_modules" ]; then
+        print_status "Installing dependencies..."
+        pnpm install
+    fi
+
+    export REMOTE_HOST="http://${SERVER_IP}"
+
+    cd "$app_path"
+    if [ -f "webpack.config.prod.js" ]; then
+        npx webpack --config webpack.config.prod.js
+    else
+        npx webpack --mode production
+    fi
+    cd "$PROJECT_ROOT"
+
+    print_success "Build completed for $app_name"
+}
+
+# Create single app deployment package
+create_single_app_package() {
+    local app_name="$1"
+    local app_path=$(get_app_path "$app_name")
+
+    print_status "Creating deployment package for $app_name..."
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+    cd "$PROJECT_ROOT"
+
+    TEMP_DIR=$(mktemp -d)
+    DEPLOY_ARCHIVE="$TEMP_DIR/deploy-${app_name}.tar.gz"
+
+    tar -czf "$DEPLOY_ARCHIVE" \
+        --exclude='node_modules' \
+        --exclude='.git' \
+        --exclude='*.log' \
+        "${app_path}/dist" \
+        "${app_path}/package.json"
+
+    print_success "Package created for $app_name"
+    echo "$DEPLOY_ARCHIVE"
+}
+
+# Deploy single app
+deploy_single_app() {
+    local app_name="$1"
+    local app_path=$(get_app_path "$app_name")
+    local app_port=$(get_app_port "$app_name")
+    local pm2_name=$(get_app_pm2_name "$app_name")
+
+    print_status "Deploying $app_name to ${SERVER_IP}..."
+
+    ARCHIVE_PATH=$(create_single_app_package "$app_name")
+
+    # Create remote directory
+    ssh "${SERVER_USER}@${SERVER_IP}" "mkdir -p ~/microfrontend/${app_path}"
+
+    # Upload files
+    print_status "Uploading $app_name..."
+    scp "$ARCHIVE_PATH" "${SERVER_USER}@${SERVER_IP}:~/microfrontend/deploy-${app_name}.tar.gz"
+
+    # Extract and restart on server
+    print_status "Restarting $app_name service..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+${NVM_LOADER}
+
+cd ~/microfrontend
+
+# Backup old dist
+if [ -d "${app_path}/dist" ]; then
+    rm -rf "${app_path}/dist.backup" 2>/dev/null || true
+    mv "${app_path}/dist" "${app_path}/dist.backup" 2>/dev/null || true
+fi
+
+# Extract new files
+tar -xzf deploy-${app_name}.tar.gz
+rm deploy-${app_name}.tar.gz
+
+# Install serve if needed
+cd ~/microfrontend/${app_path}
+npm install serve --save-dev 2>/dev/null || true
+
+# Restart only this app in PM2
+pm2 restart ${pm2_name} 2>/dev/null || pm2 start npx --name "${pm2_name}" -- serve dist -p ${app_port} -s --cors
+
+pm2 save
+
+echo ""
+echo "=== ${app_name} Status ==="
+pm2 show ${pm2_name}
+
+echo ""
+if ss -tuln 2>/dev/null | grep -q ":${app_port} "; then
+    echo "Port ${app_port}: OK"
+else
+    echo "Port ${app_port}: NOT LISTENING (may take a moment)"
+fi
+ENDSSH
+
+    # Cleanup
+    rm -rf "$(dirname "$ARCHIVE_PATH")"
+
+    print_success "$app_name deployed successfully!"
+    echo ""
+    echo "Access at: http://${SERVER_IP}:${app_port}"
+}
+
+# Full single app deploy (build + deploy)
+full_deploy_single_app() {
+    local app_name="$1"
+
+    check_requirements
+    test_connection
+    build_single_app "$app_name"
+    deploy_single_app "$app_name"
 }
 
 # Create deployment package
@@ -445,22 +621,30 @@ logs() {
 
 # Usage
 usage() {
-    echo "Usage: $0 [command]"
+    echo "Usage: $0 [command] [app-name]"
     echo ""
     echo "Commands:"
-    echo "  deploy      - Build locally and deploy to server (default)"
-    echo "  status      - Check service status"
-    echo "  start       - Start services"
-    echo "  stop        - Stop services"
-    echo "  restart     - Restart services"
-    echo "  logs        - View PM2 logs"
-    echo "  setup       - Show server setup instructions"
-    echo "  setup-nginx - Setup Nginx reverse proxy (port 80 -> 3100)"
+    echo "  deploy           - Build and deploy ALL apps (default)"
+    echo "  deploy:app NAME  - Build and deploy a single app"
+    echo "  status           - Check service status"
+    echo "  start            - Start services"
+    echo "  stop             - Stop services"
+    echo "  restart          - Restart services"
+    echo "  restart:app NAME - Restart a single app"
+    echo "  logs             - View PM2 logs"
+    echo "  logs:app NAME    - View logs for a single app"
+    echo "  list             - List available apps"
+    echo "  setup            - Show server setup instructions"
+    echo "  setup-nginx      - Setup Nginx reverse proxy (port 80 -> 3100)"
     echo ""
     echo "Examples:"
-    echo "  $0 deploy"
-    echo "  $0 setup-nginx"
-    echo "  $0 status"
+    echo "  $0 deploy              # Deploy all apps"
+    echo "  $0 deploy:app shell    # Deploy only shell"
+    echo "  $0 deploy:app cmms     # Deploy only cmms"
+    echo "  $0 restart:app shell   # Restart only shell"
+    echo "  $0 list                # Show available apps"
+    echo ""
+    list_apps
 }
 
 # Server setup instructions
@@ -550,11 +734,56 @@ ENDSSH
     echo "  sudo nginx -t && sudo systemctl reload nginx"
 }
 
+# Restart single app
+restart_single_app() {
+    local app_name="$1"
+
+    if [ -z "${APPS[$app_name]}" ]; then
+        print_error "Unknown app: $app_name"
+        list_apps
+        exit 1
+    fi
+
+    local pm2_name=$(get_app_pm2_name "$app_name")
+
+    print_status "Restarting $app_name..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+${NVM_LOADER}
+pm2 restart ${pm2_name}
+pm2 show ${pm2_name}
+ENDSSH
+    print_success "$app_name restarted"
+}
+
+# View logs for single app
+logs_single_app() {
+    local app_name="$1"
+
+    if [ -z "${APPS[$app_name]}" ]; then
+        print_error "Unknown app: $app_name"
+        list_apps
+        exit 1
+    fi
+
+    local pm2_name=$(get_app_pm2_name "$app_name")
+
+    print_status "Streaming logs for $app_name..."
+    ssh -t "${SERVER_USER}@${SERVER_IP}" "bash -c 'source ~/.nvm/nvm.sh 2>/dev/null; pm2 logs ${pm2_name}'"
+}
+
 # Main
 main() {
     case "${1:-deploy}" in
         deploy)
             full_deploy
+            ;;
+        deploy:app)
+            if [ -z "$2" ]; then
+                print_error "App name required"
+                list_apps
+                exit 1
+            fi
+            full_deploy_single_app "$2"
             ;;
         status)
             status
@@ -568,8 +797,27 @@ main() {
         restart)
             restart
             ;;
+        restart:app)
+            if [ -z "$2" ]; then
+                print_error "App name required"
+                list_apps
+                exit 1
+            fi
+            restart_single_app "$2"
+            ;;
         logs)
             logs
+            ;;
+        logs:app)
+            if [ -z "$2" ]; then
+                print_error "App name required"
+                list_apps
+                exit 1
+            fi
+            logs_single_app "$2"
+            ;;
+        list)
+            list_apps
             ;;
         setup)
             setup_instructions
