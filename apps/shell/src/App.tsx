@@ -13,8 +13,8 @@ const BookingHostPortalRemoteWrapper = lazy(() => import('./components/RemoteWra
 const ElearningAdminPortalRemoteWrapper = lazy(() => import('./components/RemoteWrapper/ElearningAdminPortalRemoteWrapper'));
 const ElearningStudentPortalRemoteWrapper = lazy(() => import('./components/RemoteWrapper/ElearningStudentPortalRemoteWrapper'));
 
-const Loading = () => (
-  <div className="flex items-center justify-center h-64" role="status" aria-label="Loading">
+const FullPageLoading = () => (
+  <div className="flex items-center justify-center min-h-screen bg-slate-50" role="status" aria-label="Loading">
     <div className="motion-safe:animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-hidden="true"></div>
     <span className="sr-only">Loading…</span>
   </div>
@@ -22,22 +22,57 @@ const Loading = () => (
 
 export default function App() {
   return (
-    <Shell>
-      <ErrorBoundary>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/hopefull-admin/*" element={<HopefullAdminRemoteWrapper />} />
-            <Route path="/assest-management/*" element={<AssestManagementRemoteWrapper />} />
-            <Route path="/cmms/*" element={<CmmsRemoteWrapper />} />
-            <Route path="/family-fun/*" element={<FamilyFunRemoteWrapper />} />
-            <Route path="/booking-guest-portal/*" element={<BookingGuestPortalRemoteWrapper />} />
-            <Route path="/booking-host-portal/*" element={<BookingHostPortalRemoteWrapper />} />
-            <Route path="/elearning-admin-portal/*" element={<ElearningAdminPortalRemoteWrapper />} />
-            <Route path="/elearning-student-portal/*" element={<ElearningStudentPortalRemoteWrapper />} />
-          </Routes>
-        </Suspense>
-      </ErrorBoundary>
-    </Shell>
+    <ErrorBoundary>
+      <Routes>
+        {/* Home page with Shell layout */}
+        <Route path="/" element={
+          <Shell>
+            <Home />
+          </Shell>
+        } />
+
+        {/* Full-page remote apps - no Shell constraint */}
+        <Route path="/hopefull-admin/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <HopefullAdminRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/assest-management/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <AssestManagementRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/cmms/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <CmmsRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/family-fun/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <FamilyFunRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/booking-guest-portal/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <BookingGuestPortalRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/booking-host-portal/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <BookingHostPortalRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/elearning-admin-portal/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <ElearningAdminPortalRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/elearning-student-portal/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <ElearningStudentPortalRemoteWrapper />
+          </Suspense>
+        } />
+      </Routes>
+    </ErrorBoundary>
   );
 }
