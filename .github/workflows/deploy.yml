@@ -22,7 +22,7 @@ env:
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       shell: ${{ steps.changes.outputs.shell }}
       hopefull-admin: ${{ steps.changes.outputs.hopefull-admin }}
@@ -164,7 +164,7 @@ jobs:
   build-and-deploy:
     needs: detect-changes
     if: needs.detect-changes.outputs.has-changes == 'true'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
