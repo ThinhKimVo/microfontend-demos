@@ -31,12 +31,13 @@ export default function Shell({ children }: ShellProps) {
                   <BackIcon />
                 </Link>
               )}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">MF</span>
-                </div>
-                <span className="font-semibold text-slate-900">Microfrontend Demo</span>
-              </div>
+              <Link to="/" className="flex items-center">
+                <img
+                  src="/logo-black.svg"
+                  alt="Saigon Technology"
+                  className="h-8 w-auto"
+                />
+              </Link>
             </div>
             {isHome && (
               <div className="flex items-center gap-2 text-sm text-slate-500">

@@ -28,8 +28,7 @@ export default function Home() {
     return (
       app.name.toLowerCase().includes(query) ||
       app.framework.toLowerCase().includes(query) ||
-      app.description.toLowerCase().includes(query) ||
-      app.features.some((f) => f.name.toLowerCase().includes(query))
+      app.description.toLowerCase().includes(query)
     );
   });
 
@@ -38,11 +37,13 @@ export default function Home() {
       {/* Hero Section */}
       <div className="text-center py-8">
         <h1 className="text-4xl font-bold text-slate-900 mb-4 text-balance">
-          Microfrontend Demo Platform
+          Saigon Technology Solution Demos
         </h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-          Explore Webpack 5 Module Federation with cross-framework microfrontends.
-          Each remote application runs independently and integrates seamlessly at runtime.
+        <p className="text-xl text-indigo-600 font-medium mb-2">
+          Your Trusted Partner for Enterprise Software Development
+        </p>
+        <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+          These demo applications showcase our expertise in building scalable, maintainable, and independently deployable enterprise solutions.
         </p>
 
         {/* Search Bar */}
@@ -52,17 +53,19 @@ export default function Home() {
               <SearchIcon />
             </div>
             <input
-              type="text"
+              type="search"
+              name="app-search"
+              autoComplete="off"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search apps by name, framework, or feature..."
-              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent transition-shadow"
               aria-label="Search apps"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:text-slate-600"
                 aria-label="Clear search"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -72,7 +75,7 @@ export default function Home() {
             )}
           </div>
           {search && (
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-500" aria-live="polite">
               {filteredApps.length} {filteredApps.length === 1 ? 'result' : 'results'} found
             </p>
           )}
@@ -85,7 +88,7 @@ export default function Home() {
           <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <SearchIcon />
           </div>
-          <h3 className="text-lg font-medium text-slate-900 mb-1">No apps found</h3>
+          <h2 className="text-lg font-medium text-slate-900 mb-1">No apps found</h2>
           <p className="text-slate-500">Try adjusting your search terms</p>
         </div>
       ) : (
@@ -93,7 +96,7 @@ export default function Home() {
         {filteredApps.map((app) => (
           <article
             key={app.id}
-            className={`group relative bg-gradient-to-br ${app.bgGradient} rounded-2xl border ${app.borderColor} overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1`}
+            className={`group relative bg-gradient-to-br ${app.bgGradient} rounded-2xl border ${app.borderColor} overflow-hidden transition-[transform,box-shadow] duration-300 motion-safe:hover:shadow-xl motion-safe:hover:shadow-slate-200/50 motion-safe:hover:-translate-y-1`}
           >
             {/* Card Header */}
             <div className={`bg-gradient-to-r ${app.gradient} p-6 text-white`}>
@@ -110,28 +113,21 @@ export default function Home() {
                 {app.description}
               </p>
 
-              {/* Features */}
+              {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-6">
-                {app.features.slice(0, 3).map((feature) => (
-                  <span
-                    key={feature.name}
-                    className={`text-xs font-medium ${app.textColor} bg-white px-2.5 py-1 rounded-full border ${app.borderColor}`}
-                  >
-                    {feature.name}
-                  </span>
-                ))}
-                {app.features.length > 3 && (
-                  <span className={`text-xs font-medium ${app.textColor} bg-white px-2.5 py-1 rounded-full border ${app.borderColor}`}>
-                    +{app.features.length - 3} more
-                  </span>
-                )}
+                <span className={`text-xs font-medium ${app.textColor} bg-white px-2.5 py-1 rounded-full border ${app.borderColor}`}>
+                  {app.framework}
+                </span>
+                <span className={`text-xs font-medium ${app.textColor} bg-white px-2.5 py-1 rounded-full border ${app.borderColor}`}>
+                  v{app.version}
+                </span>
               </div>
 
               {/* Actions */}
               <div className="flex items-center gap-3">
                 <Link
                   to={`/app/${app.id}`}
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${app.gradient} text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${app.gradient} text-white text-sm font-medium rounded-xl transition-shadow duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
                 >
                   View Details
                   <ArrowIcon />
@@ -145,30 +141,47 @@ export default function Home() {
 
       {/* Info Section */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 mt-8">
-        <h3 className="text-lg font-semibold text-slate-900 mb-3">How it works</h3>
+        <h2 className="text-lg font-semibold text-slate-900 mb-3">Why Choose Saigon Technology?</h2>
         <div className="grid sm:grid-cols-3 gap-4 text-sm">
           <div className="flex gap-3">
             <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">1</div>
             <div>
-              <p className="font-medium text-slate-900">Shell Host</p>
-              <p className="text-slate-500">Loads remotes dynamically at runtime</p>
+              <p className="font-medium text-slate-900">Proven Expertise</p>
+              <p className="text-slate-500">15+ years delivering enterprise-grade solutions</p>
             </div>
           </div>
           <div className="flex gap-3">
             <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">2</div>
             <div>
-              <p className="font-medium text-slate-900">Module Federation</p>
-              <p className="text-slate-500">Webpack 5 shares dependencies</p>
+              <p className="font-medium text-slate-900">Modern Architecture</p>
+              <p className="text-slate-500">Scalable microfrontend & microservices design</p>
             </div>
           </div>
           <div className="flex gap-3">
             <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold flex-shrink-0">3</div>
             <div>
-              <p className="font-medium text-slate-900">Independent Apps</p>
-              <p className="text-slate-500">Each app deploys independently</p>
+              <p className="font-medium text-slate-900">Dedicated Teams</p>
+              <p className="text-slate-500">Flexible engagement models for your needs</p>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-center text-white">
+        <h2 className="text-2xl font-bold mb-2 text-balance">Ready to Build Your Next Project?</h2>
+        <p className="text-indigo-100 mb-6 max-w-2xl mx-auto">
+          Partner with Saigon Technology to transform your ideas into powerful, scalable applications.
+        </p>
+        <a
+          href="https://saigontechnology.com/contact/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-600"
+        >
+          Contact Us Today
+          <ArrowIcon />
+        </a>
       </div>
     </div>
   );
