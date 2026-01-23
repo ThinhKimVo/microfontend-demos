@@ -1,0 +1,198 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  SERVER_IP: '10.30.10.18'
+  SERVER_USER: 'honghoang'
+  REMOTE_HOST: 'http://10.30.10.18'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all apps
+        run: |
+          export REMOTE_HOST=${{ env.REMOTE_HOST }}
+
+          echo "Building shell..."
+          cd apps/shell
+          if [ -f "webpack.config.prod.js" ]; then
+            npx webpack --config webpack.config.prod.js
+          else
+            npm run build
+          fi
+          cd ../..
+
+          echo "Building hopefull-admin..."
+          cd apps/hopefull-admin
+          if [ -f "webpack.config.prod.js" ]; then
+            npx webpack --config webpack.config.prod.js
+          else
+            npx webpack --mode production
+          fi
+          cd ../..
+
+          echo "Building assest-management..."
+          cd apps/assest-management
+          npx webpack --mode production
+          cd ../..
+
+          echo "Building cmms..."
+          cd apps/cmms
+          npx webpack --mode production
+          cd ../..
+
+          echo "Building FamilyFun..."
+          cd apps/FamilyFun/frontend
+          npx webpack --mode production
+          cd ../../..
+
+          echo "Building booking-guest-portal..."
+          cd apps/BookingSystem/packages/guest-portal
+          npx webpack --mode production
+          cd ../../../..
+
+          echo "Building booking-host-portal..."
+          cd apps/BookingSystem/packages/host-portal
+          npx webpack --mode production
+          cd ../../../..
+
+          echo "Building elearning-admin-portal..."
+          cd apps/elearning/admin-portal
+          npx webpack --mode production
+          cd ../../..
+
+          echo "Building elearning-student-portal..."
+          cd apps/elearning/student-portal
+          npx webpack --mode production
+          cd ../../..
+
+      - name: Create deployment package
+        run: |
+          tar -czf deploy.tar.gz \
+            apps/shell/dist \
+            apps/hopefull-admin/dist \
+            apps/assest-management/dist \
+            apps/cmms/dist \
+            apps/FamilyFun/frontend/dist \
+            apps/BookingSystem/packages/guest-portal/dist \
+            apps/BookingSystem/packages/host-portal/dist \
+            apps/elearning/admin-portal/dist \
+            apps/elearning/student-portal/dist \
+            apps/shell/package.json \
+            apps/hopefull-admin/package.json \
+            apps/assest-management/package.json \
+            apps/cmms/package.json \
+            apps/FamilyFun/frontend/package.json \
+            apps/BookingSystem/packages/guest-portal/package.json \
+            apps/BookingSystem/packages/host-portal/package.json \
+            apps/elearning/admin-portal/package.json \
+            apps/elearning/student-portal/package.json \
+            ecosystem.config.js \
+            package.json
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          # Upload package
+          scp deploy.tar.gz ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:~/microfrontend/deploy.tar.gz
+
+          # Deploy on server
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'ENDSSH'
+          # Load nvm
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+          cd ~/microfrontend
+
+          # Backup and extract
+          for app in shell hopefull-admin assest-management cmms; do
+            if [ -d "apps/${app}/dist" ]; then
+              rm -rf "apps/${app}/dist.backup" 2>/dev/null || true
+              mv "apps/${app}/dist" "apps/${app}/dist.backup" 2>/dev/null || true
+            fi
+          done
+
+          for nested_app in "FamilyFun/frontend" "BookingSystem/packages/guest-portal" "BookingSystem/packages/host-portal" "elearning/admin-portal" "elearning/student-portal"; do
+            if [ -d "apps/${nested_app}/dist" ]; then
+              rm -rf "apps/${nested_app}/dist.backup" 2>/dev/null || true
+              mv "apps/${nested_app}/dist" "apps/${nested_app}/dist.backup" 2>/dev/null || true
+            fi
+          done
+
+          tar -xzf deploy.tar.gz
+          rm deploy.tar.gz
+
+          # Restart PM2 services
+          pm2 restart all || pm2 start ecosystem.config.js
+          pm2 save
+
+          echo "Deployment completed!"
+          pm2 list
+          ENDSSH
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Server:** ${{ env.SERVER_IP }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** master" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Access URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- Shell: http://${{ env.SERVER_IP }}:3100" >> $GITHUB_STEP_SUMMARY
+          echo "- Hopefull Admin: http://${{ env.SERVER_IP }}:3101" >> $GITHUB_STEP_SUMMARY
+          echo "- Asset Management: http://${{ env.SERVER_IP }}:3102" >> $GITHUB_STEP_SUMMARY
+          echo "- CMMS: http://${{ env.SERVER_IP }}:3103" >> $GITHUB_STEP_SUMMARY
+          echo "- FamilyFun: http://${{ env.SERVER_IP }}:3104" >> $GITHUB_STEP_SUMMARY
+          echo "- Booking Guest: http://${{ env.SERVER_IP }}:3105" >> $GITHUB_STEP_SUMMARY
+          echo "- Booking Host: http://${{ env.SERVER_IP }}:3106" >> $GITHUB_STEP_SUMMARY
+          echo "- E-Learning Admin: http://${{ env.SERVER_IP }}:3107" >> $GITHUB_STEP_SUMMARY
+          echo "- E-Learning Student: http://${{ env.SERVER_IP }}:3108" >> $GITHUB_STEP_SUMMARY
