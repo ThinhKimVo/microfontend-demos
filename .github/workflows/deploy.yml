@@ -7,6 +7,12 @@ on:
 
   # Allow manual trigger
   workflow_dispatch:
+    inputs:
+      force_all:
+        description: 'Force build all apps'
+        required: false
+        default: false
+        type: boolean
 
 env:
   NODE_VERSION: '18'
@@ -15,7 +21,149 @@ env:
   REMOTE_HOST: 'http://10.30.10.18'
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      shell: ${{ steps.changes.outputs.shell }}
+      hopefull-admin: ${{ steps.changes.outputs.hopefull-admin }}
+      assest-management: ${{ steps.changes.outputs.assest-management }}
+      cmms: ${{ steps.changes.outputs.cmms }}
+      familyfun: ${{ steps.changes.outputs.familyfun }}
+      booking-guest: ${{ steps.changes.outputs.booking-guest }}
+      booking-host: ${{ steps.changes.outputs.booking-host }}
+      elearning-admin: ${{ steps.changes.outputs.elearning-admin }}
+      elearning-student: ${{ steps.changes.outputs.elearning-student }}
+      any-remote-changed: ${{ steps.changes.outputs.any-remote-changed }}
+      has-changes: ${{ steps.changes.outputs.has-changes }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed apps
+        id: changes
+        run: |
+          if [ "${{ github.event.inputs.force_all }}" == "true" ]; then
+            echo "Force build all apps"
+            echo "shell=true" >> $GITHUB_OUTPUT
+            echo "hopefull-admin=true" >> $GITHUB_OUTPUT
+            echo "assest-management=true" >> $GITHUB_OUTPUT
+            echo "cmms=true" >> $GITHUB_OUTPUT
+            echo "familyfun=true" >> $GITHUB_OUTPUT
+            echo "booking-guest=true" >> $GITHUB_OUTPUT
+            echo "booking-host=true" >> $GITHUB_OUTPUT
+            echo "elearning-admin=true" >> $GITHUB_OUTPUT
+            echo "elearning-student=true" >> $GITHUB_OUTPUT
+            echo "any-remote-changed=true" >> $GITHUB_OUTPUT
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Get changed files between current and previous commit
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git diff --name-only HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Check each app for changes
+          SHELL_CHANGED=false
+          HOPEFULL_CHANGED=false
+          ASSEST_CHANGED=false
+          CMMS_CHANGED=false
+          FAMILYFUN_CHANGED=false
+          BOOKING_GUEST_CHANGED=false
+          BOOKING_HOST_CHANGED=false
+          ELEARNING_ADMIN_CHANGED=false
+          ELEARNING_STUDENT_CHANGED=false
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/shell/"; then
+            SHELL_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/hopefull-admin/"; then
+            HOPEFULL_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/assest-management/"; then
+            ASSEST_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/cmms/"; then
+            CMMS_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/FamilyFun/"; then
+            FAMILYFUN_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/BookingSystem/packages/guest-portal/"; then
+            BOOKING_GUEST_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/BookingSystem/packages/host-portal/"; then
+            BOOKING_HOST_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/elearning/admin-portal/"; then
+            ELEARNING_ADMIN_CHANGED=true
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^apps/elearning/student-portal/"; then
+            ELEARNING_STUDENT_CHANGED=true
+          fi
+
+          # Check if any remote app changed (shell needs rebuild if remotes change)
+          ANY_REMOTE_CHANGED=false
+          if [ "$HOPEFULL_CHANGED" = "true" ] || [ "$ASSEST_CHANGED" = "true" ] || \
+             [ "$CMMS_CHANGED" = "true" ] || [ "$FAMILYFUN_CHANGED" = "true" ] || \
+             [ "$BOOKING_GUEST_CHANGED" = "true" ] || [ "$BOOKING_HOST_CHANGED" = "true" ] || \
+             [ "$ELEARNING_ADMIN_CHANGED" = "true" ] || [ "$ELEARNING_STUDENT_CHANGED" = "true" ]; then
+            ANY_REMOTE_CHANGED=true
+          fi
+
+          # Check if there are any changes to deploy
+          HAS_CHANGES=false
+          if [ "$SHELL_CHANGED" = "true" ] || [ "$ANY_REMOTE_CHANGED" = "true" ]; then
+            HAS_CHANGES=true
+          fi
+
+          # Also check for root-level changes that affect all apps
+          if echo "$CHANGED_FILES" | grep -q "^package.json$\|^pnpm-lock.yaml$\|^pnpm-workspace.yaml$"; then
+            echo "Root config changed, building all"
+            SHELL_CHANGED=true
+            HOPEFULL_CHANGED=true
+            ASSEST_CHANGED=true
+            CMMS_CHANGED=true
+            FAMILYFUN_CHANGED=true
+            BOOKING_GUEST_CHANGED=true
+            BOOKING_HOST_CHANGED=true
+            ELEARNING_ADMIN_CHANGED=true
+            ELEARNING_STUDENT_CHANGED=true
+            ANY_REMOTE_CHANGED=true
+            HAS_CHANGES=true
+          fi
+
+          echo "shell=$SHELL_CHANGED" >> $GITHUB_OUTPUT
+          echo "hopefull-admin=$HOPEFULL_CHANGED" >> $GITHUB_OUTPUT
+          echo "assest-management=$ASSEST_CHANGED" >> $GITHUB_OUTPUT
+          echo "cmms=$CMMS_CHANGED" >> $GITHUB_OUTPUT
+          echo "familyfun=$FAMILYFUN_CHANGED" >> $GITHUB_OUTPUT
+          echo "booking-guest=$BOOKING_GUEST_CHANGED" >> $GITHUB_OUTPUT
+          echo "booking-host=$BOOKING_HOST_CHANGED" >> $GITHUB_OUTPUT
+          echo "elearning-admin=$ELEARNING_ADMIN_CHANGED" >> $GITHUB_OUTPUT
+          echo "elearning-student=$ELEARNING_STUDENT_CHANGED" >> $GITHUB_OUTPUT
+          echo "any-remote-changed=$ANY_REMOTE_CHANGED" >> $GITHUB_OUTPUT
+          echo "has-changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
+
+          echo "---"
+          echo "Summary:"
+          echo "  Shell: $SHELL_CHANGED"
+          echo "  Hopefull Admin: $HOPEFULL_CHANGED"
+          echo "  Asset Management: $ASSEST_CHANGED"
+          echo "  CMMS: $CMMS_CHANGED"
+          echo "  FamilyFun: $FAMILYFUN_CHANGED"
+          echo "  Booking Guest: $BOOKING_GUEST_CHANGED"
+          echo "  Booking Host: $BOOKING_HOST_CHANGED"
+          echo "  E-Learning Admin: $ELEARNING_ADMIN_CHANGED"
+          echo "  E-Learning Student: $ELEARNING_STUDENT_CHANGED"
+          echo "  Any Remote Changed: $ANY_REMOTE_CHANGED"
+          echo "  Has Changes: $HAS_CHANGES"
+
   build-and-deploy:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-changes == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -48,86 +196,131 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build all apps
+      - name: Build changed apps
         run: |
           export REMOTE_HOST=${{ env.REMOTE_HOST }}
 
-          echo "Building shell..."
-          cd apps/shell
-          if [ -f "webpack.config.prod.js" ]; then
-            npx webpack --config webpack.config.prod.js
-          else
-            npm run build
+          # Build shell if it changed OR if any remote changed
+          if [ "${{ needs.detect-changes.outputs.shell }}" == "true" ] || [ "${{ needs.detect-changes.outputs.any-remote-changed }}" == "true" ]; then
+            echo "Building shell..."
+            cd apps/shell
+            if [ -f "webpack.config.prod.js" ]; then
+              npx webpack --config webpack.config.prod.js
+            else
+              npm run build
+            fi
+            cd ../..
           fi
-          cd ../..
 
-          echo "Building hopefull-admin..."
-          cd apps/hopefull-admin
-          if [ -f "webpack.config.prod.js" ]; then
-            npx webpack --config webpack.config.prod.js
-          else
+          if [ "${{ needs.detect-changes.outputs.hopefull-admin }}" == "true" ]; then
+            echo "Building hopefull-admin..."
+            cd apps/hopefull-admin
+            if [ -f "webpack.config.prod.js" ]; then
+              npx webpack --config webpack.config.prod.js
+            else
+              npx webpack --mode production
+            fi
+            cd ../..
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.assest-management }}" == "true" ]; then
+            echo "Building assest-management..."
+            cd apps/assest-management
             npx webpack --mode production
+            cd ../..
           fi
-          cd ../..
 
-          echo "Building assest-management..."
-          cd apps/assest-management
-          npx webpack --mode production
-          cd ../..
+          if [ "${{ needs.detect-changes.outputs.cmms }}" == "true" ]; then
+            echo "Building cmms..."
+            cd apps/cmms
+            npx webpack --mode production
+            cd ../..
+          fi
 
-          echo "Building cmms..."
-          cd apps/cmms
-          npx webpack --mode production
-          cd ../..
+          if [ "${{ needs.detect-changes.outputs.familyfun }}" == "true" ]; then
+            echo "Building FamilyFun..."
+            cd apps/FamilyFun/frontend
+            npx webpack --mode production
+            cd ../../..
+          fi
 
-          echo "Building FamilyFun..."
-          cd apps/FamilyFun/frontend
-          npx webpack --mode production
-          cd ../../..
+          if [ "${{ needs.detect-changes.outputs.booking-guest }}" == "true" ]; then
+            echo "Building booking-guest-portal..."
+            cd apps/BookingSystem/packages/guest-portal
+            npx webpack --mode production
+            cd ../../../..
+          fi
 
-          echo "Building booking-guest-portal..."
-          cd apps/BookingSystem/packages/guest-portal
-          npx webpack --mode production
-          cd ../../../..
+          if [ "${{ needs.detect-changes.outputs.booking-host }}" == "true" ]; then
+            echo "Building booking-host-portal..."
+            cd apps/BookingSystem/packages/host-portal
+            npx webpack --mode production
+            cd ../../../..
+          fi
 
-          echo "Building booking-host-portal..."
-          cd apps/BookingSystem/packages/host-portal
-          npx webpack --mode production
-          cd ../../../..
+          if [ "${{ needs.detect-changes.outputs.elearning-admin }}" == "true" ]; then
+            echo "Building elearning-admin-portal..."
+            cd apps/elearning/admin-portal
+            npx webpack --mode production
+            cd ../../..
+          fi
 
-          echo "Building elearning-admin-portal..."
-          cd apps/elearning/admin-portal
-          npx webpack --mode production
-          cd ../../..
+          if [ "${{ needs.detect-changes.outputs.elearning-student }}" == "true" ]; then
+            echo "Building elearning-student-portal..."
+            cd apps/elearning/student-portal
+            npx webpack --mode production
+            cd ../../..
+          fi
 
-          echo "Building elearning-student-portal..."
-          cd apps/elearning/student-portal
-          npx webpack --mode production
-          cd ../../..
+          echo "Build complete!"
 
       - name: Create deployment package
         run: |
-          tar -czf deploy.tar.gz \
-            apps/shell/dist \
-            apps/hopefull-admin/dist \
-            apps/assest-management/dist \
-            apps/cmms/dist \
-            apps/FamilyFun/frontend/dist \
-            apps/BookingSystem/packages/guest-portal/dist \
-            apps/BookingSystem/packages/host-portal/dist \
-            apps/elearning/admin-portal/dist \
-            apps/elearning/student-portal/dist \
-            apps/shell/package.json \
-            apps/hopefull-admin/package.json \
-            apps/assest-management/package.json \
-            apps/cmms/package.json \
-            apps/FamilyFun/frontend/package.json \
-            apps/BookingSystem/packages/guest-portal/package.json \
-            apps/BookingSystem/packages/host-portal/package.json \
-            apps/elearning/admin-portal/package.json \
-            apps/elearning/student-portal/package.json \
-            ecosystem.config.js \
-            package.json
+          # Build list of changed apps to include
+          INCLUDE_PATHS=""
+
+          # Shell (built if changed or any remote changed)
+          if [ "${{ needs.detect-changes.outputs.shell }}" == "true" ] || [ "${{ needs.detect-changes.outputs.any-remote-changed }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/shell/dist apps/shell/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.hopefull-admin }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/hopefull-admin/dist apps/hopefull-admin/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.assest-management }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/assest-management/dist apps/assest-management/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.cmms }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/cmms/dist apps/cmms/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.familyfun }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/FamilyFun/frontend/dist apps/FamilyFun/frontend/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.booking-guest }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/BookingSystem/packages/guest-portal/dist apps/BookingSystem/packages/guest-portal/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.booking-host }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/BookingSystem/packages/host-portal/dist apps/BookingSystem/packages/host-portal/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.elearning-admin }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/elearning/admin-portal/dist apps/elearning/admin-portal/package.json"
+          fi
+
+          if [ "${{ needs.detect-changes.outputs.elearning-student }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/elearning/student-portal/dist apps/elearning/student-portal/package.json"
+          fi
+
+          # Always include ecosystem config and root package.json
+          INCLUDE_PATHS="$INCLUDE_PATHS ecosystem.config.js package.json"
+
+          echo "Creating deployment package with: $INCLUDE_PATHS"
+          tar -czf deploy.tar.gz $INCLUDE_PATHS
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.8.0
@@ -140,38 +333,103 @@ jobs:
           ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to server
+        env:
+          SHELL_CHANGED: ${{ needs.detect-changes.outputs.shell == 'true' || needs.detect-changes.outputs.any-remote-changed == 'true' }}
+          HOPEFULL_CHANGED: ${{ needs.detect-changes.outputs.hopefull-admin }}
+          ASSEST_CHANGED: ${{ needs.detect-changes.outputs.assest-management }}
+          CMMS_CHANGED: ${{ needs.detect-changes.outputs.cmms }}
+          FAMILYFUN_CHANGED: ${{ needs.detect-changes.outputs.familyfun }}
+          BOOKING_GUEST_CHANGED: ${{ needs.detect-changes.outputs.booking-guest }}
+          BOOKING_HOST_CHANGED: ${{ needs.detect-changes.outputs.booking-host }}
+          ELEARNING_ADMIN_CHANGED: ${{ needs.detect-changes.outputs.elearning-admin }}
+          ELEARNING_STUDENT_CHANGED: ${{ needs.detect-changes.outputs.elearning-student }}
         run: |
           # Upload package
           scp deploy.tar.gz ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:~/microfrontend/deploy.tar.gz
 
           # Deploy on server
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'ENDSSH'
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << ENDSSH
           # Load nvm
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          export NVM_DIR="\$HOME/.nvm"
+          [ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"
 
           cd ~/microfrontend
 
-          # Backup and extract
-          for app in shell hopefull-admin assest-management cmms; do
-            if [ -d "apps/${app}/dist" ]; then
-              rm -rf "apps/${app}/dist.backup" 2>/dev/null || true
-              mv "apps/${app}/dist" "apps/${app}/dist.backup" 2>/dev/null || true
+          # Backup only the apps being deployed
+          backup_app() {
+            local app_path="\$1"
+            if [ -d "apps/\${app_path}/dist" ]; then
+              rm -rf "apps/\${app_path}/dist.backup" 2>/dev/null || true
+              mv "apps/\${app_path}/dist" "apps/\${app_path}/dist.backup" 2>/dev/null || true
             fi
-          done
+          }
 
-          for nested_app in "FamilyFun/frontend" "BookingSystem/packages/guest-portal" "BookingSystem/packages/host-portal" "elearning/admin-portal" "elearning/student-portal"; do
-            if [ -d "apps/${nested_app}/dist" ]; then
-              rm -rf "apps/${nested_app}/dist.backup" 2>/dev/null || true
-              mv "apps/${nested_app}/dist" "apps/${nested_app}/dist.backup" 2>/dev/null || true
-            fi
-          done
+          if [ "$SHELL_CHANGED" == "true" ]; then
+            backup_app "shell"
+          fi
+          if [ "$HOPEFULL_CHANGED" == "true" ]; then
+            backup_app "hopefull-admin"
+          fi
+          if [ "$ASSEST_CHANGED" == "true" ]; then
+            backup_app "assest-management"
+          fi
+          if [ "$CMMS_CHANGED" == "true" ]; then
+            backup_app "cmms"
+          fi
+          if [ "$FAMILYFUN_CHANGED" == "true" ]; then
+            backup_app "FamilyFun/frontend"
+          fi
+          if [ "$BOOKING_GUEST_CHANGED" == "true" ]; then
+            backup_app "BookingSystem/packages/guest-portal"
+          fi
+          if [ "$BOOKING_HOST_CHANGED" == "true" ]; then
+            backup_app "BookingSystem/packages/host-portal"
+          fi
+          if [ "$ELEARNING_ADMIN_CHANGED" == "true" ]; then
+            backup_app "elearning/admin-portal"
+          fi
+          if [ "$ELEARNING_STUDENT_CHANGED" == "true" ]; then
+            backup_app "elearning/student-portal"
+          fi
 
+          # Extract new dist folders
           tar -xzf deploy.tar.gz
           rm deploy.tar.gz
 
-          # Restart PM2 services
-          pm2 restart all || pm2 start ecosystem.config.js
+          # Restart only changed PM2 services
+          RESTART_APPS=""
+          if [ "$SHELL_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS shell"
+          fi
+          if [ "$HOPEFULL_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS hopefull-admin"
+          fi
+          if [ "$ASSEST_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS assest-management"
+          fi
+          if [ "$CMMS_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS cmms"
+          fi
+          if [ "$FAMILYFUN_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS family-fun"
+          fi
+          if [ "$BOOKING_GUEST_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS booking-guest-portal"
+          fi
+          if [ "$BOOKING_HOST_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS booking-host-portal"
+          fi
+          if [ "$ELEARNING_ADMIN_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS elearning-admin-portal"
+          fi
+          if [ "$ELEARNING_STUDENT_CHANGED" == "true" ]; then
+            RESTART_APPS="\$RESTART_APPS elearning-student-portal"
+          fi
+
+          echo "Restarting apps:\$RESTART_APPS"
+          for app in \$RESTART_APPS; do
+            pm2 restart \$app || echo "Warning: Failed to restart \$app"
+          done
           pm2 save
 
           echo "Deployment completed!"
@@ -186,13 +444,32 @@ jobs:
           echo "- **Branch:** master" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Access URLs" >> $GITHUB_STEP_SUMMARY
-          echo "- Shell: http://${{ env.SERVER_IP }}:3100" >> $GITHUB_STEP_SUMMARY
-          echo "- Hopefull Admin: http://${{ env.SERVER_IP }}:3101" >> $GITHUB_STEP_SUMMARY
-          echo "- Asset Management: http://${{ env.SERVER_IP }}:3102" >> $GITHUB_STEP_SUMMARY
-          echo "- CMMS: http://${{ env.SERVER_IP }}:3103" >> $GITHUB_STEP_SUMMARY
-          echo "- FamilyFun: http://${{ env.SERVER_IP }}:3104" >> $GITHUB_STEP_SUMMARY
-          echo "- Booking Guest: http://${{ env.SERVER_IP }}:3105" >> $GITHUB_STEP_SUMMARY
-          echo "- Booking Host: http://${{ env.SERVER_IP }}:3106" >> $GITHUB_STEP_SUMMARY
-          echo "- E-Learning Admin: http://${{ env.SERVER_IP }}:3107" >> $GITHUB_STEP_SUMMARY
-          echo "- E-Learning Student: http://${{ env.SERVER_IP }}:3108" >> $GITHUB_STEP_SUMMARY
+          echo "### Apps Deployed" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.detect-changes.outputs.shell }}" == "true" ] || [ "${{ needs.detect-changes.outputs.any-remote-changed }}" == "true" ]; then
+            echo "- ✅ Shell: http://${{ env.SERVER_IP }}:3100" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.hopefull-admin }}" == "true" ]; then
+            echo "- ✅ Hopefull Admin: http://${{ env.SERVER_IP }}:3101" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.assest-management }}" == "true" ]; then
+            echo "- ✅ Asset Management: http://${{ env.SERVER_IP }}:3102" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.cmms }}" == "true" ]; then
+            echo "- ✅ CMMS: http://${{ env.SERVER_IP }}:3103" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.familyfun }}" == "true" ]; then
+            echo "- ✅ FamilyFun: http://${{ env.SERVER_IP }}:3104" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.booking-guest }}" == "true" ]; then
+            echo "- ✅ Booking Guest: http://${{ env.SERVER_IP }}:3105" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.booking-host }}" == "true" ]; then
+            echo "- ✅ Booking Host: http://${{ env.SERVER_IP }}:3106" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.elearning-admin }}" == "true" ]; then
+            echo "- ✅ E-Learning Admin: http://${{ env.SERVER_IP }}:3107" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.detect-changes.outputs.elearning-student }}" == "true" ]; then
+            echo "- ✅ E-Learning Student: http://${{ env.SERVER_IP }}:3108" >> $GITHUB_STEP_SUMMARY
+          fi
