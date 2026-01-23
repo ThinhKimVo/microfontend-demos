@@ -36,8 +36,9 @@ export const apps: AppInfo[] = [
     version: '1.0.0',
     lastUpdated: '2024-01-15',
     screenshots: [
-      { url: '/screenshots/hopefull-admin-1.png', alt: 'Dashboard overview' },
-      { url: '/screenshots/hopefull-admin-2.png', alt: 'User management' },
+      { url: '/screenshots/hopefull-admin-1.png', alt: 'Login' },
+      { url: '/screenshots/hopefull-admin-2.png', alt: 'Dashboard overview' },
+      { url: '/screenshots/hopefull-admin-3.png', alt: 'User management' },
     ],
     detailContent: `
       <section class="about">

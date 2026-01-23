@@ -119,7 +119,7 @@ function Lightbox({ screenshots, currentIndex, onClose, onPrev, onNext }: Lightb
   );
 }
 
-// Screenshot Gallery Component
+// Screenshot Carousel Component
 interface ScreenshotGalleryProps {
   screenshots: AppScreenshot[];
   gradient: string;
@@ -130,8 +130,7 @@ function ScreenshotGallery({ screenshots, gradient }: ScreenshotGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
 
-  const openLightbox = (index: number) => {
-    setCurrentIndex(index);
+  const openLightbox = () => {
     setLightboxOpen(true);
     document.body.style.overflow = 'hidden';
   };
@@ -147,44 +146,131 @@ function ScreenshotGallery({ screenshots, gradient }: ScreenshotGalleryProps) {
 
   if (!screenshots || screenshots.length === 0) return null;
 
+  const prevIndex = currentIndex === 0 ? screenshots.length - 1 : currentIndex - 1;
+  const nextIndex = currentIndex === screenshots.length - 1 ? 0 : currentIndex + 1;
+
   return (
     <>
-      <div className={`grid gap-4 ${screenshots.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-        {screenshots.map((screenshot, index) => (
+      {/* Carousel Container */}
+      <div className="relative bg-slate-900 rounded-2xl overflow-hidden">
+        {/* Main Carousel Area */}
+        <div className="relative flex items-center justify-center py-8 px-4 min-h-[400px]">
+          {/* Previous Image (Left Side) */}
+          {screenshots.length > 1 && (
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/4 opacity-40 blur-[1px] pointer-events-none hidden md:block">
+              <div className="aspect-video rounded-lg overflow-hidden ml-[-50%]">
+                {!failedImages.has(prevIndex) ? (
+                  <img
+                    src={screenshots[prevIndex].url}
+                    alt={screenshots[prevIndex].alt}
+                    className="w-full h-full object-cover"
+                    onError={() => handleImageError(prevIndex)}
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${gradient} opacity-30`} />
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Arrow - Left */}
+          {screenshots.length > 1 && (
+            <button
+              onClick={goToPrev}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/20 hover:text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              aria-label="Previous screenshot"
+            >
+              <ChevronLeftIcon />
+            </button>
+          )}
+
+          {/* Main Image (Center) */}
           <button
-            key={index}
-            onClick={() => openLightbox(index)}
-            className="group relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
+            onClick={openLightbox}
+            className="relative z-5 w-full max-w-3xl mx-auto group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-900 focus-visible:ring-white rounded-xl"
           >
-            {!failedImages.has(index) ? (
-              <>
-                <img
-                  src={screenshot.url}
-                  alt={screenshot.alt}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={() => handleImageError(index)}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-white text-sm font-medium">{screenshot.alt}</p>
-                  </div>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
-                      <ExpandIcon />
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
+              <div className="aspect-video relative">
+                {!failedImages.has(currentIndex) ? (
+                  <>
+                    <img
+                      src={screenshots[currentIndex].url}
+                      alt={screenshots[currentIndex].alt}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      onError={() => handleImageError(currentIndex)}
+                    />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-white/0 group-hover:bg-white/90 flex items-center justify-center transition-all scale-0 group-hover:scale-100">
+                        <ExpandIcon />
+                      </div>
                     </div>
+                  </>
+                ) : (
+                  <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${gradient} opacity-20`}>
+                    <div className="text-slate-400"><ImagePlaceholderIcon /></div>
+                    <span className="mt-3 text-sm font-medium text-slate-500">{screenshots[currentIndex].alt}</span>
                   </div>
-                </div>
-              </>
-            ) : (
-              <div className={`absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br ${gradient} opacity-10`}>
-                <div className="text-slate-400"><ImagePlaceholderIcon /></div>
-                <span className="mt-3 text-sm font-medium text-slate-500">{screenshot.alt}</span>
+                )}
+              </div>
+            </div>
+          </button>
+
+          {/* Navigation Arrow - Right */}
+          {screenshots.length > 1 && (
+            <button
+              onClick={goToNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/20 hover:text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              aria-label="Next screenshot"
+            >
+              <ChevronRightIcon />
+            </button>
+          )}
+
+          {/* Next Image (Right Side) */}
+          {screenshots.length > 1 && (
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/4 opacity-40 blur-[1px] pointer-events-none hidden md:block">
+              <div className="aspect-video rounded-lg overflow-hidden mr-[-50%]">
+                {!failedImages.has(nextIndex) ? (
+                  <img
+                    src={screenshots[nextIndex].url}
+                    alt={screenshots[nextIndex].alt}
+                    className="w-full h-full object-cover"
+                    onError={() => handleImageError(nextIndex)}
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${gradient} opacity-30`} />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Caption & Indicators */}
+        <div className="bg-slate-800/50 px-6 py-4">
+          <div className="flex items-center justify-between max-w-3xl mx-auto">
+            <p className="text-white/90 text-sm font-medium">{screenshots[currentIndex].alt}</p>
+            {screenshots.length > 1 && (
+              <div className="flex items-center gap-2">
+                {screenshots.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                      index === currentIndex
+                        ? 'bg-white w-6'
+                        : 'bg-white/40 hover:bg-white/60'
+                    }`}
+                    aria-label={`Go to screenshot ${index + 1}`}
+                  />
+                ))}
               </div>
             )}
-          </button>
-        ))}
+          </div>
+        </div>
       </div>
 
+      {/* Lightbox */}
       {lightboxOpen && (
         <Lightbox
           screenshots={screenshots}
@@ -279,17 +365,16 @@ export default function AppDetail() {
           </div>
         </div>
 
+        {/* Screenshots Carousel - Full Width */}
+        {app.screenshots.length > 0 && (
+          <div className="mb-8">
+            <ScreenshotGallery screenshots={app.screenshots} gradient={app.gradient} />
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content - HTML */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Screenshots */}
-            {app.screenshots.length > 0 && (
-              <section className="bg-white rounded-2xl border border-slate-200 p-6">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Screenshots</h2>
-                <ScreenshotGallery screenshots={app.screenshots} gradient={app.gradient} />
-              </section>
-            )}
-
             {/* HTML Content */}
             <div
               className="app-detail-content bg-white rounded-2xl border border-slate-200 p-6"
