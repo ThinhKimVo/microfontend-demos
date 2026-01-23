@@ -93,31 +93,31 @@ export default function AppDetail() {
         </div>
       </header>
 
-      {/* Hero Section with Gradient */}
-      <section className={`relative pt-14 bg-gradient-to-br ${app.gradient} overflow-hidden`}>
-        {/* Animated background shapes */}
+      {/* Hero Section */}
+      <section className="relative pt-14 bg-slate-50 overflow-hidden">
+        {/* Subtle background pattern */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-1/2 -right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl motion-safe:animate-pulse" />
-          <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl motion-safe:animate-pulse motion-safe:animation-delay-1000" />
+          <div className={`absolute -top-1/2 -right-1/4 w-96 h-96 bg-gradient-to-br ${app.gradient} opacity-10 rounded-full blur-3xl`} />
+          <div className={`absolute -bottom-1/2 -left-1/4 w-96 h-96 bg-gradient-to-br ${app.gradient} opacity-10 rounded-full blur-3xl`} />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
-            <div className="text-white motion-safe:animate-slide-up">
+            <div className="motion-safe:animate-slide-up">
               <div className="flex items-center gap-3 mb-4">
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+                <span className={`px-3 py-1 bg-gradient-to-r ${app.gradient} text-white rounded-full text-sm font-medium`}>
                   {app.framework}
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1 bg-green-500/30 backdrop-blur-sm rounded-full text-sm font-medium">
-                  <span className="w-2 h-2 bg-green-400 rounded-full motion-safe:animate-pulse" />
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  <span className="w-2 h-2 bg-green-500 rounded-full motion-safe:animate-pulse" />
                   Online
                 </span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-slate-900 text-balance">
                 {app.name}
               </h1>
-              <p className="text-lg md:text-xl text-white/90 mb-8 max-w-xl">
+              <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-xl">
                 {app.description}
               </p>
               <div className="flex flex-wrap gap-4">
@@ -125,7 +125,7 @@ export default function AppDetail() {
                   href={app.path}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-full motion-safe:transition-all motion-safe:hover:scale-105 motion-safe:hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${app.gradient} text-white font-semibold rounded-full motion-safe:transition-all motion-safe:hover:scale-105 motion-safe:hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                 >
                   Launch App
                   <ArrowIcon />
@@ -133,7 +133,7 @@ export default function AppDetail() {
                 {hasScreenshots && (
                   <button
                     onClick={() => document.getElementById('screenshots')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full motion-safe:transition-all motion-safe:hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 font-semibold rounded-full motion-safe:transition-all motion-safe:hover:bg-slate-50 motion-safe:hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   >
                     <PlayIcon />
                     View Demo
@@ -145,30 +145,24 @@ export default function AppDetail() {
             {/* Hero Image/Screenshot */}
             {hasScreenshots && !imageError.has(0) && (
               <div className="relative motion-safe:animate-slide-up motion-safe:animation-delay-200">
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl motion-safe:hover:scale-[1.02] motion-safe:transition-transform">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl motion-safe:hover:scale-[1.02] motion-safe:transition-transform border border-slate-200">
                   <img
                     src={screenshots[0].url}
                     alt={screenshots[0].alt}
                     className="w-full"
                     onError={() => setImageError(prev => new Set(prev).add(0))}
                   />
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent motion-safe:animate-shine" />
                 </div>
                 {/* Floating elements */}
-                <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/20 rounded-2xl backdrop-blur-sm motion-safe:animate-float" />
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/20 rounded-full backdrop-blur-sm motion-safe:animate-float motion-safe:animation-delay-500" />
+                <div className={`absolute -bottom-4 -left-4 w-24 h-24 bg-gradient-to-br ${app.gradient} opacity-20 rounded-2xl motion-safe:animate-float`} />
+                <div className={`absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br ${app.gradient} opacity-20 rounded-full motion-safe:animate-float motion-safe:animation-delay-500`} />
               </div>
             )}
           </div>
         </div>
 
-        {/* Wave divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
-          </svg>
-        </div>
+        {/* Subtle divider */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
       </section>
 
       {/* Screenshots Gallery */}

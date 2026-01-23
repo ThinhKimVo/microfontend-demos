@@ -62,17 +62,29 @@ export const apps: AppInfo[] = [
           <p class="subtitle">Everything you need to manage your platform efficiently</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon blue">📊</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                </svg>
+              </div>
               <h3>Real-time Dashboard</h3>
               <p>Live metrics, KPIs, and system health with customizable widgets and instant updates.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">👥</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
               <h3>User Management</h3>
               <p>Complete CRUD with role-based access control (RBAC) and detailed audit logging.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">📈</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+                </svg>
+              </div>
               <h3>Advanced Analytics</h3>
               <p>Interactive charts, exportable reports, and powerful data visualization tools.</p>
             </div>
@@ -234,22 +246,38 @@ export const apps: AppInfo[] = [
           <p class="subtitle">Everything you need to manage assets efficiently</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon blue">📍</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
               <h3>Real-time Tracking</h3>
               <p>GPS and RFID location tracking with live status monitoring and geofencing alerts.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">🔧</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+              </div>
               <h3>Preventive Maintenance</h3>
               <p>Automated scheduling based on time, usage, or condition to prevent failures.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">📊</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+                </svg>
+              </div>
               <h3>Analytics & Reports</h3>
               <p>Utilization metrics, depreciation tracking, and customizable dashboards.</p>
             </div>
             <div class="feature-card">
-              <div class="icon green">📦</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+              </div>
               <h3>Inventory Management</h3>
               <p>Spare parts tracking with automatic reorder points and vendor management.</p>
             </div>
@@ -349,22 +377,38 @@ export const apps: AppInfo[] = [
           <p class="subtitle">Complete maintenance management toolkit</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon blue">📋</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/><path d="m9 14 2 2 4-4"/>
+                </svg>
+              </div>
               <h3>Work Orders</h3>
               <p>Create, assign, and track tasks with priority levels, SLA tracking, and mobile notifications.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">🔄</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
+                </svg>
+              </div>
               <h3>Preventive Maintenance</h3>
               <p>Automated scheduling based on time intervals, meter readings, or condition triggers.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">📦</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+              </div>
               <h3>Parts Inventory</h3>
               <p>Track spare parts with min/max levels, automatic reordering, and vendor management.</p>
             </div>
             <div class="feature-card">
-              <div class="icon green">👷</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/>
+                </svg>
+              </div>
               <h3>Technician Management</h3>
               <p>Skill-based assignments, workload balancing, and performance dashboards.</p>
             </div>
@@ -461,22 +505,38 @@ export const apps: AppInfo[] = [
           <p class="subtitle">The easiest way to plan family activities</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon purple">🎉</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>
+                </svg>
+              </div>
               <h3>Curated Events</h3>
               <p>Hand-picked family-friendly activities verified for quality and safety.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">📍</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
               <h3>Location-Based</h3>
               <p>Discover events near you with interactive maps and distance filters.</p>
             </div>
             <div class="feature-card">
-              <div class="icon blue">💳</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
               <h3>Easy Booking</h3>
               <p>Secure payments with instant confirmation and mobile tickets.</p>
             </div>
             <div class="feature-card">
-              <div class="icon green">⭐</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
               <h3>Reviews & Ratings</h3>
               <p>Real feedback from families to help you choose the best activities.</p>
             </div>
@@ -551,22 +611,38 @@ export const apps: AppInfo[] = [
           <p class="subtitle">Everything you need for a seamless booking experience</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon orange">🔍</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                </svg>
+              </div>
               <h3>Smart Search</h3>
               <p>Find properties by location, dates, guests, and amenities with powerful filters.</p>
             </div>
             <div class="feature-card">
-              <div class="icon blue">📅</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
               <h3>Instant Booking</h3>
               <p>Secure reservations with real-time availability and instant confirmation.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">❤️</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                </svg>
+              </div>
               <h3>Wishlists</h3>
               <p>Save your favorite properties and share lists with travel companions.</p>
             </div>
             <div class="feature-card">
-              <div class="icon green">💬</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
               <h3>Host Messaging</h3>
               <p>Direct communication with hosts for questions and special requests.</p>
             </div>
@@ -679,22 +755,38 @@ export const apps: AppInfo[] = [
           <p class="subtitle">Everything you need to succeed as a host</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon cyan">🏠</div>
+              <div class="icon cyan">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+              </div>
               <h3>Property Listings</h3>
               <p>Create beautiful listings with unlimited photos, amenities, and house rules.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">📅</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
               <h3>Smart Calendar</h3>
               <p>Manage availability with sync to Airbnb, VRBO, and Google Calendar.</p>
             </div>
             <div class="feature-card">
-              <div class="icon green">💰</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
               <h3>Earnings Dashboard</h3>
               <p>Track revenue, view payout history, and download tax documents.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">💬</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
               <h3>Guest Communication</h3>
               <p>Messaging with saved responses, automated check-in instructions.</p>
             </div>
@@ -803,32 +895,61 @@ export const apps: AppInfo[] = [
           <p class="subtitle">This very extraordinary feature can make learning activities more efficient</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon blue">📚</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                </svg>
+              </div>
               <h3>Course Management</h3>
               <p>Create and organize courses with rich media content, modules, and learning paths.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">📝</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 11l3 3L22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+              </div>
               <h3>Assignments & Quizzes</h3>
               <p>Create assessments with auto-grading, time limits, and detailed feedback options.</p>
             </div>
             <div class="feature-card">
-              <div class="icon cyan">📊</div>
+              <div class="icon cyan">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+              </div>
               <h3>Progress Analytics</h3>
               <p>Track student engagement, completion rates, and performance metrics in real-time.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">💬</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
               <h3>Discussion Forums</h3>
               <p>Foster collaboration with threaded discussions, Q&A boards, and peer reviews.</p>
             </div>
             <div class="feature-card">
-              <div class="icon green">🎥</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="23 7 16 12 23 17 23 7"/>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+              </div>
               <h3>Live Classes</h3>
               <p>Host virtual classrooms with video conferencing, screen sharing, and recording.</p>
             </div>
             <div class="feature-card">
-              <div class="icon blue">🏆</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="6"/>
+                  <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+                </svg>
+              </div>
               <h3>Certificates</h3>
               <p>Issue customizable certificates upon course completion with verification.</p>
             </div>
@@ -909,22 +1030,38 @@ export const apps: AppInfo[] = [
           <p class="subtitle">Everything you need to succeed</p>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="icon green">🔍</div>
+              <div class="icon green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                </svg>
+              </div>
               <h3>Explore Courses</h3>
               <p>Browse thousands of courses with personalized recommendations based on your interests.</p>
             </div>
             <div class="feature-card">
-              <div class="icon blue">📖</div>
+              <div class="icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+              </div>
               <h3>Interactive Learning</h3>
               <p>Video lessons, quizzes, assignments, and hands-on projects for effective learning.</p>
             </div>
             <div class="feature-card">
-              <div class="icon purple">📊</div>
+              <div class="icon purple">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
               <h3>Track Progress</h3>
               <p>Visual progress tracking, study streaks, and achievement badges to keep you motivated.</p>
             </div>
             <div class="feature-card">
-              <div class="icon orange">🏆</div>
+              <div class="icon orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                </svg>
+              </div>
               <h3>Earn Certificates</h3>
               <p>Get verified certificates upon completion to showcase your new skills.</p>
             </div>

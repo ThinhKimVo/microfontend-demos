@@ -396,40 +396,47 @@ jobs:
           tar -xzf deploy.tar.gz
           rm deploy.tar.gz
 
-          # Restart only changed PM2 services
-          RESTART_APPS=""
-          if [ "$SHELL_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS shell"
-          fi
-          if [ "$HOPEFULL_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS hopefull-admin"
-          fi
-          if [ "$ASSEST_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS assest-management"
-          fi
-          if [ "$CMMS_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS cmms"
-          fi
-          if [ "$FAMILYFUN_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS family-fun"
-          fi
-          if [ "$BOOKING_GUEST_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS booking-guest-portal"
-          fi
-          if [ "$BOOKING_HOST_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS booking-host-portal"
-          fi
-          if [ "$ELEARNING_ADMIN_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS elearning-admin-portal"
-          fi
-          if [ "$ELEARNING_STUDENT_CHANGED" == "true" ]; then
-            RESTART_APPS="\$RESTART_APPS elearning-student-portal"
-          fi
+          # Check if PM2 processes exist, if not start ecosystem
+          PM2_LIST=\$(pm2 jlist 2>/dev/null || echo "[]")
+          if [ "\$PM2_LIST" == "[]" ] || ! echo "\$PM2_LIST" | grep -q '"name":"shell"'; then
+            echo "PM2 processes not found, starting ecosystem..."
+            pm2 start ecosystem.config.js
+          else
+            # Restart only changed PM2 services
+            RESTART_APPS=""
+            if [ "$SHELL_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS shell"
+            fi
+            if [ "$HOPEFULL_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS hopefull-admin"
+            fi
+            if [ "$ASSEST_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS assest-management"
+            fi
+            if [ "$CMMS_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS cmms"
+            fi
+            if [ "$FAMILYFUN_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS family-fun"
+            fi
+            if [ "$BOOKING_GUEST_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS booking-guest-portal"
+            fi
+            if [ "$BOOKING_HOST_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS booking-host-portal"
+            fi
+            if [ "$ELEARNING_ADMIN_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS elearning-admin-portal"
+            fi
+            if [ "$ELEARNING_STUDENT_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS elearning-student-portal"
+            fi
 
-          echo "Restarting apps:\$RESTART_APPS"
-          for app in \$RESTART_APPS; do
-            pm2 restart \$app || echo "Warning: Failed to restart \$app"
-          done
+            echo "Restarting apps:\$RESTART_APPS"
+            for app in \$RESTART_APPS; do
+              pm2 restart \$app || echo "Warning: Failed to restart \$app"
+            done
+          fi
           pm2 save
 
           echo "Deployment completed!"
