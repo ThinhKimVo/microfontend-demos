@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apps } from '../data/apps';
 
 const SearchIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -15,128 +16,20 @@ const ReactIcon = () => (
 
 const ArrowIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
   </svg>
 );
-
-const ExternalLinkIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-  </svg>
-);
-
-// Use current origin for external links (works in dev and prod)
-const getBaseUrl = () => window.location.origin;
-
-const demos = [
-  {
-    name: 'Hopefull Admin',
-    path: '/hopefull-admin',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-sky-500 to-blue-600',
-    bgGradient: 'from-sky-50 to-blue-50',
-    borderColor: 'border-sky-200',
-    textColor: 'text-sky-700',
-    description: 'Hopefull Admin dashboard microfrontend',
-    features: ['Dashboard', 'Users', 'Analytics'],
-  },
-  {
-    name: 'AssestManagement Remote',
-    path: '/assest-management',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-sky-500 to-blue-600',
-    bgGradient: 'from-sky-50 to-blue-50',
-    borderColor: 'border-sky-200',
-    textColor: 'text-sky-700',
-    description: 'AssestManagement microfrontend',
-    features: ['App'],
-  },
-  {
-    name: 'Cmms Remote',
-    path: '/cmms',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-sky-500 to-blue-600',
-    bgGradient: 'from-sky-50 to-blue-50',
-    borderColor: 'border-sky-200',
-    textColor: 'text-sky-700',
-    description: 'Cmms microfrontend',
-    features: ['App'],
-  },
-  {
-    name: 'FamilyFun',
-    path: '/family-fun',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-purple-500 to-indigo-600',
-    bgGradient: 'from-purple-50 to-indigo-50',
-    borderColor: 'border-purple-200',
-    textColor: 'text-purple-700',
-    description: 'Family events and activities platform',
-    features: ['Events', 'Merchant Portal', 'Admin'],
-  },
-  {
-    name: 'Booking Guest Portal',
-    path: '/booking-guest-portal',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-amber-500 to-orange-600',
-    bgGradient: 'from-amber-50 to-orange-50',
-    borderColor: 'border-amber-200',
-    textColor: 'text-amber-700',
-    description: 'Guest booking and property search',
-    features: ['Search', 'Booking', 'Wishlists'],
-  },
-  {
-    name: 'Booking Host Portal',
-    path: '/booking-host-portal',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-teal-500 to-cyan-600',
-    bgGradient: 'from-teal-50 to-cyan-50',
-    borderColor: 'border-teal-200',
-    textColor: 'text-teal-700',
-    description: 'Host dashboard for property management',
-    features: ['Listings', 'Calendar', 'Earnings'],
-  },
-  {
-    name: 'E-Learning Admin',
-    path: '/elearning-admin-portal',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-fuchsia-500 to-pink-600',
-    bgGradient: 'from-fuchsia-50 to-pink-50',
-    borderColor: 'border-fuchsia-200',
-    textColor: 'text-fuchsia-700',
-    description: 'Teacher and admin course management',
-    features: ['Courses', 'Analytics', 'Students'],
-  },
-  {
-    name: 'E-Learning Student',
-    path: '/elearning-student-portal',
-    framework: 'React',
-    icon: ReactIcon,
-    gradient: 'from-lime-500 to-green-600',
-    bgGradient: 'from-lime-50 to-green-50',
-    borderColor: 'border-lime-200',
-    textColor: 'text-lime-700',
-    description: 'Student learning platform',
-    features: ['Explore', 'My Courses', 'Certificates'],
-  },
-];
 
 export default function Home() {
   const [search, setSearch] = useState('');
 
-  const filteredDemos = demos.filter((demo) => {
+  const filteredApps = apps.filter((app) => {
     const query = search.toLowerCase();
     return (
-      demo.name.toLowerCase().includes(query) ||
-      demo.framework.toLowerCase().includes(query) ||
-      demo.description.toLowerCase().includes(query) ||
-      demo.features.some((f) => f.toLowerCase().includes(query))
+      app.name.toLowerCase().includes(query) ||
+      app.framework.toLowerCase().includes(query) ||
+      app.description.toLowerCase().includes(query) ||
+      app.features.some((f) => f.name.toLowerCase().includes(query))
     );
   });
 
@@ -162,9 +55,9 @@ export default function Home() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search demos by name, framework, or feature..."
+              placeholder="Search apps by name, framework, or feature..."
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-              aria-label="Search demos"
+              aria-label="Search apps"
             />
             {search && (
               <button
@@ -180,73 +73,69 @@ export default function Home() {
           </div>
           {search && (
             <p className="mt-2 text-sm text-slate-500">
-              {filteredDemos.length} {filteredDemos.length === 1 ? 'result' : 'results'} found
+              {filteredApps.length} {filteredApps.length === 1 ? 'result' : 'results'} found
             </p>
           )}
         </div>
       </div>
 
       {/* Cards Grid */}
-      {filteredDemos.length === 0 ? (
+      {filteredApps.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <SearchIcon />
           </div>
-          <h3 className="text-lg font-medium text-slate-900 mb-1">No demos found</h3>
+          <h3 className="text-lg font-medium text-slate-900 mb-1">No apps found</h3>
           <p className="text-slate-500">Try adjusting your search terms</p>
         </div>
       ) : (
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDemos.map((demo) => (
+        {filteredApps.map((app) => (
           <article
-            key={demo.path}
-            className={`group relative bg-gradient-to-br ${demo.bgGradient} rounded-2xl border ${demo.borderColor} overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1`}
+            key={app.id}
+            className={`group relative bg-gradient-to-br ${app.bgGradient} rounded-2xl border ${app.borderColor} overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1`}
           >
             {/* Card Header */}
-            <div className={`bg-gradient-to-r ${demo.gradient} p-6 text-white`}>
+            <div className={`bg-gradient-to-r ${app.gradient} p-6 text-white`}>
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm w-fit">
-                <demo.icon />
+                <ReactIcon />
               </div>
-              <h2 className="text-xl font-bold mt-4 text-balance">{demo.name}</h2>
-              <p className="text-sm text-white/80 mt-1">{demo.framework} Application</p>
+              <h2 className="text-xl font-bold mt-4 text-balance">{app.name}</h2>
+              <p className="text-sm text-white/80 mt-1">{app.framework} Application</p>
             </div>
 
             {/* Card Body */}
             <div className="p-6">
               <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                {demo.description}
+                {app.description}
               </p>
 
               {/* Features */}
               <div className="flex flex-wrap gap-2 mb-6">
-                {demo.features.map((feature) => (
+                {app.features.slice(0, 3).map((feature) => (
                   <span
-                    key={feature}
-                    className={`text-xs font-medium ${demo.textColor} bg-white px-2.5 py-1 rounded-full border ${demo.borderColor}`}
+                    key={feature.name}
+                    className={`text-xs font-medium ${app.textColor} bg-white px-2.5 py-1 rounded-full border ${app.borderColor}`}
                   >
-                    {feature}
+                    {feature.name}
                   </span>
                 ))}
+                {app.features.length > 3 && (
+                  <span className={`text-xs font-medium ${app.textColor} bg-white px-2.5 py-1 rounded-full border ${app.borderColor}`}>
+                    +{app.features.length - 3} more
+                  </span>
+                )}
               </div>
 
               {/* Actions */}
               <div className="flex items-center gap-3">
                 <Link
-                  to={demo.path}
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${demo.gradient} text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
+                  to={`/app/${app.id}`}
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${app.gradient} text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
                 >
-                  Open App
+                  View Details
                   <ArrowIcon />
                 </Link>
-                <a
-                  href={`${getBaseUrl()}${demo.path}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-2.5 border ${demo.borderColor} rounded-xl ${demo.textColor} hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500`}
-                  aria-label={`Open ${demo.name} in new tab`}
-                >
-                  <ExternalLinkIcon />
-                </a>
               </div>
             </div>
           </article>

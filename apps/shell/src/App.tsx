@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Shell from './components/Layout/Shell';
 import Home from './pages/Home';
+import AppDetail from './pages/AppDetail';
 import ErrorBoundary from './components/RemoteWrapper/ErrorBoundary';
 
 const HopefullAdminRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HopefullAdminRemoteWrapper'));
@@ -30,6 +31,9 @@ export default function App() {
             <Home />
           </Shell>
         } />
+
+        {/* App detail page */}
+        <Route path="/app/:appId" element={<AppDetail />} />
 
         {/* Full-page remote apps - no Shell constraint */}
         <Route path="/hopefull-admin/*" element={
