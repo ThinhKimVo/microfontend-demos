@@ -15,6 +15,14 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+    // Proxy API requests to the backend server
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'http://localhost:3150',
+        changeOrigin: true,
+      },
+    ],
   },
   output: {
     publicPath: 'auto',

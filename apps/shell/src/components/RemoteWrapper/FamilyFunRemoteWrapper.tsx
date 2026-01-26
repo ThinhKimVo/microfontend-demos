@@ -1,32 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import { createRemoteWrapper } from './createRemoteWrapper';
 
-const FamilyFunRemoteWrapper: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const unmountRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    const loadRemote = async () => {
-      if (!containerRef.current) return;
-
-      try {
-        const { default: mount } = await import('familyFun/mount');
-        const { unmount } = mount(containerRef.current);
-        unmountRef.current = unmount;
-      } catch (error) {
-        console.error('Failed to load family-fun remote:', error);
-      }
-    };
-
-    loadRemote();
-
-    return () => {
-      if (unmountRef.current) {
-        unmountRef.current();
-      }
-    };
-  }, []);
-
-  return <div ref={containerRef} className="family-fun-remote-container" />;
-};
-
-export default FamilyFunRemoteWrapper;
+export default createRemoteWrapper({
+  name: 'family-fun',
+  containerClassName: 'family-fun-remote-container',
+  loadMount: () => import('familyFun/mount'),
+});

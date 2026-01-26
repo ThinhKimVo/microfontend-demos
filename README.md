@@ -23,6 +23,8 @@ Shell (Host) - React                → http://localhost:3100
 - **Independent Deployment**: Each remote can be deployed separately
 - **Runtime Integration**: Components loaded dynamically at runtime
 - **Mount/Unmount Pattern**: Remotes expose mount functions with MemoryRouter for isolated routing
+- **Admin Panel**: Manage app metadata without code changes (`/admin`)
+- **Auto Availability Detection**: Automatically detects if remote apps are deployed
 - **CI/CD Pipeline**: GitHub Actions with self-hosted runner for automatic deployment
 - **PM2 Process Management**: Production-ready process management
 
@@ -104,21 +106,31 @@ microfrontend/
 
 ## Deployment
 
-### Option 1: PM2 with Cloudflare Tunnel (Recommended, No Sudo Required)
+### Architecture
 
-Deploy to a server with PM2 and get a free HTTPS URL via Cloudflare Tunnel:
+```
+Production Services:
+├── PostgreSQL Database     → Docker container (port 5432)
+├── Shell API Server        → PM2 process (port 3150)
+├── Shell Frontend          → PM2 static server (port 3100)
+└── Remote Apps (8)         → PM2 static servers (ports 3101-3108)
+```
+
+### Option 1: PM2 with Docker PostgreSQL (Recommended)
+
+Deploy all services including the database:
 
 ```bash
-# Build and deploy
+# Full deployment (database + API + all frontends)
 ./scripts/deploy-pm2.sh deploy
 
-# Check status
+# Check status (shows database, API, and all apps)
 ./scripts/deploy-pm2.sh status
 
 # View logs
 ./scripts/deploy-pm2.sh logs
 
-# Stop services
+# Stop services (keeps database running)
 ./scripts/deploy-pm2.sh stop
 ```
 
@@ -127,20 +139,56 @@ After deployment, get your public URL:
 ssh user@server "pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare"
 ```
 
-This gives you a URL like: `https://random-words.trycloudflare.com`
-
-### Option 2: Docker Deployment
+### Database Management
 
 ```bash
-# Build and start with Docker Compose
-pnpm docker:build
-pnpm docker:up
+# Start database only
+./scripts/deploy-pm2.sh db:start
 
-# Stop
-pnpm docker:down
+# Stop database
+./scripts/deploy-pm2.sh db:stop
 
-# View logs
-pnpm docker:logs
+# Check database status and table info
+./scripts/deploy-pm2.sh db:status
+
+# Initialize or reset database schema
+./scripts/deploy-pm2.sh db:init
+
+# View database logs
+./scripts/deploy-pm2.sh db:logs
+```
+
+### Single App Deployment
+
+Deploy individual apps without affecting others:
+
+```bash
+# Deploy specific apps
+./scripts/deploy-pm2.sh deploy:app shell        # Frontend only
+./scripts/deploy-pm2.sh deploy:app shell-api    # API server only
+./scripts/deploy-pm2.sh deploy:app cmms         # Single remote
+
+# Restart specific apps
+./scripts/deploy-pm2.sh restart:app shell-api
+
+# View logs for specific app
+./scripts/deploy-pm2.sh logs:app shell-api
+```
+
+### Option 2: Local Development with Database
+
+```bash
+# Start PostgreSQL locally
+cd apps/shell
+docker-compose up -d
+
+# Start API server (in one terminal)
+cd apps/shell/server
+npm install
+npm run dev
+
+# Start all frontends (in another terminal)
+pnpm dev
 ```
 
 ### Option 3: Manual PM2 Deployment
@@ -148,6 +196,17 @@ pnpm docker:logs
 On your server:
 
 ```bash
+# Start database
+docker run -d \
+  --name shell-postgres \
+  -e POSTGRES_USER=shell \
+  -e POSTGRES_PASSWORD=shell123 \
+  -e POSTGRES_DB=shell_apps \
+  -p 5432:5432 \
+  -v shell_postgres_data:/var/lib/postgresql/data \
+  --restart unless-stopped \
+  postgres:15-alpine
+
 # Install dependencies
 pnpm install
 
@@ -161,10 +220,10 @@ pm2 save
 
 ### Server Requirements
 
-- Node.js 18+
-- PM2 (`npm install -g pm2`)
+- **Docker** (for PostgreSQL database)
+- **Node.js 18+**
+- **PM2** (`npm install -g pm2`)
 - (Optional) Nginx for port 80 reverse proxy
-- (Optional) Docker & Docker Compose
 
 ### Environment Variables
 
@@ -172,7 +231,33 @@ Create `.env` file based on `.env.example`:
 
 ```bash
 REMOTE_HOST=http://your-server-ip
+
+# Database (defaults shown)
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=shell_apps
+DB_USER=shell
+DB_PASSWORD=shell123
+
+# API Server
+API_PORT=3150
 ```
+
+### Port Reference
+
+| Service | Port | Description |
+|---------|------|-------------|
+| PostgreSQL | 5432 | Database |
+| Shell API | 3150 | Backend API server |
+| Shell | 3100 | Host application |
+| Hopefull Admin | 3101 | Remote app |
+| Asset Management | 3102 | Remote app |
+| CMMS | 3103 | Remote app |
+| FamilyFun | 3104 | Remote app |
+| Booking Guest | 3105 | Remote app |
+| Booking Host | 3106 | Remote app |
+| E-Learning Admin | 3107 | Remote app |
+| E-Learning Student | 3108 | Remote app |
 
 ## Integrating New Remotes
 
@@ -309,17 +394,75 @@ const RemoteWrapper: React.FC = () => {
 | **E-Learning Admin** | Course and student management for educators |
 | **E-Learning Student** | Learning interface for students |
 
+## Admin Panel
+
+The shell includes an admin panel at `http://localhost:3100/admin` for managing app information.
+
+### Features
+
+- **CRUD Operations**: Add, edit, delete apps without code changes
+- **App Configuration**: Name, description, port, framework, version, color theme
+- **Screenshot Management**: Upload and manage app screenshots
+- **Availability Toggle**: Manually disable apps with "Integrated & Deployed" toggle
+- **Export to JSON**: Download app data as JSON backup
+
+### Backend
+
+The admin panel uses a PostgreSQL database backend:
+
+- **Database**: PostgreSQL 15 (Docker container)
+- **API Server**: Express.js on port 3150
+- **Endpoints**: `/api/apps`, `/api/upload-screenshot`
+
+### Auto Availability Detection
+
+The AppDetail page automatically checks if remote apps are deployed:
+
+1. Makes HEAD request to `{host}:{port}/remoteEntry.js`
+2. Shows status: "Checking..." → "Online" (green) or "Offline" (amber)
+3. Disables "Launch App" button for unavailable apps
+
+### Data Flow
+
+```
+Admin Panel → API Server (port 3150) → PostgreSQL Database
+                                    ↓
+                              Export JSON (backup)
+```
+
 ## Scripts Reference
+
+### Development
 
 | Command | Description |
 |---------|-------------|
 | `pnpm dev` | Start all apps in development |
+| `pnpm dev:shell` | Start shell only |
 | `pnpm build` | Build all apps |
 | `pnpm build:prod` | Build for production |
 | `pnpm integrate` | Interactive remote integration |
 | `pnpm integrate:scan` | Auto-integrate new apps |
-| `pnpm deploy:pm2` | Deploy with PM2 + Cloudflare Tunnel |
-| `pnpm docker:up` | Start with Docker Compose |
+
+### Deployment
+
+| Command | Description |
+|---------|-------------|
+| `./scripts/deploy-pm2.sh deploy` | Full deployment (database + all apps) |
+| `./scripts/deploy-pm2.sh deploy:app NAME` | Deploy single app |
+| `./scripts/deploy-pm2.sh status` | Check all services status |
+| `./scripts/deploy-pm2.sh logs` | View all PM2 logs |
+| `./scripts/deploy-pm2.sh restart` | Restart all services |
+| `./scripts/deploy-pm2.sh stop` | Stop all services |
+
+### Database
+
+| Command | Description |
+|---------|-------------|
+| `./scripts/deploy-pm2.sh db:start` | Start PostgreSQL container |
+| `./scripts/deploy-pm2.sh db:stop` | Stop PostgreSQL container |
+| `./scripts/deploy-pm2.sh db:status` | Show database status |
+| `./scripts/deploy-pm2.sh db:init` | Initialize database schema |
+| `./scripts/deploy-pm2.sh db:logs` | View database logs |
 
 ## CI/CD
 
@@ -395,6 +538,38 @@ pm2 logs shell
 
 # Restart all apps
 pm2 restart ecosystem.config.js
+```
+
+### Database Connection Issues
+```bash
+# Check if database is running
+./scripts/deploy-pm2.sh db:status
+
+# Start database if not running
+./scripts/deploy-pm2.sh db:start
+
+# Check Docker container
+docker ps | grep shell-postgres
+
+# View database logs
+./scripts/deploy-pm2.sh db:logs
+
+# Reset database (caution: deletes data)
+docker rm -f shell-postgres
+docker volume rm shell_postgres_data
+./scripts/deploy-pm2.sh db:init
+```
+
+### API Server Issues
+```bash
+# Check API server status
+pm2 logs mfe-shell-api
+
+# Restart API server
+pm2 restart mfe-shell-api
+
+# Test API endpoint
+curl http://localhost:3150/api/health
 ```
 
 ## License

@@ -3,6 +3,27 @@
 
 module.exports = {
   apps: [
+    // Shell API Server (PostgreSQL backend)
+    {
+      name: 'mfe-shell-api',
+      script: 'node',
+      args: 'index.js',
+      cwd: './apps/shell/server',
+      env: {
+        NODE_ENV: 'production',
+        API_PORT: 3150,
+        DB_HOST: 'localhost',
+        DB_PORT: 5432,
+        DB_NAME: 'shell_apps',
+        DB_USER: 'shell',
+        DB_PASSWORD: 'shell123',
+      },
+      watch: false,
+      instances: 1,
+      autorestart: true,
+      max_memory_restart: '200M',
+    },
+    // Shell Frontend
     {
       name: 'mfe-shell',
       script: 'npx',

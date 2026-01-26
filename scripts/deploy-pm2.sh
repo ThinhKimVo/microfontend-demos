@@ -1,9 +1,14 @@
 #!/bin/bash
 
 # ============================================================
-# Microfrontend Deployment Script (PM2 + Node.js - No Docker)
+# Microfrontend Deployment Script (PM2 + Docker PostgreSQL)
 # Target: VMware HONGHOANG-DEMO.saigontechnology
 # Server: demo (10.30.10.18)
+#
+# Services:
+#   - PostgreSQL: Docker container (port 5432)
+#   - Shell API:  Express server via PM2 (port 3150)
+#   - Frontend:   Static servers via PM2 (ports 3100-3108)
 # ============================================================
 
 set -e
@@ -19,6 +24,7 @@ get_app_config() {
     local app_name="$1"
     case "$app_name" in
         shell)              echo "apps/shell:3100:mfe-shell" ;;
+        shell-api)          echo "apps/shell/server:3150:mfe-shell-api" ;;
         hopefull-admin)     echo "apps/hopefull-admin:3101:mfe-hopefull-admin" ;;
         assest-management)  echo "apps/assest-management:3102:mfe-assest-management" ;;
         cmms)               echo "apps/cmms:3103:mfe-cmms" ;;
@@ -32,7 +38,14 @@ get_app_config() {
 }
 
 # All app names
-ALL_APPS="shell hopefull-admin assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
+ALL_APPS="shell shell-api hopefull-admin assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
+
+# Database configuration
+DB_CONTAINER="shell-postgres"
+DB_PORT="5432"
+DB_NAME="shell_apps"
+DB_USER="shell"
+DB_PASSWORD="shell123"
 
 # Get app path
 get_app_path() {
@@ -74,6 +87,160 @@ print_status() { echo -e "${BLUE}[INFO]${NC} $1" >&2; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1" >&2; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1" >&2; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
+
+# Check if Docker is available on server
+check_docker() {
+    print_status "Checking Docker on server..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << 'ENDSSH'
+if ! command -v docker &> /dev/null; then
+    echo "ERROR: Docker is not installed"
+    echo ""
+    echo "Install Docker:"
+    echo "  curl -fsSL https://get.docker.com | sh"
+    echo "  sudo usermod -aG docker $USER"
+    echo "  newgrp docker"
+    exit 1
+fi
+echo "Docker: $(docker --version)"
+ENDSSH
+}
+
+# Start database
+start_database() {
+    print_status "Starting PostgreSQL database..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+# Check if container exists
+if docker ps -a --format '{{.Names}}' | grep -q "^${DB_CONTAINER}\$"; then
+    # Container exists, check if running
+    if docker ps --format '{{.Names}}' | grep -q "^${DB_CONTAINER}\$"; then
+        echo "Database already running"
+    else
+        echo "Starting existing container..."
+        docker start ${DB_CONTAINER}
+    fi
+else
+    echo "Creating new PostgreSQL container..."
+    docker run -d \\
+        --name ${DB_CONTAINER} \\
+        -e POSTGRES_USER=${DB_USER} \\
+        -e POSTGRES_PASSWORD=${DB_PASSWORD} \\
+        -e POSTGRES_DB=${DB_NAME} \\
+        -p ${DB_PORT}:5432 \\
+        -v shell_postgres_data:/var/lib/postgresql/data \\
+        --restart unless-stopped \\
+        postgres:15-alpine
+
+    echo "Waiting for database to be ready..."
+    sleep 5
+fi
+
+# Verify connection
+if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} &>/dev/null; then
+    echo "Database is ready"
+else
+    echo "WARNING: Database may not be ready yet"
+fi
+ENDSSH
+    print_success "Database started"
+}
+
+# Stop database
+stop_database() {
+    print_status "Stopping PostgreSQL database..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "docker stop ${DB_CONTAINER} 2>/dev/null || echo 'Database not running'"
+    print_success "Database stopped"
+}
+
+# Initialize database schema
+init_database() {
+    print_status "Initializing database schema..."
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+    # Upload init.sql to server
+    scp "${PROJECT_ROOT}/apps/shell/db/init.sql" "${SERVER_USER}@${SERVER_IP}:~/microfrontend/init.sql"
+
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+# Wait for database to be ready
+echo "Waiting for database..."
+for i in {1..30}; do
+    if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} &>/dev/null; then
+        break
+    fi
+    sleep 1
+done
+
+# Run init script
+echo "Running init.sql..."
+docker exec -i ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} < ~/microfrontend/init.sql
+
+echo "Database initialized"
+ENDSSH
+    print_success "Database schema initialized"
+}
+
+# Database status
+database_status() {
+    print_status "Checking database status..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+echo "=== Docker Container Status ==="
+if docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep -E "(NAMES|${DB_CONTAINER})"; then
+    :
+else
+    echo "Container ${DB_CONTAINER} not found"
+fi
+
+echo ""
+echo "=== Database Connection ==="
+if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} 2>/dev/null; then
+    echo "PostgreSQL: READY"
+    echo ""
+    echo "=== Tables ==="
+    docker exec ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} -c "\\dt" 2>/dev/null || echo "No tables found"
+    echo ""
+    echo "=== App Count ==="
+    docker exec ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} -c "SELECT COUNT(*) as apps FROM apps;" 2>/dev/null || echo "Could not query apps"
+else
+    echo "PostgreSQL: NOT RUNNING"
+fi
+ENDSSH
+}
+
+# Database logs
+database_logs() {
+    print_status "Showing database logs..."
+    ssh -t "${SERVER_USER}@${SERVER_IP}" "docker logs -f ${DB_CONTAINER}"
+}
+
+# Run database migrations (for existing databases)
+migrate_database() {
+    print_status "Running database migrations..."
+
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+    # Upload init.sql to server
+    scp "${PROJECT_ROOT}/apps/shell/db/init.sql" "${SERVER_USER}@${SERVER_IP}:~/microfrontend/init.sql"
+
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+# Wait for database to be ready
+echo "Waiting for database..."
+for i in {1..30}; do
+    if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} &>/dev/null; then
+        break
+    fi
+    sleep 1
+done
+
+# Run init script (includes migrations with IF NOT EXISTS)
+echo "Running migrations..."
+docker exec -i ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} < ~/microfrontend/init.sql 2>&1 | grep -v "already exists" || true
+
+echo "Migrations completed"
+ENDSSH
+    print_success "Database migrations completed"
+}
 
 # NVM loader script - this gets prepended to all remote commands
 NVM_LOADER='
@@ -389,6 +556,11 @@ full_deploy_single_app() {
     test_connection
     build_single_app "$app_name"
     deploy_single_app "$app_name"
+
+    # Run migrations when deploying shell or shell-api
+    if [ "$app_name" = "shell" ] || [ "$app_name" = "shell-api" ]; then
+        migrate_database
+    fi
 }
 
 # Create deployment package
@@ -403,12 +575,15 @@ create_package() {
     TEMP_DIR=$(mktemp -d)
     DEPLOY_ARCHIVE="$TEMP_DIR/deploy.tar.gz"
 
-    # Include dist folders and necessary files
+    # Include dist folders, server files, and necessary files
     tar -czf "$DEPLOY_ARCHIVE" \
         --exclude='node_modules' \
         --exclude='.git' \
         --exclude='*.log' \
         apps/shell/dist \
+        apps/shell/server \
+        apps/shell/db \
+        apps/shell/public/screenshots \
         apps/hopefull-admin/dist \
         apps/assest-management/dist \
         apps/cmms/dist \
@@ -436,6 +611,10 @@ create_package() {
 # Deploy to server
 deploy() {
     print_status "Deploying to ${SERVER_IP}..."
+
+    # Start database first
+    check_docker
+    start_database
 
     ARCHIVE_PATH=$(create_package)
 
@@ -488,7 +667,18 @@ for nested_app in "FamilyFun/frontend" "BookingSystem/packages/guest-portal" "Bo
     npm install serve --save-dev 2>/dev/null || true
 done
 
+# Install API server dependencies
+echo "Installing API server dependencies..."
+cd ~/microfrontend/apps/shell/server
+npm install --production 2>/dev/null || true
+
 cd ~/microfrontend
+
+# Initialize database schema
+echo "Initializing database..."
+if [ -f "apps/shell/db/init.sql" ]; then
+    docker exec -i ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} < apps/shell/db/init.sql 2>/dev/null || echo "Database init may have warnings (tables may already exist)"
+fi
 
 # Start with PM2
 pm2 start ecosystem.config.js
@@ -559,7 +749,11 @@ full_deploy() {
     echo "  Local:            http://${SERVER_IP}:3100"
     echo "  Cloudflare:       Check tunnel URL with: ssh ${SERVER_USER}@${SERVER_IP} 'pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare'"
     echo ""
-    echo "Remote apps (ports 3100-3108):"
+    echo "Backend Services:"
+    echo "  PostgreSQL:         localhost:5432 (container: ${DB_CONTAINER})"
+    echo "  Shell API:          http://${SERVER_IP}:3150"
+    echo ""
+    echo "Frontend Apps (ports 3100-3108):"
     echo "  Shell:              http://${SERVER_IP}:3100"
     echo "  Hopefull Admin:     http://${SERVER_IP}:3101"
     echo "  Asset Management:   http://${SERVER_IP}:3102"
@@ -570,6 +764,10 @@ full_deploy() {
     echo "  E-Learning Admin:   http://${SERVER_IP}:3107"
     echo "  E-Learning Student: http://${SERVER_IP}:3108"
     echo ""
+    echo "Database Commands:"
+    echo "  $0 db:status       # Check database status"
+    echo "  $0 db:logs         # View database logs"
+    echo ""
 }
 
 # Show status
@@ -579,18 +777,45 @@ status() {
     ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
 ${NVM_LOADER}
 
+echo "=== Database Status ==="
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^${DB_CONTAINER}\$"; then
+    echo "PostgreSQL: RUNNING"
+    if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} &>/dev/null; then
+        echo "Connection: READY"
+    else
+        echo "Connection: NOT READY"
+    fi
+else
+    echo "PostgreSQL: NOT RUNNING"
+fi
+
+echo ""
 echo "=== PM2 Status ==="
 pm2 list 2>/dev/null || echo "PM2 not running"
 
 echo ""
 echo "=== Port Status ==="
-for port in 3100 3101 3102 3103 3104 3105 3106 3107 3108; do
+check_port() {
+    local port=\$1
+    local name=\$2
     if netstat -tuln 2>/dev/null | grep -q ":\${port} " || ss -tuln 2>/dev/null | grep -q ":\${port} "; then
-        echo "Port \${port}: LISTENING"
+        printf "  %-25s (port %s): LISTENING\n" "\$name" "\$port"
     else
-        echo "Port \${port}: NOT LISTENING"
+        printf "  %-25s (port %s): NOT LISTENING\n" "\$name" "\$port"
     fi
-done
+}
+
+check_port 5432 "PostgreSQL"
+check_port 3150 "Shell API"
+check_port 3100 "Shell"
+check_port 3101 "Hopefull Admin"
+check_port 3102 "Asset Management"
+check_port 3103 "CMMS"
+check_port 3104 "FamilyFun"
+check_port 3105 "Booking Guest"
+check_port 3106 "Booking Host"
+check_port 3107 "E-Learning Admin"
+check_port 3108 "E-Learning Student"
 ENDSSH
 }
 
@@ -637,7 +862,7 @@ usage() {
     echo "Commands:"
     echo "  deploy           - Build and deploy ALL apps (default)"
     echo "  deploy:app NAME  - Build and deploy a single app"
-    echo "  status           - Check service status"
+    echo "  status           - Check service status (includes database)"
     echo "  start            - Start services"
     echo "  stop             - Stop services"
     echo "  restart          - Restart services"
@@ -648,10 +873,20 @@ usage() {
     echo "  setup            - Show server setup instructions"
     echo "  setup-nginx      - Setup Nginx reverse proxy (port 80 -> 3100)"
     echo ""
+    echo "Database Commands:"
+    echo "  db:start         - Start PostgreSQL database container"
+    echo "  db:stop          - Stop PostgreSQL database container"
+    echo "  db:status        - Show database status and table info"
+    echo "  db:init          - Initialize/reset database schema"
+    echo "  db:migrate       - Run database migrations (add new columns)"
+    echo "  db:logs          - View database logs"
+    echo ""
     echo "Examples:"
-    echo "  $0 deploy              # Deploy all apps"
+    echo "  $0 deploy              # Deploy all apps with database"
     echo "  $0 deploy:app shell    # Deploy only shell"
-    echo "  $0 deploy:app cmms     # Deploy only cmms"
+    echo "  $0 deploy:app shell-api # Deploy only API server"
+    echo "  $0 db:start            # Start database only"
+    echo "  $0 db:status           # Check database status"
     echo "  $0 restart:app shell   # Restart only shell"
     echo "  $0 list                # Show available apps"
     echo ""
@@ -661,25 +896,30 @@ usage() {
 # Server setup instructions
 setup_instructions() {
     echo "============================================"
-    echo "Server Setup Instructions (NO sudo required)"
+    echo "Server Setup Instructions"
     echo "============================================"
     echo ""
-    echo "1. Install nvm and Node.js 18:"
+    echo "1. Install Docker (requires sudo once):"
+    echo "   curl -fsSL https://get.docker.com | sh"
+    echo "   sudo usermod -aG docker \$USER"
+    echo "   newgrp docker"
+    echo ""
+    echo "2. Install nvm and Node.js 18 (no sudo required):"
     echo "   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash"
     echo "   source ~/.bashrc"
     echo "   nvm install 18"
     echo ""
-    echo "2. Install PM2 globally:"
+    echo "3. Install PM2 globally:"
     echo "   npm install -g pm2"
     echo ""
-    echo "3. (Optional) Install pnpm:"
+    echo "4. (Optional) Install pnpm:"
     echo "   npm install -g pnpm"
     echo ""
-    echo "4. (Optional) Setup PM2 to start on boot (requires sudo):"
+    echo "5. (Optional) Setup PM2 to start on boot (requires sudo):"
     echo "   pm2 startup"
     echo "   # Follow the instructions it outputs"
     echo ""
-    echo "5. Setup Nginx reverse proxy (requires sudo):"
+    echo "6. Setup Nginx reverse proxy (requires sudo):"
     echo "   $0 setup-nginx"
     echo ""
 }
@@ -835,6 +1075,28 @@ main() {
             ;;
         setup-nginx)
             setup_nginx
+            ;;
+        # Database commands
+        db:start)
+            check_docker
+            start_database
+            ;;
+        db:stop)
+            stop_database
+            ;;
+        db:status)
+            database_status
+            ;;
+        db:init)
+            check_docker
+            start_database
+            init_database
+            ;;
+        db:migrate)
+            migrate_database
+            ;;
+        db:logs)
+            database_logs
             ;;
         help|--help|-h)
             usage

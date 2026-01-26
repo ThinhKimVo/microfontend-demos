@@ -37,6 +37,56 @@ npx tsc --noEmit
 
 This is a **Webpack 5 Module Federation** microfrontend monorepo. The shell app (this directory) is the host that dynamically loads remote applications at runtime.
 
+### Directory Structure
+
+```
+src/
+├── api/                        # API layer
+│   ├── httpClient.ts           # Centralized fetch wrapper
+│   └── appsApi.ts              # CRUD operations for apps
+├── components/
+│   ├── Admin/                  # Admin page components
+│   │   ├── EditAppModal.tsx    # Modal form for app editing
+│   │   ├── AppsTable.tsx       # Table display component
+│   │   ├── ScreenshotManager.tsx # Screenshot upload UI
+│   │   └── index.ts
+│   ├── AppDetail/              # AppDetail page components
+│   │   ├── HeroSection.tsx     # Hero with gradient
+│   │   ├── ScreenshotCarousel.tsx # Screenshot carousel
+│   │   └── index.ts
+│   ├── Icons/                  # Shared SVG icons
+│   │   └── index.tsx           # BackIcon, ArrowIcon, SearchIcon, etc.
+│   ├── Layout/
+│   │   └── Shell.tsx           # Main layout with header
+│   └── RemoteWrapper/          # Microfrontend wrappers
+│       ├── createRemoteWrapper.tsx  # Factory function
+│       ├── ErrorBoundary.tsx
+│       └── [8 wrapper files]   # One-liner wrappers using factory
+├── constants/
+│   ├── config.ts               # API_BASE, timeouts
+│   └── themes.ts               # gradientPresets
+├── hooks/                      # Custom React hooks
+│   ├── useLoadApps.ts          # App loading with loading state
+│   ├── useMessage.ts           # Toast message with auto-dismiss
+│   ├── useCarousel.ts          # Slide navigation logic
+│   └── index.ts
+├── pages/
+│   ├── Admin.tsx               # Admin panel (~250 lines)
+│   ├── AppDetail.tsx           # App detail page (~180 lines)
+│   └── Home.tsx                # Home page with cards
+├── services/
+│   └── appsService.ts          # Facade re-exporting from api/utils
+├── styles/
+│   ├── index.css
+│   └── appDetail.css           # AppDetail content styles
+├── utils/
+│   └── appHelpers.ts           # Array utilities, generators
+├── data/
+│   └── apps.ts                 # TypeScript interfaces
+└── federation/
+    └── types.d.ts              # Remote module declarations
+```
+
 ### Apps Structure
 
 | App | Port | Framework | Role |
@@ -106,51 +156,110 @@ All remotes use the mount/unmount pattern:
 - The App component typically has its own `BrowserRouter`
 - Importing App directly causes "Router inside Router" errors
 
-**RemoteWrapper pattern with StrictMode handling:**
+**RemoteWrapper Factory Pattern:**
 ```tsx
-const RemoteWrapper: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mountedRef = useRef(false);  // Prevents double-mount in StrictMode
-  const unmountRef = useRef<(() => void) | null>(null);
+// src/components/RemoteWrapper/createRemoteWrapper.tsx
+import { createRemoteWrapper } from './createRemoteWrapper';
 
-  useEffect(() => {
-    if (mountedRef.current) return;
-    mountedRef.current = true;
-
-    const loadRemote = async () => {
-      if (!containerRef.current) return;
-      try {
-        const { default: mount } = await import('remoteName/mount');
-        const { unmount } = mount(containerRef.current);
-        unmountRef.current = unmount;
-      } catch (error) {
-        console.error('Failed to load remote:', error);
-      }
-    };
-    loadRemote();
-
-    return () => {
-      if (unmountRef.current) {
-        try { unmountRef.current(); } catch (e) {}
-        unmountRef.current = null;
-      }
-    };
-  }, []);
-
-  return <div ref={containerRef} className="remote-container" />;
-};
+export default createRemoteWrapper({
+  name: 'my-app',
+  containerClassName: 'my-app-remote-container',
+  loadMount: () => import('myApp/mount'),
+});
 ```
 
-### Key Files
+The factory handles StrictMode double-mount, error handling, and cleanup automatically.
 
-- `src/components/Layout/Shell.tsx` - Main layout with sticky header and back navigation
-- `src/pages/Home.tsx` - Home page with searchable demo cards
-- `src/components/RemoteWrapper/*` - Wrapper components for each remote framework
-- `src/components/RemoteWrapper/ErrorBoundary.tsx` - Catches remote loading failures
+## Hooks Usage
+
+Custom hooks are located in `src/hooks/`:
+
+```tsx
+import { useLoadApps, useMessage, useCarousel } from '../hooks';
+
+// Load apps with loading state
+const { apps, loading, reload } = useLoadApps();
+
+// Toast messages with auto-dismiss
+const { message, showMessage } = useMessage(3000);
+showMessage('success', 'Saved!');
+
+// Carousel navigation
+const { currentSlide, nextSlide, prevSlide, goToSlide } = useCarousel(totalSlides);
+```
+
+## Component Organization
+
+### Icons
+All shared icons are in `src/components/Icons/index.tsx`:
+```tsx
+import { BackIcon, ArrowIcon, SearchIcon, ChevronLeftIcon } from '../components/Icons';
+
+// Icons accept optional className prop
+<BackIcon className="w-6 h-6" />
+```
+
+### Admin Components
+```tsx
+import { EditAppModal, AppsTable, ScreenshotManager } from '../components/Admin';
+```
+
+### AppDetail Components
+```tsx
+import { HeroSection, ScreenshotCarousel } from '../components/AppDetail';
+```
+
+## Key Files
+
+### Core
 - `src/App.tsx` - Route definitions
+- `src/components/Layout/Shell.tsx` - Main layout with sticky header
+- `src/data/apps.ts` - TypeScript interfaces (AppInfo, AppScreenshot)
+- `public/data/apps.json` - App configuration data (source of truth)
+
+### Pages
+- `src/pages/Home.tsx` - Home page with searchable demo cards
+- `src/pages/AppDetail.tsx` - App detail page with availability detection
+- `src/pages/Admin.tsx` - Admin panel for managing app data
+
+### Services & API
+- `src/services/appsService.ts` - Facade re-exporting from specialized modules
+- `src/api/appsApi.ts` - CRUD operations for apps
+- `src/api/httpClient.ts` - Centralized fetch wrapper
+- `src/utils/appHelpers.ts` - Array utilities and generators
+- `src/constants/themes.ts` - Gradient presets
+- `src/constants/config.ts` - API configuration
+
+### Remote Integration
+- `src/components/RemoteWrapper/createRemoteWrapper.tsx` - Factory for wrappers
+- `src/components/RemoteWrapper/ErrorBoundary.tsx` - Error boundary for remotes
 - `src/federation/types.d.ts` - TypeScript declarations for remote modules
 - `webpack.config.js` - Module federation configuration
 - `../../scripts/integrate-remote.js` - Script to integrate new remotes
+
+### Admin Page
+
+The shell includes an admin panel at `/admin` for managing app information without code changes.
+
+**Features:**
+- Add, edit, delete apps
+- Configure app metadata (name, description, port, framework, version)
+- Color theme presets
+- Toggle "Integrated & Deployed" status
+- Export to JSON for permanent updates
+
+**Data Flow:**
+1. App data is stored in PostgreSQL database
+2. Admin changes are saved directly to database
+3. Click "Export JSON" to download a backup
+4. Use "Refresh" to reload from database
+
+**App Availability Detection:**
+- The AppDetail page automatically checks if a remote app is deployed
+- Makes HEAD request to `{host}:{port}/remoteEntry.js` with 3s timeout
+- Shows "Checking..." → "Online" (green) or "Offline" (amber)
+- Launch button disabled for unavailable apps
+- Admin can manually override with `integrated: false` field
 
 ### Shared Dependencies
 
@@ -163,14 +272,20 @@ React, ReactDOM, and React Router are configured as singletons to prevent duplic
 
 ## Deployment
 
-### PM2 with Cloudflare Tunnel (No Sudo Required)
+### PM2 with Docker PostgreSQL
+
+The deployment script manages:
+- **PostgreSQL database** via Docker container (port 5432)
+- **Shell API server** via PM2 (port 3150)
+- **Frontend apps** via PM2 static servers (ports 3100-3108)
 
 ```bash
-# Deploy all apps with Cloudflare Tunnel
+# Deploy all apps with database
 ./scripts/deploy-pm2.sh deploy
 
 # Deploy a single app only
 ./scripts/deploy-pm2.sh deploy:app shell
+./scripts/deploy-pm2.sh deploy:app shell-api
 ./scripts/deploy-pm2.sh deploy:app hopefull-admin
 ./scripts/deploy-pm2.sh deploy:app assest-management
 ./scripts/deploy-pm2.sh deploy:app cmms
@@ -189,7 +304,7 @@ React, ReactDOM, and React Router are configured as singletons to prevent duplic
 # List all managed apps
 ./scripts/deploy-pm2.sh list
 
-# Check status
+# Check status (includes database)
 ./scripts/deploy-pm2.sh status
 
 # View all logs
@@ -197,6 +312,39 @@ React, ReactDOM, and React Router are configured as singletons to prevent duplic
 
 # Get Cloudflare Tunnel URL
 ssh user@server "pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare"
+```
+
+### Database Commands
+
+```bash
+# Start database only
+./scripts/deploy-pm2.sh db:start
+
+# Stop database
+./scripts/deploy-pm2.sh db:stop
+
+# Check database status
+./scripts/deploy-pm2.sh db:status
+
+# Initialize/reset database schema
+./scripts/deploy-pm2.sh db:init
+
+# View database logs
+./scripts/deploy-pm2.sh db:logs
+```
+
+### Local Development with Database
+
+```bash
+# Start PostgreSQL locally with Docker Compose
+cd apps/shell
+docker-compose up -d
+
+# Start API server
+cd server && npm install && npm run dev
+
+# Start shell frontend (in another terminal)
+pnpm dev:shell
 ```
 
 ### Production Build
@@ -213,3 +361,28 @@ pnpm --filter @mfe/shell build:prod
 
 The `webpack.config.prod.js` uses environment variables:
 - `REMOTE_HOST` - Base URL for remote apps (default: `http://10.30.10.18`)
+
+## Refactoring Guidelines
+
+### Adding New Components
+1. Create component in appropriate subdirectory under `src/components/`
+2. Add export to the directory's `index.ts`
+3. Import from the directory, not the file directly
+
+### Adding New Icons
+1. Add to `src/components/Icons/index.tsx`
+2. Follow the `IconProps` interface pattern with optional `className`
+
+### Adding New Hooks
+1. Create in `src/hooks/` with `use` prefix
+2. Export from `src/hooks/index.ts`
+
+### Service Layer Changes
+1. Add API calls to `src/api/appsApi.ts`
+2. Add utilities to `src/utils/appHelpers.ts`
+3. Re-export from `src/services/appsService.ts` for backward compatibility
+
+### CSS Organization
+- Global styles: `src/styles/index.css`
+- Component-specific styles: `src/styles/[componentName].css`
+- Import CSS files in components that use them
