@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
   Table,
   TableBody,
   TableCell,
@@ -12,6 +11,7 @@ import {
   TableRow,
   Chip,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import EventIcon from '@mui/icons-material/Event';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import StoreIcon from '@mui/icons-material/Store';

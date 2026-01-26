@@ -3,7 +3,6 @@ import {
   Container,
   Box,
   Typography,
-  Grid,
   TextField,
   InputAdornment,
   Chip,
@@ -13,6 +12,7 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import SearchIcon from '@mui/icons-material/Search';
 import EventCard from '../../components/EventCard';
 import FilterSidebar from '../../components/FilterSidebar';

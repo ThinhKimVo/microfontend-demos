@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   Box,
   Typography,
-  Grid,
   Paper,
   Button,
   List,
@@ -12,6 +11,7 @@ import {
   Divider,
   LinearProgress,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import EventIcon from '@mui/icons-material/Event';
 import PendingIcon from '@mui/icons-material/Pending';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

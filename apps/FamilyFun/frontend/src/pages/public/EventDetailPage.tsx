@@ -4,7 +4,6 @@ import {
   Container,
   Box,
   Typography,
-  Grid,
   Chip,
   Button,
   Paper,
@@ -12,6 +11,7 @@ import {
   IconButton,
   Breadcrumbs,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';

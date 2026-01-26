@@ -13,8 +13,8 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
-  Grid,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';

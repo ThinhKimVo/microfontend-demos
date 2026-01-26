@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
   Button,
   Chip,
   Dialog,
@@ -17,6 +16,7 @@ import {
   CardContent,
   IconButton,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';

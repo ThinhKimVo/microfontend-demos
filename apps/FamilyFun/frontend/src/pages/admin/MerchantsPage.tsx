@@ -21,12 +21,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid,
   Divider,
   FormControl,
   InputLabel,
   Select,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';

@@ -4,10 +4,10 @@ import {
   Container,
   Box,
   Typography,
-  Grid,
   Paper,
   Button,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import SearchIcon from '@mui/icons-material/Search';
 import VerifiedIcon from '@mui/icons-material/Verified';

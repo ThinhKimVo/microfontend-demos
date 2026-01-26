@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   Box,
   Typography,
-  Grid,
   Paper,
   Button,
   List,
@@ -14,6 +13,7 @@ import {
   Divider,
   Chip,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import EventIcon from '@mui/icons-material/Event';
 import StoreIcon from '@mui/icons-material/Store';
 import VisibilityIcon from '@mui/icons-material/Visibility';

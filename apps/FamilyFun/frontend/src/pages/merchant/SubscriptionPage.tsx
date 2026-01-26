@@ -4,7 +4,6 @@ import {
   Typography,
   Paper,
   Button,
-  Grid,
   Divider,
   List,
   ListItem,
@@ -17,6 +16,7 @@ import {
   RadioGroup,
   FormControlLabel,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import HistoryIcon from '@mui/icons-material/History';
