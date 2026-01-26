@@ -4,13 +4,13 @@ import {
   Container,
   Box,
   Typography,
-  Grid,
   Button,
   TextField,
   InputAdornment,
   Card,
   Chip,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AccessibleIcon from '@mui/icons-material/Accessible';
