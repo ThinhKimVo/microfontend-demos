@@ -4,7 +4,10 @@ import Shell from './components/Layout/Shell';
 import Home from './pages/Home';
 import AppDetail from './pages/AppDetail';
 import Admin from './pages/Admin';
+import Login from './pages/Login';
 import ErrorBoundary from './components/RemoteWrapper/ErrorBoundary';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 const HopefullAdminRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HopefullAdminRemoteWrapper'));
 const AssestManagementRemoteWrapper = lazy(() => import('./components/RemoteWrapper/AssestManagementRemoteWrapper'));
@@ -24,20 +27,28 @@ const FullPageLoading = () => (
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <Routes>
-        {/* Home page with Shell layout */}
-        <Route path="/" element={
-          <Shell>
-            <Home />
-          </Shell>
-        } />
+    <AuthProvider>
+      <ErrorBoundary>
+        <Routes>
+          {/* Home page with Shell layout */}
+          <Route path="/" element={
+            <Shell>
+              <Home />
+            </Shell>
+          } />
 
-        {/* App detail page */}
-        <Route path="/app/:appId" element={<AppDetail />} />
+          {/* App detail page */}
+          <Route path="/app/:appId" element={<AppDetail />} />
 
-        {/* Admin page */}
-        <Route path="/admin" element={<Admin />} />
+          {/* Login page */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Admin page - protected */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          } />
 
         {/* Full-page remote apps - no Shell constraint */}
         <Route path="/hopefull-admin/*" element={
@@ -80,7 +91,8 @@ export default function App() {
             <ElearningStudentPortalRemoteWrapper />
           </Suspense>
         } />
-      </Routes>
-    </ErrorBoundary>
+        </Routes>
+      </ErrorBoundary>
+    </AuthProvider>
   );
 }

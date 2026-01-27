@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BackIcon } from '../Icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ShellProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface ShellProps {
 
 export default function Shell({ children }: ShellProps) {
   const location = useLocation();
+  const { isAuthenticated, user } = useAuth();
   const isHome = location.pathname === '/';
 
   return (
@@ -34,12 +36,32 @@ export default function Shell({ children }: ShellProps) {
                 />
               </Link>
             </div>
-            {isHome && (
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" aria-hidden="true" />
-                <span>All services running</span>
-              </div>
-            )}
+            <div className="flex items-center gap-4">
+              {isHome && (
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" aria-hidden="true" />
+                  <span>All services running</span>
+                </div>
+              )}
+              {isAuthenticated ? (
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 text-xs text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  <span className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-xs font-medium">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="hidden sm:inline">{user?.name}</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-xs text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Sign in
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </header>

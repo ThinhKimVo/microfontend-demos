@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppInfo } from '../data/apps';
 import {
   loadApps,
@@ -13,8 +14,11 @@ import {
 import { Sidebar, Dashboard, AppsGrid, EditAppDrawer } from '../components/Admin';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { useMessage } from '../hooks';
+import { useAuth } from '../contexts/AuthContext';
 
 const Admin: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [apps, setApps] = useState<AppInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingApp, setEditingApp] = useState<AppInfo | null>(null);
@@ -26,6 +30,11 @@ const Admin: React.FC = () => {
     return saved === 'true';
   });
   const { message, showMessage } = useMessage();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => {
@@ -174,6 +183,8 @@ const Admin: React.FC = () => {
         appCount={apps.length}
         collapsed={sidebarCollapsed}
         onToggleCollapse={toggleSidebar}
+        user={user}
+        onLogout={handleLogout}
       />
 
       {/* Main Content */}

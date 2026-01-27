@@ -1,12 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+}
+
 interface SidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
   appCount: number;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  user?: User | null;
+  onLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -15,6 +24,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   appCount,
   collapsed,
   onToggleCollapse,
+  user,
+  onLogout,
 }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
@@ -116,6 +127,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
+      {/* User Info & Logout */}
+      {user && (
+        <div className={`border-t border-slate-800 ${collapsed ? 'p-2' : 'p-3'}`}>
+          {collapsed ? (
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center justify-center px-3 py-2.5 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition-all"
+              title={`Logout (${user.name})`}
+              aria-label="Logout"
+            >
+              <LogoutIcon className="w-5 h-5" />
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 px-3 py-2">
+                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-200 text-sm font-medium truncate">{user.name}</p>
+                  <p className="text-slate-500 text-xs truncate">{user.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={onLogout}
+                className="w-full flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition-all"
+              >
+                <LogoutIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Sign out</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Back to Site */}
       <div className={`border-t border-slate-800 ${collapsed ? 'p-2' : 'p-3'}`}>
         <Link
@@ -164,5 +210,11 @@ const SettingsIcon: React.FC<{ className?: string }> = ({ className }) => (
 const CollapseIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+);
+
+const LogoutIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
   </svg>
 );

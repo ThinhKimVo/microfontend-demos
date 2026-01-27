@@ -38,6 +38,29 @@ CREATE TABLE IF NOT EXISTS screenshots (
 -- Index for faster lookups
 CREATE INDEX IF NOT EXISTS idx_screenshots_app_id ON screenshots(app_id);
 
+-- Users table for authentication
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  role VARCHAR(50) DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sessions table for login tokens
+CREATE TABLE IF NOT EXISTS sessions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(255) UNIQUE NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+
 -- Add unique constraint if it doesn't exist
 DO $$
 BEGIN
@@ -79,3 +102,9 @@ VALUES
   ('hopefull-admin', '/screenshots/hopefull-admin-3.png', 'User management', 3),
   ('assest-management', '/screenshots/assest-management-1.png', 'Asset Management Dashboard', 1)
 ON CONFLICT DO NOTHING;
+
+-- Insert mock admin user (password: admin123)
+-- Password hash is SHA256 of 'admin123' + 'shell_salt'
+INSERT INTO users (email, password_hash, name, role)
+VALUES ('admin@saigontechnology.com', '9fd940f0c1540f8b4e26ec05cde7acebaa943e152bbb91580a93b685077d0524', 'Admin User', 'admin')
+ON CONFLICT (email) DO NOTHING;

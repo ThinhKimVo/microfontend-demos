@@ -3,9 +3,19 @@ const { Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.API_PORT || 3150;
+
+// Simple password hashing (for demo - use bcrypt in production)
+const hashPassword = (password) => {
+  return crypto.createHash('sha256').update(password + 'shell_salt').digest('hex');
+};
+
+const generateToken = () => {
+  return crypto.randomBytes(32).toString('hex');
+};
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -25,6 +35,173 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// ============ AUTH ENDPOINTS ============
+
+// Login
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Find user by email
+    const userResult = await pool.query(
+      'SELECT id, email, password_hash, name, role FROM users WHERE email = $1',
+      [email.toLowerCase()]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const user = userResult.rows[0];
+    const passwordHash = hashPassword(password);
+
+    // Check password
+    if (user.password_hash !== passwordHash) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Create session
+    const token = generateToken();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await pool.query(
+      'INSERT INTO sessions (user_id, token, expires_at) VALUES ($1, $2, $3)',
+      [user.id, token, expiresAt]
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// Logout
+app.post('/api/auth/logout', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (token) {
+      await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).json({ error: 'Logout failed' });
+  }
+});
+
+// Get current user
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const sessionResult = await pool.query(
+      `SELECT s.user_id, s.expires_at, u.email, u.name, u.role
+       FROM sessions s
+       JOIN users u ON s.user_id = u.id
+       WHERE s.token = $1`,
+      [token]
+    );
+
+    if (sessionResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid or expired session' });
+    }
+
+    const session = sessionResult.rows[0];
+
+    if (new Date(session.expires_at) < new Date()) {
+      await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
+      return res.status(401).json({ error: 'Session expired' });
+    }
+
+    res.json({
+      user: {
+        id: session.user_id,
+        email: session.email,
+        name: session.name,
+        role: session.role,
+      },
+    });
+  } catch (err) {
+    console.error('Get user error:', err);
+    res.status(500).json({ error: 'Failed to get user' });
+  }
+});
+
+// Register (for demo purposes)
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Email, password, and name are required' });
+    }
+
+    // Check if user exists
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email.toLowerCase()]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    // Create user
+    const passwordHash = hashPassword(password);
+    const result = await pool.query(
+      'INSERT INTO users (email, password_hash, name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, name, role',
+      [email.toLowerCase(), passwordHash, name, 'user']
+    );
+
+    const user = result.rows[0];
+
+    // Create session
+    const token = generateToken();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await pool.query(
+      'INSERT INTO sessions (user_id, token, expires_at) VALUES ($1, $2, $3)',
+      [user.id, token, expiresAt]
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+// ============ END AUTH ENDPOINTS ============
 
 // Check upload capability
 app.get('/api/check-upload', async (req, res) => {
