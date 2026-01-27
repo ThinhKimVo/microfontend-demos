@@ -156,20 +156,53 @@ export default function Home() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-emerald-600 rounded-xl p-8 text-center">
-        <h2 className="text-xl font-semibold text-white mb-2">Ready to Build Your Next Project?</h2>
-        <p className="text-emerald-100 mb-6 max-w-2xl mx-auto text-sm">
-          Partner with Saigon Technology to transform your ideas into powerful, scalable applications.
-        </p>
-        <a
-          href="https://saigontechnology.com/contact/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-600 text-sm font-medium rounded-lg hover:bg-emerald-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-600"
-        >
-          Contact Us Today
-          <ArrowIcon aria-hidden="true" className="w-4 h-4" />
-        </a>
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative px-6 py-12 sm:px-12 sm:py-16">
+          {/* Stats Row */}
+          <div className="flex justify-center gap-8 sm:gap-16 mb-8">
+            <div className="text-center">
+              <p className="text-2xl sm:text-3xl font-bold text-white">15+</p>
+              <p className="text-xs text-slate-400 mt-1">Years Experience</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl sm:text-3xl font-bold text-white">500+</p>
+              <p className="text-xs text-slate-400 mt-1">Projects Delivered</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl sm:text-3xl font-bold text-white">98%</p>
+              <p className="text-xs text-slate-400 mt-1">Client Satisfaction</p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="w-12 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mb-8" />
+
+          {/* Content */}
+          <div className="text-center max-w-xl mx-auto">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-3">
+              Ready to Build Your Next Project?
+            </h2>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+              Partner with Saigon Technology to transform your ideas into powerful, scalable applications.
+            </p>
+            <a
+              href="https://saigontechnology.com/contact/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-500 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            >
+              Contact Us Today
+              <ArrowIcon aria-hidden="true" className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

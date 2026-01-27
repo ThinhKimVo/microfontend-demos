@@ -81,7 +81,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-emerald-600 text-emerald-600'
                   : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
@@ -108,7 +108,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="text"
                         value={app.name}
                         onChange={(e) => updateField('name', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                         placeholder="My Awesome App"
                       />
                     </div>
@@ -125,7 +125,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                           type="text"
                           value={app.path.replace(/^\//, '')}
                           onChange={(e) => updateField('path', '/' + e.target.value.replace(/^\//, ''))}
-                          className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-r-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                           placeholder="my-app"
                         />
                       </div>
@@ -138,7 +138,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       <textarea
                         value={app.description}
                         onChange={(e) => updateField('description', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
                         rows={4}
                         placeholder="A brief description of what this app does..."
                       />
@@ -154,7 +154,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       <select
                         value={app.framework}
                         onChange={(e) => updateField('framework', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                       >
                         <optgroup label="Web">
                           <option value="React">React</option>
@@ -176,7 +176,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="number"
                         value={app.port}
                         onChange={(e) => updateField('port', parseInt(e.target.value) || 3100)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                       />
                     </div>
                     <div>
@@ -185,7 +185,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="text"
                         value={app.version}
                         onChange={(e) => updateField('version', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                         placeholder="1.0.0"
                       />
                     </div>
@@ -210,7 +210,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                           type="url"
                           value={app.iosAppUrl || ''}
                           onChange={(e) => updateField('iosAppUrl', e.target.value)}
-                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
                           placeholder="https://apps.apple.com/app/..."
                         />
                         {app.iosAppUrl && (
@@ -235,7 +235,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                           type="url"
                           value={app.androidAppUrl || ''}
                           onChange={(e) => updateField('androidAppUrl', e.target.value)}
-                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
                           placeholder="https://play.google.com/store/apps/..."
                         />
                         {app.androidAppUrl && (
@@ -258,7 +258,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
               <div className="space-y-6">
                 <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
                   <h3 className="font-semibold text-slate-900 mb-4">Deployment Status</h3>
-                  <label className="flex items-center gap-4 cursor-pointer p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 transition-colors">
+                  <label className="flex items-center gap-4 cursor-pointer p-4 bg-white rounded-xl border border-slate-200 hover:border-emerald-300 transition-colors">
                     <div className="relative">
                       <input
                         type="checkbox"
@@ -266,7 +266,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         onChange={(e) => updateField('integrated', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-14 h-8 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                      <div className="w-14 h-8 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
                     </div>
                     <div>
                       <span className="font-medium text-slate-900">Integrated & Deployed</span>
@@ -314,7 +314,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       onClick={() => applyGradientPreset(preset)}
                       className={`relative group p-1 rounded-xl transition-all ${
                         app.gradient === preset.gradient
-                          ? 'ring-2 ring-blue-500 ring-offset-2'
+                          ? 'ring-2 ring-emerald-500 ring-offset-2'
                           : 'hover:scale-105'
                       }`}
                     >
@@ -513,17 +513,17 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
+        {/* Footer - Sticky with shadow for visibility */}
+        <div className="sticky bottom-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <button
             onClick={onCancel}
-            className="px-6 py-3 text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-100 transition-colors"
+            className="min-w-[120px] py-2.5 text-slate-600 hover:text-slate-800 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30"
+            className="min-w-[120px] py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
             {isNew ? 'Create App' : 'Save Changes'}
           </button>
