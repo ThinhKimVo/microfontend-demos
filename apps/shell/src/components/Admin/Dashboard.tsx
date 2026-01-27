@@ -28,7 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
         <div className="flex gap-3">
           <button
             onClick={onAddApp}
-            className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <PlusIcon className="w-4 h-4" />
             Add New App
