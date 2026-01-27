@@ -38,7 +38,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
         </div>
         <button
           onClick={onAdd}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2"
         >
           <PlusIcon className="w-4 h-4" />
           Add New App
@@ -56,7 +56,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
               placeholder="Search apps…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
 
@@ -64,7 +64,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
           <select
             value={filterFramework}
             onChange={(e) => setFilterFramework(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[140px]"
+            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[140px]"
           >
             {frameworks.map(fw => (
               <option key={fw} value={fw}>
@@ -77,7 +77,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[120px]"
+            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[120px]"
           >
             <option value="all">All Status</option>
             <option value="deployed">Deployed</option>
@@ -166,7 +166,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => onEdit(app)}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
                       >
                         <EditIcon className="w-4 h-4" />
                       </button>
@@ -223,7 +223,7 @@ const AppCard: React.FC<{
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit(app)}
-            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
           >
             <EditIcon className="w-3.5 h-3.5" />
           </button>

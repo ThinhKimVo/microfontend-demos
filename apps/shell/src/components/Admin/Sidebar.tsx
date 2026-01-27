@@ -43,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Toggle Button - On border between sidebar and main */}
       <button
         onClick={onToggleCollapse}
-        className="absolute top-[88px] -right-3 z-50 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        className="absolute top-[88px] -right-3 z-50 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         <CollapseIcon className={`w-3 h-3 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} aria-hidden="true" />
@@ -51,8 +51,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Header with Logo */}
       <div className={`border-b border-slate-800 p-4 h-[72px] flex items-center ${collapsed ? 'justify-center' : ''}`}>
-        <Link to="/" className={`flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg ${collapsed ? 'justify-center' : ''}`} aria-label="Go to home page">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Link to="/" className={`flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg ${collapsed ? 'justify-center' : ''}`} aria-label="Go to home page">
+          <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
@@ -73,7 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <li key={item.id} className="relative">
               <button
                 onClick={() => onSectionChange(item.id)}
-                className={`w-full flex items-center gap-3 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                className={`w-full flex items-center gap-3 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                   collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2.5'
                 } ${
                   activeSection === item.id
@@ -84,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 aria-current={activeSection === item.id ? 'page' : undefined}
               >
                 {activeSection === item.id && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-blue-500 rounded-r-full" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-500 rounded-r-full" />
                 )}
                 <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                 {!collapsed && (
@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="flex-1 text-left text-sm font-medium whitespace-nowrap">{item.label}</span>
                     {item.badge !== undefined && (
                       <span className={`min-w-[20px] h-5 px-1.5 text-xs font-medium rounded flex items-center justify-center ${
-                        activeSection === item.id ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300'
+                        activeSection === item.id ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300'
                       }`}>
                         {item.badge}
                       </span>
@@ -101,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
               </button>
               {collapsed && item.badge !== undefined && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-blue-600 text-white text-[10px] font-medium rounded flex items-center justify-center">
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-emerald-600 text-white text-[10px] font-medium rounded flex items-center justify-center">
                   {item.badge}
                 </span>
               )}
@@ -166,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className={`border-t border-slate-800 ${collapsed ? 'p-2' : 'p-3'}`}>
         <Link
           to="/"
-          className={`flex items-center gap-3 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+          className={`flex items-center gap-3 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
             collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2.5'
           }`}
           aria-label={collapsed ? 'Back to Site' : undefined}

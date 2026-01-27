@@ -90,7 +90,7 @@ export const ScreenshotCarousel: React.FC<ScreenshotCarouselProps> = ({
                 onClick={() => onGoToSlide(index)}
                 className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 ${
                   index === currentSlide
-                    ? 'w-6 bg-blue-600'
+                    ? 'w-6 bg-emerald-600'
                     : 'w-1.5 bg-slate-300 hover:bg-slate-400'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}

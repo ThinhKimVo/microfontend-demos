@@ -13,7 +13,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
   const frameworks = [...new Set(apps.map(app => app.framework))];
 
   const stats = [
-    { label: 'Total Apps', value: apps.length, icon: AppsIcon, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Total Apps', value: apps.length, icon: AppsIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Deployed', value: deployedApps.length, icon: CheckIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Screenshots', value: totalScreenshots, icon: ImageIcon, color: 'text-violet-600', bg: 'bg-violet-50' },
     { label: 'Frameworks', value: frameworks.length, icon: CodeIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
@@ -28,7 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
         <div className="flex gap-3">
           <button
             onClick={onAddApp}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2"
           >
             <PlusIcon className="w-4 h-4" />
             Add New App
@@ -65,8 +65,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
               onClick={onAddApp}
               className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors text-left"
             >
-              <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                <PlusIcon className="w-4 h-4 text-blue-600" />
+              <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                <PlusIcon className="w-4 h-4 text-emerald-600" />
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-900">Create New App</p>
@@ -101,7 +101,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
         <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-slate-900">Recent Apps</h2>
-            <button onClick={onGoToApps} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
+            <button onClick={onGoToApps} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
               View All
             </button>
           </div>
