@@ -4,7 +4,10 @@ import { AVAILABILITY_TIMEOUT_MS } from '../constants/config';
 
 function getRemoteBaseUrl(): string {
   const { protocol, hostname } = window.location;
-  return `${protocol}//${hostname}`;
+  const isDev = hostname === 'localhost' || hostname === '127.0.0.1';
+  // REMOTE_HOST is injected at build time via webpack DefinePlugin
+  const remoteHost = process.env.REMOTE_HOST || hostname;
+  return `${protocol}//${isDev ? hostname : remoteHost}`;
 }
 
 export async function checkAppAvailability(app: AppInfo): Promise<boolean> {

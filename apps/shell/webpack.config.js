@@ -1,9 +1,13 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const webpack = require('webpack');
 const path = require('path');
 
 const deps = require('./package.json').dependencies;
+
+// Remote host for availability checks (injected at build time)
+const REMOTE_HOST = process.env.REMOTE_HOST || 'localhost';
 
 module.exports = {
   entry: './src/index.tsx',
@@ -98,6 +102,9 @@ module.exports = {
           },
         },
       ],
+    }),
+    new webpack.DefinePlugin({
+      'process.env.REMOTE_HOST': JSON.stringify(REMOTE_HOST),
     }),
   ],
 };
