@@ -392,11 +392,46 @@ app.post('/api/apps', async (req, res) => {
   }
 });
 
+// Helper function to delete screenshot file
+function deleteScreenshotFile(url) {
+  if (!url || !url.startsWith('/screenshots/')) return;
+
+  const filename = url.replace('/screenshots/', '');
+  // Prevent directory traversal
+  if (filename.includes('..')) return;
+
+  const distPath = path.join(distScreenshotsDir, filename);
+  const publicPath = path.join(publicScreenshotsDir, filename);
+
+  // Delete from both locations
+  [distPath, publicPath].forEach(filepath => {
+    if (fs.existsSync(filepath)) {
+      try {
+        fs.unlinkSync(filepath);
+        console.log(`[Screenshot] Deleted: ${filepath}`);
+      } catch (err) {
+        console.error(`[Screenshot] Failed to delete ${filepath}:`, err.message);
+      }
+    }
+  });
+}
+
 // Update app
 app.put('/api/apps/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const app = req.body;
+
+    // Get old screenshots before updating
+    const oldScreenshotsResult = await pool.query(
+      'SELECT url FROM screenshots WHERE app_id = $1',
+      [id]
+    );
+    const oldUrls = oldScreenshotsResult.rows.map(r => r.url);
+    const newUrls = (app.screenshots || []).map(s => s.url);
+
+    // Find screenshots that were removed
+    const removedUrls = oldUrls.filter(url => !newUrls.includes(url));
 
     await pool.query(`
       UPDATE apps SET
@@ -424,6 +459,9 @@ app.put('/api/apps/:id', async (req, res) => {
       }
     }
 
+    // Delete removed screenshot files from disk
+    removedUrls.forEach(url => deleteScreenshotFile(url));
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating app:', err);
@@ -435,10 +473,38 @@ app.put('/api/apps/:id', async (req, res) => {
 app.delete('/api/apps/:id', async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Get screenshots before deleting app
+    const screenshotsResult = await pool.query(
+      'SELECT url FROM screenshots WHERE app_id = $1',
+      [id]
+    );
+
+    // Delete app (screenshots cascade due to foreign key)
     await pool.query('DELETE FROM apps WHERE id = $1', [id]);
+
+    // Delete screenshot files from disk
+    screenshotsResult.rows.forEach(row => deleteScreenshotFile(row.url));
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error deleting app:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete screenshot file endpoint
+app.delete('/api/screenshot', async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url) {
+      return res.status(400).json({ error: 'Missing url' });
+    }
+
+    deleteScreenshotFile(url);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[Screenshot] Delete error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -460,18 +526,6 @@ app.post('/api/upload-screenshot', async (req, res) => {
     // Use correct file extension based on MIME type
     const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
     const correctFilename = `${nameWithoutExt}.${mimeType}`;
-
-    // Save to BOTH dist/screenshots (for production serving) and public/screenshots (for future builds)
-    const distScreenshotsDir = path.join(__dirname, '..', 'dist', 'screenshots');
-    const publicScreenshotsDir = path.join(__dirname, '..', 'public', 'screenshots');
-
-    // Create directories if they don't exist
-    for (const dir of [distScreenshotsDir, publicScreenshotsDir]) {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-        console.log(`[Screenshot] Created directory: ${dir}`);
-      }
-    }
 
     // Ensure filename doesn't contain path traversal attempts
     const distFilepath = path.join(distScreenshotsDir, correctFilename);

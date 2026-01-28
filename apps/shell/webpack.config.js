@@ -1,13 +1,9 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-const webpack = require('webpack');
 const path = require('path');
 
 const deps = require('./package.json').dependencies;
-
-// Remote host for availability checks (injected at build time)
-const REMOTE_HOST = process.env.REMOTE_HOST || 'localhost';
 
 module.exports = {
   entry: './src/index.tsx',
@@ -19,10 +15,10 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
-    // Proxy API requests to the backend server
+    // Proxy API and screenshots to the backend server
     proxy: [
       {
-        context: ['/api'],
+        context: ['/api', '/screenshots'],
         target: 'http://localhost:3150',
         changeOrigin: true,
       },
@@ -40,7 +36,7 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
-        exclude: /node_modules/,
+        exclude: [/node_modules/, /server/],
         use: {
           loader: 'babel-loader',
           options: {
@@ -102,9 +98,6 @@ module.exports = {
           },
         },
       ],
-    }),
-    new webpack.DefinePlugin({
-      'process.env.REMOTE_HOST': JSON.stringify(REMOTE_HOST),
     }),
   ],
 };

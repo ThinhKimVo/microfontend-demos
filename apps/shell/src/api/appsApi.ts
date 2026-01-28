@@ -2,12 +2,12 @@ import { AppInfo } from '../data/apps';
 import { get, post, put, del, withApiResult } from './httpClient';
 import { AVAILABILITY_TIMEOUT_MS } from '../constants/config';
 
+// Get base URL for remote app availability checks
+// REMOTE_HOST is injected at build time via webpack DefinePlugin
 function getRemoteBaseUrl(): string {
-  const { protocol, hostname } = window.location;
+  const { hostname } = window.location;
   const isDev = hostname === 'localhost' || hostname === '127.0.0.1';
-  // REMOTE_HOST is injected at build time via webpack DefinePlugin
-  const remoteHost = process.env.REMOTE_HOST || hostname;
-  return `${protocol}//${isDev ? hostname : remoteHost}`;
+  return `${'http'}//${isDev ? hostname : '127.0.0.1'}`;
 }
 
 export async function checkAppAvailability(app: AppInfo): Promise<boolean> {

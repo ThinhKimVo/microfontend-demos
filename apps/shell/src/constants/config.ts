@@ -1,14 +1,11 @@
-// In development, API is proxied through webpack devServer
-// In production, API server runs on port 3150
+// API base URL configuration
+// In development: proxied through webpack devServer
+// In production: use relative /api path (nginx proxies to port 3150)
 function getApiBase(): string {
-  // Check if we're in development by looking at the port
-  // Development runs on 3100 with webpack dev server proxy
-  const isDev = typeof window !== 'undefined' && window.location.port === '3100' && window.location.hostname === 'localhost';
-  if (isDev) {
-    return '/api';
-  }
-  // Production: API server on port 3150
-  return `http://localhost:3150/api`;
+  // Always use relative /api path - it works for both:
+  // - Development: webpack devServer proxies to localhost:3150
+  // - Production: nginx proxies to localhost:3150
+  return '/api';
 }
 
 export const API_BASE = getApiBase();
