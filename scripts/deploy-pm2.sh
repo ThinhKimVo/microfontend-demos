@@ -556,11 +556,6 @@ full_deploy_single_app() {
     test_connection
     build_single_app "$app_name"
     deploy_single_app "$app_name"
-
-    # Run migrations when deploying shell or shell-api
-    if [ "$app_name" = "shell" ] || [ "$app_name" = "shell-api" ]; then
-        migrate_database
-    fi
 }
 
 # Create deployment package
@@ -946,6 +941,31 @@ server {
     listen 80;
     server_name _;
 
+    # CORS headers
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
+
+    # API Server
+    location /api/ {
+        proxy_pass http://127.0.0.1:3150/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Screenshots - served from API server
+    location /screenshots/ {
+        proxy_pass http://127.0.0.1:3150/screenshots/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cache_valid 200 1d;
+    }
+
+    # Shell App (catch-all)
     location / {
         proxy_pass http://127.0.0.1:3100;
         proxy_http_version 1.1;
@@ -956,11 +976,6 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
-
-        # CORS headers
-        add_header 'Access-Control-Allow-Origin' '*' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
-        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
     }
 }
 NGINX_EOF

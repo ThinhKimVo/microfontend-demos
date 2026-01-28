@@ -29,6 +29,41 @@ const pool = new Pool({
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+
+// Serve screenshots from both dist and public directories
+// Priority: dist (production uploads) > public (bundled assets)
+const distScreenshotsDir = path.join(__dirname, '..', 'dist', 'screenshots');
+const publicScreenshotsDir = path.join(__dirname, '..', 'public', 'screenshots');
+
+// Ensure screenshots directories exist
+[distScreenshotsDir, publicScreenshotsDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`[Server] Created screenshots directory: ${dir}`);
+  }
+});
+
+// Serve screenshots - check dist first, then public
+app.use('/screenshots', (req, res, next) => {
+  const filename = req.path.replace(/^\//, '');
+  const distPath = path.join(distScreenshotsDir, filename);
+  const publicPath = path.join(publicScreenshotsDir, filename);
+
+  // Prevent directory traversal
+  if (filename.includes('..')) {
+    return res.status(400).send('Invalid path');
+  }
+
+  // Check dist first (uploaded files), then public (bundled files)
+  if (fs.existsSync(distPath)) {
+    return res.sendFile(distPath);
+  } else if (fs.existsSync(publicPath)) {
+    return res.sendFile(publicPath);
+  }
+
+  res.status(404).send('Screenshot not found');
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Health check
