@@ -3,6 +3,12 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
+  Stethoscope,
+  Calendar,
+  FolderTree,
+  CreditCard,
+  Settings,
+  Headphones,
   LogOut,
   Menu,
   X,
@@ -13,6 +19,12 @@ import { cn } from '../../lib/utils';
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Users', href: '/users', icon: Users },
+  { name: 'Therapists', href: '/therapists', icon: Stethoscope },
+  { name: 'Appointments', href: '/appointments', icon: Calendar },
+  { name: 'Categories', href: '/categories', icon: FolderTree },
+  { name: 'Payments', href: '/payments', icon: CreditCard },
+  { name: 'Support', href: '/support', icon: Headphones },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -86,7 +98,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-        <span className="text-xl font-bold text-primary-600">Hopefull</span>
+        <span className="text-xl font-bold text-primary-600">Healthcare</span>
         {onClose && (
           <button onClick={onClose} className="lg:hidden">
             <X className="h-6 w-6 text-gray-500" />
@@ -116,7 +128,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
       </nav>
 
       <div className="p-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500">Hopefull Admin v1.0.0</p>
+        <p className="text-xs text-gray-500">Healthcare Admin v1.0.0</p>
       </div>
     </div>
   );

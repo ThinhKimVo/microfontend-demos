@@ -45,7 +45,7 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'hopefullAdmin',
+      name: 'healthcareAdmin',
       filename: 'remoteEntry.js',
       exposes: {
         './App': './src/App',
