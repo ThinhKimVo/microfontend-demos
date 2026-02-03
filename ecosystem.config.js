@@ -34,10 +34,19 @@ module.exports = {
       },
     },
     {
-      name: 'mfe-hopefull-admin',
+      name: 'mfe-healthcare-admin',
       script: 'npx',
       args: 'serve dist -p 3101 -s --cors',
-      cwd: './apps/hopefull-admin',
+      cwd: './apps/healthcare-admin',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'mfe-healthcare-marketing',
+      script: 'npx',
+      args: 'serve dist -p 3109 -s --cors',
+      cwd: './apps/healthcare-marketing',
       env: {
         NODE_ENV: 'production',
       },

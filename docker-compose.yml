@@ -14,7 +14,7 @@ services:
       - "3101:3101"  # React Remote
       - "3102:3102"  # Vue Remote
       - "3103:3103"  # Angular Remote
-      - "3105:3105"  # Hopefull Admin
+      - "3105:3105"  # Healthcare Admin
     networks:
       - mfe-network
     healthcheck:

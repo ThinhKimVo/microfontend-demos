@@ -296,7 +296,7 @@ main() {
             echo "  React Remote:     http://${SERVER_IP}:3101"
             echo "  Vue Remote:       http://${SERVER_IP}:3102"
             echo "  Angular Remote:   http://${SERVER_IP}:3103"
-            echo "  Hopefull Admin:   http://${SERVER_IP}:3105"
+            echo "  Healthcare Admin: http://${SERVER_IP}:3105"
             ;;
         status)
             status

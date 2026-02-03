@@ -6,7 +6,7 @@ A demonstration of microfrontends using Webpack 5 Module Federation with multipl
 
 ```
 Shell (Host) - React                → http://localhost:3100
-├── Hopefull Admin                  → http://localhost:3101
+├── Healthcare Admin                  → http://localhost:3101
 ├── Asset Management                → http://localhost:3102
 ├── CMMS                            → http://localhost:3103
 ├── FamilyFun                       → http://localhost:3104
@@ -53,7 +53,7 @@ Or start individual applications:
 
 ```bash
 pnpm dev:shell              # Shell host
-pnpm dev:hopefull-admin     # Hopefull Admin
+pnpm dev:healthcare-admin     # Healthcare Admin
 pnpm dev:assestmanagement   # Asset Management
 pnpm dev:cmms               # CMMS
 pnpm dev:familyfun          # FamilyFun
@@ -68,7 +68,7 @@ pnpm dev:elearn-student     # E-Learning Student
 | App | URL | Description |
 |-----|-----|-------------|
 | Shell | http://localhost:3100 | Host application with routing |
-| Hopefull Admin | http://localhost:3101 | Admin dashboard |
+| Healthcare Admin | http://localhost:3101 | Admin dashboard |
 | Asset Management | http://localhost:3102 | Asset tracking system |
 | CMMS | http://localhost:3103 | Maintenance management |
 | FamilyFun | http://localhost:3104 | Family events platform |
@@ -83,7 +83,7 @@ pnpm dev:elearn-student     # E-Learning Student
 microfrontend/
 ├── apps/
 │   ├── shell/                  # Host application (React)
-│   ├── hopefull-admin/         # Hopefull Admin dashboard
+│   ├── healthcare-admin/         # Healthcare Admin dashboard
 │   ├── assest-management/      # Asset Management system
 │   ├── cmms/                   # CMMS application
 │   ├── FamilyFun/              # Family events platform
@@ -250,7 +250,7 @@ API_PORT=3150
 | PostgreSQL | 5432 | Database |
 | Shell API | 3150 | Backend API server |
 | Shell | 3100 | Host application |
-| Hopefull Admin | 3101 | Remote app |
+| Healthcare Admin | 3101 | Remote app |
 | Asset Management | 3102 | Remote app |
 | CMMS | 3103 | Remote app |
 | FamilyFun | 3104 | Remote app |
@@ -328,7 +328,7 @@ The shell consumes these remotes:
 new ModuleFederationPlugin({
   name: 'shell',
   remotes: {
-    hopefullAdmin: 'hopefullAdmin@http://localhost:3101/remoteEntry.js',
+    healthcareAdmin: 'healthcareAdmin@http://localhost:3101/remoteEntry.js',
     assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
     cmms: 'cmms@http://localhost:3103/remoteEntry.js',
     familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',
@@ -385,7 +385,7 @@ const RemoteWrapper: React.FC = () => {
 
 | App | Description |
 |-----|-------------|
-| **Hopefull Admin** | Admin dashboard with analytics and user management |
+| **Healthcare Admin** | Admin dashboard with analytics and user management |
 | **Asset Management** | Asset tracking and inventory management system |
 | **CMMS** | Computerized Maintenance Management System |
 | **FamilyFun** | Family events discovery platform for Hong Kong |

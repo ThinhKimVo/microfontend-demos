@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "predev": "bash scripts/pre-dev.sh",
-    "dev": "pnpm predev && concurrently -n shell,hopefull-admin,assestmanagement,cmms,familyfun,booking-guest,booking-host,elearn-admin,elearn-student -c blue,cyan,white,gray,blueBright,greenBright,yellowBright,magentaBright,cyanBright \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/hopefull-admin dev\" \"pnpm --filter @mfe/assest-management dev\" \"pnpm --filter @mfe/cmms dev\" \"pnpm --filter @mfe/family-fun dev\" \"pnpm --filter @mfe/booking-guest-portal dev\" \"pnpm --filter @mfe/booking-host-portal dev\" \"pnpm --filter @mfe/elearning-admin-portal dev\" \"pnpm --filter @mfe/elearning-student-portal dev\"",
+    "dev": "pnpm predev && concurrently -n shell,healthcare-admin,healthcare-marketing,assestmanagement,cmms,familyfun,booking-guest,booking-host,elearn-admin,elearn-student -c blue,cyan,magenta,white,gray,blueBright,greenBright,yellowBright,magentaBright,cyanBright \"pnpm --filter @mfe/shell dev\" \"pnpm --filter @mfe/healthcare-admin dev\" \"pnpm --filter @mfe/healthcare-marketing dev\" \"pnpm --filter @mfe/assest-management dev\" \"pnpm --filter @mfe/cmms dev\" \"pnpm --filter @mfe/family-fun dev\" \"pnpm --filter @mfe/booking-guest-portal dev\" \"pnpm --filter @mfe/booking-host-portal dev\" \"pnpm --filter @mfe/elearning-admin-portal dev\" \"pnpm --filter @mfe/elearning-student-portal dev\"",
     "dev:clean": "pnpm predev",
     "validate": "node scripts/validate-versions.js",
     "dev:shell": "pnpm --filter @mfe/shell dev",
     "build": "pnpm -r build",
     "build:prod": "pnpm -r build:prod",
     "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:hopefull-admin": "pnpm --filter @mfe/hopefull-admin dev",
+    "dev:healthcare-admin": "pnpm --filter @mfe/healthcare-admin dev",
     "integrate": "node scripts/integrate-remote.js",
     "integrate:scan": "node scripts/integrate-remote.js --scan",
     "docker:build": "docker compose build",
@@ -32,7 +32,8 @@
     "dev:booking-guest": "pnpm --filter @mfe/booking-guest-portal dev",
     "dev:booking-host": "pnpm --filter @mfe/booking-host-portal dev",
     "dev:elearn-admin": "pnpm --filter @mfe/elearning-admin-portal dev",
-    "dev:elearn-student": "pnpm --filter @mfe/elearning-student-portal dev"
+    "dev:elearn-student": "pnpm --filter @mfe/elearning-student-portal dev",
+    "dev:healthcare-marketing": "pnpm --filter @mfe/healthcare-marketing dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

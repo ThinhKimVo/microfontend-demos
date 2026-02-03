@@ -1,22 +1,39 @@
 [
   {
-    "id": "hopefull-admin",
-    "name": "Hopefull Admin",
-    "path": "/hopefull-admin",
+    "id": "healthcare-admin",
+    "name": "Healthcare Admin",
+    "path": "/healthcare-admin",
     "framework": "React",
     "port": 3101,
     "gradient": "from-sky-500 to-blue-600",
     "bgGradient": "from-sky-50 to-blue-50",
     "borderColor": "border-sky-200",
     "textColor": "text-sky-700",
-    "description": "Hopefull Admin dashboard",
+    "description": "Healthcare Admin dashboard",
     "version": "1.0.0",
     "lastUpdated": "2024-01-15",
     "screenshots": [
-      { "url": "/screenshots/hopefull-admin-1.png", "alt": "Login" },
-      { "url": "/screenshots/hopefull-admin-2.png", "alt": "Dashboard overview" },
-      { "url": "/screenshots/hopefull-admin-3.png", "alt": "User management" }
+      { "url": "/screenshots/healthcare-admin-1.png", "alt": "Login" },
+      { "url": "/screenshots/healthcare-admin-2.png", "alt": "Dashboard overview" },
+      { "url": "/screenshots/healthcare-admin-3.png", "alt": "User management" }
     ],
+    "detailContent": "",
+    "integrated": true
+  },
+  {
+    "id": "healthcare-marketing",
+    "name": "Healthcare Marketing",
+    "path": "/healthcare-marketing",
+    "framework": "React",
+    "port": 3109,
+    "gradient": "from-emerald-500 to-green-600",
+    "bgGradient": "from-emerald-50 to-green-50",
+    "borderColor": "border-emerald-200",
+    "textColor": "text-emerald-700",
+    "description": "Healthcare marketing website with landing pages, pricing, and contact",
+    "version": "1.0.0",
+    "lastUpdated": "2025-02-03",
+    "screenshots": [],
     "detailContent": "",
     "integrated": true
   },

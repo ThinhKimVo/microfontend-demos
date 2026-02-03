@@ -25,7 +25,7 @@ jobs:
     runs-on: self-hosted
     outputs:
       shell: ${{ steps.changes.outputs.shell }}
-      hopefull-admin: ${{ steps.changes.outputs.hopefull-admin }}
+      healthcare-admin: ${{ steps.changes.outputs.healthcare-admin }}
       assest-management: ${{ steps.changes.outputs.assest-management }}
       cmms: ${{ steps.changes.outputs.cmms }}
       familyfun: ${{ steps.changes.outputs.familyfun }}
@@ -47,7 +47,7 @@ jobs:
           if [ "${{ github.event.inputs.force_all }}" == "true" ]; then
             echo "Force build all apps"
             echo "shell=true" >> $GITHUB_OUTPUT
-            echo "hopefull-admin=true" >> $GITHUB_OUTPUT
+            echo "healthcare-admin=true" >> $GITHUB_OUTPUT
             echo "assest-management=true" >> $GITHUB_OUTPUT
             echo "cmms=true" >> $GITHUB_OUTPUT
             echo "familyfun=true" >> $GITHUB_OUTPUT
@@ -67,7 +67,7 @@ jobs:
 
           # Check each app for changes
           SHELL_CHANGED=false
-          HOPEFULL_CHANGED=false
+          HEALTHCARE_CHANGED=false
           ASSEST_CHANGED=false
           CMMS_CHANGED=false
           FAMILYFUN_CHANGED=false
@@ -79,8 +79,8 @@ jobs:
           if echo "$CHANGED_FILES" | grep -q "^apps/shell/"; then
             SHELL_CHANGED=true
           fi
-          if echo "$CHANGED_FILES" | grep -q "^apps/hopefull-admin/"; then
-            HOPEFULL_CHANGED=true
+          if echo "$CHANGED_FILES" | grep -q "^apps/healthcare-admin/"; then
+            HEALTHCARE_CHANGED=true
           fi
           if echo "$CHANGED_FILES" | grep -q "^apps/assest-management/"; then
             ASSEST_CHANGED=true
@@ -106,7 +106,7 @@ jobs:
 
           # Check if any remote app changed (shell needs rebuild if remotes change)
           ANY_REMOTE_CHANGED=false
-          if [ "$HOPEFULL_CHANGED" = "true" ] || [ "$ASSEST_CHANGED" = "true" ] || \
+          if [ "$HEALTHCARE_CHANGED" = "true" ] || [ "$ASSEST_CHANGED" = "true" ] || \
              [ "$CMMS_CHANGED" = "true" ] || [ "$FAMILYFUN_CHANGED" = "true" ] || \
              [ "$BOOKING_GUEST_CHANGED" = "true" ] || [ "$BOOKING_HOST_CHANGED" = "true" ] || \
              [ "$ELEARNING_ADMIN_CHANGED" = "true" ] || [ "$ELEARNING_STUDENT_CHANGED" = "true" ]; then
@@ -123,7 +123,7 @@ jobs:
           if echo "$CHANGED_FILES" | grep -q "^package.json$\|^pnpm-lock.yaml$\|^pnpm-workspace.yaml$"; then
             echo "Root config changed, building all"
             SHELL_CHANGED=true
-            HOPEFULL_CHANGED=true
+            HEALTHCARE_CHANGED=true
             ASSEST_CHANGED=true
             CMMS_CHANGED=true
             FAMILYFUN_CHANGED=true
@@ -136,7 +136,7 @@ jobs:
           fi
 
           echo "shell=$SHELL_CHANGED" >> $GITHUB_OUTPUT
-          echo "hopefull-admin=$HOPEFULL_CHANGED" >> $GITHUB_OUTPUT
+          echo "healthcare-admin=$HEALTHCARE_CHANGED" >> $GITHUB_OUTPUT
           echo "assest-management=$ASSEST_CHANGED" >> $GITHUB_OUTPUT
           echo "cmms=$CMMS_CHANGED" >> $GITHUB_OUTPUT
           echo "familyfun=$FAMILYFUN_CHANGED" >> $GITHUB_OUTPUT
@@ -150,7 +150,7 @@ jobs:
           echo "---"
           echo "Summary:"
           echo "  Shell: $SHELL_CHANGED"
-          echo "  Hopefull Admin: $HOPEFULL_CHANGED"
+          echo "  Healthcare Admin: $HEALTHCARE_CHANGED"
           echo "  Asset Management: $ASSEST_CHANGED"
           echo "  CMMS: $CMMS_CHANGED"
           echo "  FamilyFun: $FAMILYFUN_CHANGED"
@@ -227,9 +227,9 @@ jobs:
             cd ../..
           fi
 
-          if [ "${{ needs.detect-changes.outputs.hopefull-admin }}" == "true" ]; then
-            echo "Building hopefull-admin..."
-            cd apps/hopefull-admin
+          if [ "${{ needs.detect-changes.outputs.healthcare-admin }}" == "true" ]; then
+            echo "Building healthcare-admin..."
+            cd apps/healthcare-admin
             if [ -f "webpack.config.prod.js" ]; then
               npx webpack --config webpack.config.prod.js
             else
@@ -299,8 +299,8 @@ jobs:
             INCLUDE_PATHS="$INCLUDE_PATHS apps/shell/dist apps/shell/package.json"
           fi
 
-          if [ "${{ needs.detect-changes.outputs.hopefull-admin }}" == "true" ]; then
-            INCLUDE_PATHS="$INCLUDE_PATHS apps/hopefull-admin/dist apps/hopefull-admin/package.json"
+          if [ "${{ needs.detect-changes.outputs.healthcare-admin }}" == "true" ]; then
+            INCLUDE_PATHS="$INCLUDE_PATHS apps/healthcare-admin/dist apps/healthcare-admin/package.json"
           fi
 
           if [ "${{ needs.detect-changes.outputs.assest-management }}" == "true" ]; then
@@ -350,7 +350,7 @@ jobs:
       - name: Deploy to server
         env:
           SHELL_CHANGED: ${{ needs.detect-changes.outputs.shell == 'true' || needs.detect-changes.outputs.any-remote-changed == 'true' }}
-          HOPEFULL_CHANGED: ${{ needs.detect-changes.outputs.hopefull-admin }}
+          HEALTHCARE_CHANGED: ${{ needs.detect-changes.outputs.healthcare-admin }}
           ASSEST_CHANGED: ${{ needs.detect-changes.outputs.assest-management }}
           CMMS_CHANGED: ${{ needs.detect-changes.outputs.cmms }}
           FAMILYFUN_CHANGED: ${{ needs.detect-changes.outputs.familyfun }}
@@ -382,8 +382,8 @@ jobs:
           if [ "$SHELL_CHANGED" == "true" ]; then
             backup_app "shell"
           fi
-          if [ "$HOPEFULL_CHANGED" == "true" ]; then
-            backup_app "hopefull-admin"
+          if [ "$HEALTHCARE_CHANGED" == "true" ]; then
+            backup_app "healthcare-admin"
           fi
           if [ "$ASSEST_CHANGED" == "true" ]; then
             backup_app "assest-management"
@@ -422,8 +422,8 @@ jobs:
             if [ "$SHELL_CHANGED" == "true" ]; then
               RESTART_APPS="\$RESTART_APPS shell"
             fi
-            if [ "$HOPEFULL_CHANGED" == "true" ]; then
-              RESTART_APPS="\$RESTART_APPS hopefull-admin"
+            if [ "$HEALTHCARE_CHANGED" == "true" ]; then
+              RESTART_APPS="\$RESTART_APPS healthcare-admin"
             fi
             if [ "$ASSEST_CHANGED" == "true" ]; then
               RESTART_APPS="\$RESTART_APPS assest-management"
@@ -471,8 +471,8 @@ jobs:
           if [ "${{ needs.detect-changes.outputs.shell }}" == "true" ] || [ "${{ needs.detect-changes.outputs.any-remote-changed }}" == "true" ]; then
             echo "- ✅ Shell: http://${{ env.SERVER_IP }}:3100" >> $GITHUB_STEP_SUMMARY
           fi
-          if [ "${{ needs.detect-changes.outputs.hopefull-admin }}" == "true" ]; then
-            echo "- ✅ Hopefull Admin: http://${{ env.SERVER_IP }}:3101" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.detect-changes.outputs.healthcare-admin }}" == "true" ]; then
+            echo "- ✅ Healthcare Admin: http://${{ env.SERVER_IP }}:3101" >> $GITHUB_STEP_SUMMARY
           fi
           if [ "${{ needs.detect-changes.outputs.assest-management }}" == "true" ]; then
             echo "- ✅ Asset Management: http://${{ env.SERVER_IP }}:3102" >> $GITHUB_STEP_SUMMARY

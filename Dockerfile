@@ -12,7 +12,7 @@ COPY apps/shell/package.json ./apps/shell/
 COPY apps/react-remote/package.json ./apps/react-remote/
 COPY apps/vue-remote/package.json ./apps/vue-remote/
 COPY apps/angular-remote/package.json ./apps/angular-remote/
-COPY apps/hopefull-admin/package.json ./apps/hopefull-admin/
+COPY apps/healthcare-admin/package.json ./apps/healthcare-admin/
 COPY packages/shared/package.json ./packages/shared/
 
 # Install dependencies
@@ -30,7 +30,7 @@ RUN cd apps/shell && pnpm exec webpack --config webpack.config.prod.js
 RUN cd apps/react-remote && pnpm exec webpack --config webpack.config.prod.js
 RUN cd apps/vue-remote && pnpm exec webpack --config webpack.config.prod.js
 RUN cd apps/angular-remote && pnpm exec webpack --config webpack.config.prod.js
-RUN cd apps/hopefull-admin && pnpm exec webpack --config webpack.config.prod.js
+RUN cd apps/healthcare-admin && pnpm exec webpack --config webpack.config.prod.js
 
 # Production stage with nginx
 FROM nginx:alpine AS production
@@ -43,7 +43,7 @@ COPY --from=builder /app/apps/shell/dist /usr/share/nginx/html/shell
 COPY --from=builder /app/apps/react-remote/dist /usr/share/nginx/html/react-remote
 COPY --from=builder /app/apps/vue-remote/dist /usr/share/nginx/html/vue-remote
 COPY --from=builder /app/apps/angular-remote/dist /usr/share/nginx/html/angular-remote
-COPY --from=builder /app/apps/hopefull-admin/dist /usr/share/nginx/html/hopefull-admin
+COPY --from=builder /app/apps/healthcare-admin/dist /usr/share/nginx/html/healthcare-admin
 
 # Expose all ports
 EXPOSE 3100 3101 3102 3103 3105

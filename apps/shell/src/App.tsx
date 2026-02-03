@@ -9,7 +9,8 @@ import ErrorBoundary from './components/RemoteWrapper/ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
-const HopefullAdminRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HopefullAdminRemoteWrapper'));
+const HealthcareAdminRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HealthcareAdminRemoteWrapper'));
+const HealthcareMarketingRemoteWrapper = lazy(() => import('./components/RemoteWrapper/HealthcareMarketingRemoteWrapper'));
 const AssestManagementRemoteWrapper = lazy(() => import('./components/RemoteWrapper/AssestManagementRemoteWrapper'));
 const CmmsRemoteWrapper = lazy(() => import('./components/RemoteWrapper/CmmsRemoteWrapper'));
 const FamilyFunRemoteWrapper = lazy(() => import('./components/RemoteWrapper/FamilyFunRemoteWrapper'));
@@ -51,9 +52,14 @@ export default function App() {
           } />
 
         {/* Full-page remote apps - no Shell constraint */}
-        <Route path="/hopefull-admin/*" element={
+        <Route path="/healthcare-admin/*" element={
           <Suspense fallback={<FullPageLoading />}>
-            <HopefullAdminRemoteWrapper />
+            <HealthcareAdminRemoteWrapper />
+          </Suspense>
+        } />
+        <Route path="/healthcare-marketing/*" element={
+          <Suspense fallback={<FullPageLoading />}>
+            <HealthcareMarketingRemoteWrapper />
           </Suspense>
         } />
         <Route path="/assest-management/*" element={

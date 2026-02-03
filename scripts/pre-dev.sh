@@ -22,10 +22,10 @@ pkill -f "webpack serve" 2>/dev/null || true
 pkill -f "webpack-dev-server" 2>/dev/null || true
 
 # Define ports used by microfrontends
-# shell: 3100, hopefull-admin: 3101, assest-management: 3102, cmms: 3103
+# shell: 3100, healthcare-admin: 3101, assest-management: 3102, cmms: 3103
 # family-fun: 3104, booking-guest: 3105, booking-host: 3106
-# elearning-admin: 3107, elearning-student: 3108
-PORTS=(3100 3101 3102 3103 3104 3105 3106 3107 3108)
+# elearning-admin: 3107, elearning-student: 3108, healthcare-marketing: 3109
+PORTS=(3100 3101 3102 3103 3104 3105 3106 3107 3108 3109)
 
 # Kill processes on specific ports
 echo -e "${YELLOW}[pre-dev] Freeing up ports...${NC}"

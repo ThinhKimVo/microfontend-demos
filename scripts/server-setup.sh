@@ -77,7 +77,7 @@ if command -v ufw &> /dev/null && ufw status | grep -q "active"; then
     ufw allow 3101/tcp  # React Remote
     ufw allow 3102/tcp  # Vue Remote
     ufw allow 3103/tcp  # Angular Remote
-    ufw allow 3105/tcp  # Hopefull Admin
+    ufw allow 3105/tcp  # Healthcare Admin
     print_success "Firewall ports opened"
 fi
 

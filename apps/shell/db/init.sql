@@ -84,7 +84,7 @@ END $$;
 -- Insert initial data from apps.json
 INSERT INTO apps (id, name, path, framework, port, gradient, bg_gradient, border_color, text_color, description, version, last_updated, detail_content, integrated)
 VALUES
-  ('hopefull-admin', 'Hopefull Admin', '/hopefull-admin', 'React', 3101, 'from-sky-500 to-blue-600', 'from-sky-50 to-blue-50', 'border-sky-200', 'text-sky-700', 'Hopefull Admin dashboard', '1.0.0', '2024-01-15', '', true),
+  ('healthcare-admin', 'Healthcare Admin', '/healthcare-admin', 'React', 3101, 'from-sky-500 to-blue-600', 'from-sky-50 to-blue-50', 'border-sky-200', 'text-sky-700', 'Healthcare Admin dashboard', '1.0.0', '2024-01-15', '', true),
   ('assest-management', 'Asset Management', '/assest-management', 'React', 3102, 'from-sky-500 to-blue-600', 'from-sky-50 to-blue-50', 'border-sky-200', 'text-sky-700', 'Enterprise Asset Management Solution', '1.0.0', '2024-01-15', '', true),
   ('cmms', 'CMMS', '/cmms', 'React', 3103, 'from-sky-500 to-blue-600', 'from-sky-50 to-blue-50', 'border-sky-200', 'text-sky-700', 'Computerized Maintenance Management System', '1.0.0', '2024-01-15', '', true),
   ('family-fun', 'FamilyFun', '/family-fun', 'React', 3104, 'from-purple-500 to-indigo-600', 'from-purple-50 to-indigo-50', 'border-purple-200', 'text-purple-700', 'Family events and activities platform', '1.0.0', '2024-01-15', '', true),
@@ -97,9 +97,9 @@ ON CONFLICT (id) DO NOTHING;
 -- Insert screenshots
 INSERT INTO screenshots (app_id, url, alt, sort_order)
 VALUES
-  ('hopefull-admin', '/screenshots/hopefull-admin-1.png', 'Login', 1),
-  ('hopefull-admin', '/screenshots/hopefull-admin-2.png', 'Dashboard overview', 2),
-  ('hopefull-admin', '/screenshots/hopefull-admin-3.png', 'User management', 3),
+  ('healthcare-admin', '/screenshots/healthcare-admin-1.png', 'Login', 1),
+  ('healthcare-admin', '/screenshots/healthcare-admin-2.png', 'Dashboard overview', 2),
+  ('healthcare-admin', '/screenshots/healthcare-admin-3.png', 'User management', 3),
   ('assest-management', '/screenshots/assest-management-1.png', 'Asset Management Dashboard', 1)
 ON CONFLICT DO NOTHING;
 

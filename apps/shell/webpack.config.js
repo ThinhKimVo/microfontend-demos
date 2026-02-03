@@ -59,7 +59,8 @@ module.exports = {
       name: 'shell',
       filename: 'remoteEntry.js',
       remotes: {
-        hopefullAdmin: 'hopefullAdmin@http://localhost:3101/remoteEntry.js',
+        healthcareAdmin: 'healthcareAdmin@http://localhost:3101/remoteEntry.js',
+        healthcareMarketing: 'healthcareMarketing@http://localhost:3109/remoteEntry.js',
         assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
         cmms: 'cmms@http://localhost:3103/remoteEntry.js',
         familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',

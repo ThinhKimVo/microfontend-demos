@@ -10,7 +10,7 @@ pnpm dev
 
 # Start individual apps
 pnpm dev:shell              # Shell host at http://localhost:3100
-pnpm dev:hopefull-admin     # Hopefull Admin at http://localhost:3101
+pnpm dev:healthcare-admin     # Healthcare Admin at http://localhost:3101
 pnpm dev:assestmanagement   # Asset Management at http://localhost:3102
 pnpm dev:cmms               # CMMS at http://localhost:3103
 pnpm dev:familyfun          # FamilyFun at http://localhost:3104
@@ -92,7 +92,7 @@ src/
 | App | Port | Framework | Role |
 |-----|------|-----------|------|
 | shell | 3100 | React 18 | Host application with routing and layout |
-| hopefull-admin | 3101 | React 18 | Hopefull Admin dashboard |
+| healthcare-admin | 3101 | React 18 | Healthcare Admin dashboard |
 | assest-management | 3102 | React 18 | Asset Management app |
 | cmms | 3103 | React 18 | CMMS app |
 | family-fun | 3104 | React 18 | Family events platform |
@@ -106,7 +106,7 @@ src/
 **Shell consumes remotes via webpack config:**
 ```javascript
 remotes: {
-  hopefullAdmin: 'hopefullAdmin@http://localhost:3101/remoteEntry.js',
+  healthcareAdmin: 'healthcareAdmin@http://localhost:3101/remoteEntry.js',
   assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
   cmms: 'cmms@http://localhost:3103/remoteEntry.js',
   familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',
@@ -286,7 +286,7 @@ The deployment script manages:
 # Deploy a single app only
 ./scripts/deploy-pm2.sh deploy:app shell
 ./scripts/deploy-pm2.sh deploy:app shell-api
-./scripts/deploy-pm2.sh deploy:app hopefull-admin
+./scripts/deploy-pm2.sh deploy:app healthcare-admin
 ./scripts/deploy-pm2.sh deploy:app assest-management
 ./scripts/deploy-pm2.sh deploy:app cmms
 ./scripts/deploy-pm2.sh deploy:app family-fun
@@ -299,7 +299,7 @@ The deployment script manages:
 ./scripts/deploy-pm2.sh restart:app shell
 
 # View logs for a single app
-./scripts/deploy-pm2.sh logs:app hopefull-admin
+./scripts/deploy-pm2.sh logs:app healthcare-admin
 
 # List all managed apps
 ./scripts/deploy-pm2.sh list

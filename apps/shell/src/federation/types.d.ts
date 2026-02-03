@@ -1,10 +1,10 @@
-// Hopefull Admin Remote
-declare module 'hopefullAdmin/App' {
+// Healthcare Admin Remote
+declare module 'healthcareAdmin/App' {
   const App: React.ComponentType;
   export default App;
 }
 
-declare module 'hopefullAdmin/mount' {
+declare module 'healthcareAdmin/mount' {
   interface MountOptions {
     initialPath?: string;
   }
@@ -12,6 +12,19 @@ declare module 'hopefullAdmin/mount' {
   export default mount;
 }
 
+// Healthcare Marketing Remote
+declare module 'healthcareMarketing/App' {
+  const App: React.ComponentType;
+  export default App;
+}
+
+declare module 'healthcareMarketing/mount' {
+  interface MountOptions {
+    initialPath?: string;
+  }
+  const mount: (el: HTMLElement, options?: MountOptions) => { unmount: () => void };
+  export default mount;
+}
 
 // AssestManagement Remote
 declare module 'assestManagement/App' {

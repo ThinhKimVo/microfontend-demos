@@ -25,7 +25,7 @@ get_app_config() {
     case "$app_name" in
         shell)              echo "apps/shell:3100:mfe-shell" ;;
         shell-api)          echo "apps/shell/server:3150:mfe-shell-api" ;;
-        hopefull-admin)     echo "apps/hopefull-admin:3101:mfe-hopefull-admin" ;;
+        healthcare-admin)   echo "apps/healthcare-admin:3101:mfe-healthcare-admin" ;;
         assest-management)  echo "apps/assest-management:3102:mfe-assest-management" ;;
         cmms)               echo "apps/cmms:3103:mfe-cmms" ;;
         family-fun)         echo "apps/FamilyFun/frontend:3104:mfe-family-fun" ;;
@@ -38,7 +38,7 @@ get_app_config() {
 }
 
 # All app names
-ALL_APPS="shell shell-api hopefull-admin assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
+ALL_APPS="shell shell-api healthcare-admin assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
 
 # Database configuration
 DB_CONTAINER="shell-postgres"
@@ -365,9 +365,9 @@ build_local() {
     fi
     cd "$PROJECT_ROOT"
 
-    # Build hopefull-admin
-    print_status "Building hopefull-admin..."
-    cd "apps/hopefull-admin"
+    # Build healthcare-admin
+    print_status "Building healthcare-admin..."
+    cd "apps/healthcare-admin"
     if [ -f "webpack.config.prod.js" ]; then
         npx webpack --config webpack.config.prod.js
     else
@@ -579,7 +579,7 @@ create_package() {
         apps/shell/server \
         apps/shell/db \
         apps/shell/public/screenshots \
-        apps/hopefull-admin/dist \
+        apps/healthcare-admin/dist \
         apps/assest-management/dist \
         apps/cmms/dist \
         apps/FamilyFun/frontend/dist \
@@ -588,7 +588,7 @@ create_package() {
         apps/elearning/admin-portal/dist \
         apps/elearning/student-portal/dist \
         apps/shell/package.json \
-        apps/hopefull-admin/package.json \
+        apps/healthcare-admin/package.json \
         apps/assest-management/package.json \
         apps/cmms/package.json \
         apps/FamilyFun/frontend/package.json \
@@ -631,7 +631,7 @@ cd ~/microfrontend
 pm2 delete all 2>/dev/null || true
 
 # Backup old dist folders
-for app in shell hopefull-admin assest-management cmms; do
+for app in shell healthcare-admin assest-management cmms; do
     if [ -d "apps/\${app}/dist" ]; then
         rm -rf "apps/\${app}/dist.backup" 2>/dev/null || true
         mv "apps/\${app}/dist" "apps/\${app}/dist.backup" 2>/dev/null || true
@@ -651,7 +651,7 @@ tar -xzf deploy.tar.gz
 rm deploy.tar.gz
 
 # Install serve package for each app
-for app in shell hopefull-admin assest-management cmms; do
+for app in shell healthcare-admin assest-management cmms; do
     cd ~/microfrontend/apps/\${app}
     npm install serve --save-dev 2>/dev/null || true
 done
@@ -750,7 +750,7 @@ full_deploy() {
     echo ""
     echo "Frontend Apps (ports 3100-3108):"
     echo "  Shell:              http://${SERVER_IP}:3100"
-    echo "  Hopefull Admin:     http://${SERVER_IP}:3101"
+    echo "  Healthcare Admin:   http://${SERVER_IP}:3101"
     echo "  Asset Management:   http://${SERVER_IP}:3102"
     echo "  CMMS:               http://${SERVER_IP}:3103"
     echo "  FamilyFun:          http://${SERVER_IP}:3104"
@@ -803,7 +803,7 @@ check_port() {
 check_port 5432 "PostgreSQL"
 check_port 3150 "Shell API"
 check_port 3100 "Shell"
-check_port 3101 "Hopefull Admin"
+check_port 3101 "Healthcare Admin"
 check_port 3102 "Asset Management"
 check_port 3103 "CMMS"
 check_port 3104 "FamilyFun"

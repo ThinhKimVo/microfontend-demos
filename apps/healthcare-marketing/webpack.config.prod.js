@@ -1,23 +1,25 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const path = require('path');
 
 const deps = require('./package.json').dependencies;
 
 // Production host configuration
-const REMOTE_HOST = process.env.REMOTE_HOST || 'http://127.0.0.1';
+const REMOTE_HOST = process.env.REMOTE_HOST || 'http://10.30.10.18';
 
 module.exports = {
   entry: './src/index.tsx',
   mode: 'production',
   output: {
-    publicPath: 'auto',
+    publicPath: `${REMOTE_HOST}:3109/`,
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
   },
   module: {
     rules: [
@@ -43,29 +45,20 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'shell',
+      name: 'healthcareMarketing',
       filename: 'remoteEntry.js',
-      remotes: {
-        healthcareAdmin: `healthcareAdmin@${REMOTE_HOST}:3101/remoteEntry.js`,
-        healthcareMarketing: `healthcareMarketing@${REMOTE_HOST}:3109/remoteEntry.js`,
-        assestManagement: `assestManagement@${REMOTE_HOST}:3102/remoteEntry.js`,
-        cmms: `cmms@${REMOTE_HOST}:3103/remoteEntry.js`,
-        familyFun: `familyFun@${REMOTE_HOST}:3104/remoteEntry.js`,
-        bookingGuestPortal: `bookingGuestPortal@${REMOTE_HOST}:3105/remoteEntry.js`,
-        bookingHostPortal: `bookingHostPortal@${REMOTE_HOST}:3106/remoteEntry.js`,
-        elearningAdminPortal: `elearningAdminPortal@${REMOTE_HOST}:3107/remoteEntry.js`,
-        elearningStudentPortal: `elearningStudentPortal@${REMOTE_HOST}:3108/remoteEntry.js`,
+      exposes: {
+        './App': './src/App',
+        './mount': './src/expose/mount',
       },
       shared: {
         react: {
           singleton: true,
           requiredVersion: deps.react,
-          eager: true,
         },
         'react-dom': {
           singleton: true,
           requiredVersion: deps['react-dom'],
-          eager: true,
         },
         'react-router-dom': {
           singleton: true,
@@ -75,17 +68,6 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: 'public',
-          to: '',
-          globOptions: {
-            ignore: ['**/index.html'],
-          },
-        },
-      ],
     }),
   ],
   optimization: {
