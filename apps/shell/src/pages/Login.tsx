@@ -160,7 +160,7 @@ export default function Login() {
             </div>
 
             {/* Demo Credentials */}
-            {isLogin && (
+            {/* {isLogin && (
               <div className="mt-6 pt-4 border-t border-slate-200">
                 <p className="text-xs text-slate-500 text-center mb-2">Demo credentials:</p>
                 <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-600 font-mono">
@@ -168,7 +168,7 @@ export default function Login() {
                   <p>Password: admin123</p>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Back link */}

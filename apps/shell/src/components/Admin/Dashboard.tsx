@@ -43,7 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white border border-slate-200 rounded-xl p-4">
             <div className={`w-9 h-9 ${stat.bg} rounded-lg flex items-center justify-center mb-3`}>

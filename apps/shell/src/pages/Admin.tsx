@@ -29,6 +29,7 @@ const Admin: React.FC = () => {
     const saved = localStorage.getItem('admin-sidebar-collapsed');
     return saved === 'true';
   });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { message, showMessage } = useMessage();
 
   const handleLogout = async () => {
@@ -174,30 +175,59 @@ const Admin: React.FC = () => {
     return <LoadingScreen message="Loading admin panel…" fullScreen />;
   }
 
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 flex">
-      {/* Sidebar */}
-      <Sidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        appCount={apps.length}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
-        user={user}
-        onLogout={handleLogout}
-      />
+      {/* Mobile backdrop */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar wrapper – overlay on mobile, sticky column on desktop */}
+      <div
+        className={`fixed inset-y-0 left-0 z-40 md:sticky md:top-0 md:h-screen md:z-auto md:inset-auto md:flex-shrink-0 transition-transform duration-300 ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+          appCount={apps.length}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={toggleSidebar}
+          user={user}
+          onLogout={handleLogout}
+          onMobileClose={() => setMobileMenuOpen(false)}
+        />
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto min-w-0">
         {/* Top Bar */}
         <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-          <div className="flex items-center justify-between px-8 py-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-semibold text-slate-900 capitalize">
+          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+            <div className="flex items-center gap-3">
+              {/* Hamburger – mobile only */}
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="md:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                aria-label="Open navigation menu"
+              >
+                <MenuIcon className="w-5 h-5" aria-hidden="true" />
+              </button>
+              <h1 className="text-base sm:text-xl font-semibold text-slate-900 capitalize">
                 {activeSection === 'apps' ? 'Applications' : activeSection}
               </h1>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={handleRefresh}
                 className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
@@ -207,17 +237,25 @@ const Admin: React.FC = () => {
               </button>
               <button
                 onClick={handleExport}
-                className="px-4 py-2 text-slate-600 hover:text-slate-800 border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="hidden sm:flex px-4 py-2 text-slate-600 hover:text-slate-800 border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <DownloadIcon className="w-4 h-4" aria-hidden="true" />
                 Export
+              </button>
+              {/* Mobile export icon-only button */}
+              <button
+                onClick={handleExport}
+                className="sm:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-label="Export data"
+              >
+                <DownloadIcon className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
           </div>
         </header>
 
         {/* Content Area */}
-        <div className="p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {activeSection === 'dashboard' && (
             <Dashboard
               apps={apps}
@@ -403,6 +441,12 @@ const Settings: React.FC<{ onExport: () => void }> = ({ onExport }) => {
 };
 
 // Icons
+const MenuIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+
 const RefreshIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

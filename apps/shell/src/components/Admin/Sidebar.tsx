@@ -16,6 +16,7 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   user?: User | null;
   onLogout?: () => void;
+  onMobileClose?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -26,6 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
   user,
   onLogout,
+  onMobileClose,
 }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
@@ -36,21 +38,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`bg-slate-900 min-h-screen flex flex-col transition-all duration-300 relative border-r border-slate-800 ${
+      className={`bg-slate-900 h-full flex flex-col transition-all duration-300 relative border-r border-slate-800 ${
         collapsed ? 'w-[72px]' : 'w-60'
       }`}
     >
-      {/* Toggle Button - On border between sidebar and main */}
+      {/* Toggle Button - On border between sidebar and main (desktop only) */}
       <button
         onClick={onToggleCollapse}
-        className="absolute top-[88px] -right-3 z-50 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        className="hidden md:flex absolute top-[88px] -right-3 z-50 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         <CollapseIcon className={`w-3 h-3 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
 
       {/* Header with Logo */}
-      <div className={`border-b border-slate-800 p-4 h-[72px] flex items-center ${collapsed ? 'justify-center' : ''}`}>
+      <div className={`border-b border-slate-800 p-4 h-[72px] flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
         <Link to="/" className={`flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg ${collapsed ? 'justify-center' : ''}`} aria-label="Go to home page">
           <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -64,10 +66,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
         </Link>
+        {/* Mobile close button */}
+        {onMobileClose && (
+          <button
+            onClick={onMobileClose}
+            className="md:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            aria-label="Close navigation"
+          >
+            <CloseIcon className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
-      {/* Navigation */}
-      <nav className={`flex-1 py-4 ${collapsed ? 'px-2' : 'px-3'}`} aria-label="Admin navigation">
+      {/* Navigation – scrolls independently if items overflow */}
+      <nav className={`flex-1 overflow-y-auto py-4 ${collapsed ? 'px-2' : 'px-3'}`} aria-label="Admin navigation">
         <ul className="space-y-1">
           {menuItems.map((item) => (
             <li key={item.id} className="relative">
@@ -110,73 +122,76 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </ul>
       </nav>
 
-      {/* Database Status */}
-      <div className={`border-t border-slate-800 ${collapsed ? 'p-3' : 'p-3'}`}>
+      {/* ── Sticky bottom footer ── */}
+      <footer className={`border-t border-slate-800 ${collapsed ? 'p-2 space-y-1' : 'p-3 space-y-1'}`}>
+        {/* DB connection status */}
         {collapsed ? (
           <div className="flex justify-center py-2" title="Database Connected">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
           </div>
         ) : (
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-slate-300 text-xs font-medium">Connected</p>
-              <p className="text-slate-500 text-[10px]">PostgreSQL</p>
+              <p className="text-slate-300 text-xs font-medium leading-none">Connected</p>
+              <p className="text-slate-500 text-[10px] mt-0.5">PostgreSQL</p>
             </div>
           </div>
         )}
-      </div>
 
-      {/* User Info & Logout */}
-      {user && (
-        <div className={`border-t border-slate-800 ${collapsed ? 'p-2' : 'p-3'}`}>
-          {collapsed ? (
-            <button
-              onClick={onLogout}
-              className="w-full flex items-center justify-center px-3 py-2.5 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition-all"
-              title={`Logout (${user.name})`}
-              aria-label="Logout"
-            >
-              <LogoutIcon className="w-5 h-5" />
-            </button>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center gap-3 px-3 py-2">
-                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-sm font-medium truncate">{user.name}</p>
-                  <p className="text-slate-500 text-xs truncate">{user.email}</p>
-                </div>
-              </div>
+        {/* User info + sign out */}
+        {user && (
+          <>
+            {collapsed ? (
               <button
                 onClick={onLogout}
-                className="w-full flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition-all"
+                className="w-full flex items-center justify-center px-3 py-2.5 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                title={`Sign out (${user.name})`}
+                aria-label="Sign out"
               >
                 <LogoutIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Sign out</span>
               </button>
-            </div>
-          )}
-        </div>
-      )}
+            ) : (
+              <div className="border-t border-slate-800/60 pt-1 mt-1 space-y-1">
+                {/* Avatar + name/email */}
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-slate-200 text-sm font-medium truncate leading-none">{user.name}</p>
+                    <p className="text-slate-500 text-xs truncate mt-0.5">{user.email}</p>
+                  </div>
+                </div>
+                {/* Sign out */}
+                <button
+                  onClick={onLogout}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                >
+                  <LogoutIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">Sign out</span>
+                </button>
+              </div>
+            )}
+          </>
+        )}
 
-      {/* Back to Site */}
-      <div className={`border-t border-slate-800 ${collapsed ? 'p-2' : 'p-3'}`}>
-        <Link
-          to="/"
-          className={`flex items-center gap-3 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-            collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2.5'
-          }`}
-          aria-label={collapsed ? 'Back to Site' : undefined}
-        >
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-          </svg>
-          {!collapsed && <span className="text-sm font-medium whitespace-nowrap">Back to Site</span>}
-        </Link>
-      </div>
+        {/* Back to site */}
+        <div className={user ? '' : 'border-t border-slate-800/60 pt-1 mt-1'}>
+          <Link
+            to="/"
+            className={`flex items-center gap-3 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+              collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2'
+            }`}
+            aria-label={collapsed ? 'Back to Site' : undefined}
+          >
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+            </svg>
+            {!collapsed && <span className="text-sm font-medium whitespace-nowrap">Back to Site</span>}
+          </Link>
+        </div>
+      </footer>
     </aside>
   );
 };
@@ -216,5 +231,11 @@ const CollapseIcon: React.FC<{ className?: string }> = ({ className }) => (
 const LogoutIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+  </svg>
+);
+
+const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
   </svg>
 );

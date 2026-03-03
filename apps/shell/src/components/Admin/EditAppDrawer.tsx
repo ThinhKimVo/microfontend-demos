@@ -51,7 +51,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
       {/* Full Page Modal */}
       <div className="w-full h-full bg-white flex flex-col animate-fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-200 bg-slate-50">
           <div className="flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
               {app.name?.charAt(0) || 'A'}
@@ -74,12 +74,12 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-200 px-6 bg-white">
+        <div className="flex border-b border-slate-200 px-4 sm:px-6 bg-white overflow-x-auto scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+              className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab.id
                   ? 'border-emerald-600 text-emerald-600'
                   : 'border-transparent text-slate-500 hover:text-slate-700'
@@ -92,7 +92,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {activeTab === 'general' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column */}
@@ -148,7 +148,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
 
                 <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
                   <h3 className="font-semibold text-slate-900 mb-4">Technical Details</h3>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Framework</label>
                       <select

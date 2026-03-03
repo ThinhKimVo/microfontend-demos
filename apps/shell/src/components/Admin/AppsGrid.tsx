@@ -47,61 +47,64 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
 
       {/* Filters & Search */}
       <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <div className="flex flex-col lg:flex-row gap-3">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <SearchIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search apps…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
+        <div className="flex flex-col gap-3">
+          {/* Top row: search + view toggle */}
+          <div className="flex gap-3">
+            <div className="flex-1 relative">
+              <SearchIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search apps…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
+            {/* View Toggle */}
+            <div className="flex bg-slate-100 rounded-lg p-0.5 flex-shrink-0">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  viewMode === 'grid' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                aria-label="Grid view"
+              >
+                <GridIcon className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  viewMode === 'list' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                aria-label="List view"
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Framework Filter */}
-          <select
-            value={filterFramework}
-            onChange={(e) => setFilterFramework(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[140px]"
-          >
-            {frameworks.map(fw => (
-              <option key={fw} value={fw}>
-                {fw === 'all' ? 'All Frameworks' : fw}
-              </option>
-            ))}
-          </select>
-
-          {/* Status Filter */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[120px]"
-          >
-            <option value="all">All Status</option>
-            <option value="deployed">Deployed</option>
-            <option value="draft">Draft</option>
-          </select>
-
-          {/* View Toggle */}
-          <div className="flex bg-slate-100 rounded-lg p-0.5">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-md transition-colors ${
-                viewMode === 'grid' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
-              }`}
+          {/* Bottom row: filters */}
+          <div className="flex gap-3">
+            <select
+              value={filterFramework}
+              onChange={(e) => setFilterFramework(e.target.value)}
+              className="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
-              <GridIcon className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
-              }`}
+              {frameworks.map(fw => (
+                <option key={fw} value={fw}>
+                  {fw === 'all' ? 'All Frameworks' : fw}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
-              <ListIcon className="w-4 h-4" />
-            </button>
+              <option value="all">All Status</option>
+              <option value="deployed">Deployed</option>
+              <option value="draft">Draft</option>
+            </select>
           </div>
         </div>
       </div>
@@ -127,7 +130,8 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px]">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">App</th>
@@ -182,6 +186,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ apps, onEdit, onDelete, onAd
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
@@ -220,16 +225,18 @@ const AppCard: React.FC<{
 
       <div className="flex items-center justify-between pt-3 border-t border-slate-100">
         <code className="text-[10px] text-slate-400">{app.path}</code>
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit(app)}
             className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+            aria-label={`Edit ${app.name}`}
           >
             <EditIcon className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(app.id)}
             className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+            aria-label={`Delete ${app.name}`}
           >
             <TrashIcon className="w-3.5 h-3.5" />
           </button>
