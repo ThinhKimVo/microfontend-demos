@@ -26,22 +26,22 @@ export const ScreenshotCarousel: React.FC<ScreenshotCarouselProps> = ({
   if (screenshots.length <= 1) return null;
 
   return (
-    <section id="screenshots" className="py-12 md:py-16 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="screenshots" className="py-8">
+      <div className="glass-panel p-8 rounded-[2.5rem] border-white/10 shadow-xl overflow-hidden relative group/carousel">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-2">
-            Screenshots
+          <h2 className="text-xl font-black text-white mb-2 uppercase tracking-tight">
+            Visual Analysis
           </h2>
-          <p className="text-slate-500 text-sm">
-            Explore the features and interface of {app.name}
+          <p className="text-slate-500 font-mono text-[10px] uppercase tracking-widest">
+            {app.name} Core Interface
           </p>
         </div>
 
         {/* Carousel */}
         <div className="relative">
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-2xl border border-white/5 bg-black/20">
             <div
-              className="flex transition-transform duration-500"
+              className="flex transition-transform duration-700 cubic-bezier(0.23, 1, 0.32, 1)"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
               {screenshots.map((screenshot, index) => (
@@ -52,13 +52,13 @@ export const ScreenshotCarousel: React.FC<ScreenshotCarouselProps> = ({
                       alt={screenshot.alt}
                       width={1280}
                       height={720}
-                      className="w-full"
+                      className="w-full opacity-90"
                       loading={index === 0 ? 'eager' : 'lazy'}
                       onError={() => onImageError(index)}
                     />
                   ) : (
-                    <div className="w-full aspect-video bg-slate-100 flex items-center justify-center">
-                      <span className="text-slate-400 text-sm">Image unavailable</span>
+                    <div className="w-full aspect-video bg-white/5 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-xl">
+                      <span className="text-slate-500 font-mono text-[10px] uppercase tracking-widest">Data Stream Interrupted</span>
                     </div>
                   )}
                 </div>
@@ -69,39 +69,40 @@ export const ScreenshotCarousel: React.FC<ScreenshotCarouselProps> = ({
           {/* Navigation */}
           <button
             onClick={onPrevSlide}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-obsidian transition-all opacity-0 group-hover/carousel:opacity-100"
             aria-label="Previous screenshot"
           >
-            <ChevronLeftIcon aria-hidden="true" className="w-5 h-5" />
+            <ChevronLeftIcon className="w-6 h-6" />
           </button>
           <button
             onClick={onNextSlide}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-obsidian transition-all opacity-0 group-hover/carousel:opacity-100"
             aria-label="Next screenshot"
           >
-            <ChevronRightIcon aria-hidden="true" className="w-5 h-5" />
+            <ChevronRightIcon className="w-6 h-6" />
           </button>
 
           {/* Dots */}
-          <div className="flex justify-center gap-1.5 mt-4">
+          <div className="flex justify-center gap-3 mt-8">
             {screenshots.map((_, index) => (
               <button
                 key={index}
                 onClick={() => onGoToSlide(index)}
-                className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 ${
-                  index === currentSlide
-                    ? 'w-6 bg-emerald-600'
-                    : 'w-1.5 bg-slate-300 hover:bg-slate-400'
-                }`}
+                className={`h-1 rounded-full transition-all ${index === currentSlide
+                    ? 'w-10 bg-accent-cyan shadow-[0_0_10px_rgba(6,241,255,0.5)]'
+                    : 'w-4 bg-white/10 hover:bg-white/20'
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
 
           {/* Caption */}
-          <p className="text-center mt-3 text-slate-500 text-sm">
-            {screenshots[currentSlide]?.alt}
-          </p>
+          <div className="mt-6 flex justify-center">
+            <p className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full font-mono text-[10px] text-slate-400 uppercase tracking-widest">
+              {screenshots[currentSlide]?.alt || 'System Module Display'}
+            </p>
+          </div>
         </div>
       </div>
     </section>

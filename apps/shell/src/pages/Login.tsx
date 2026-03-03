@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { ArrowIcon } from '../components/Icons';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function Login() {
       if (result.success) {
         navigate('/admin');
       } else {
-        setError(result.error || 'An error occurred');
+        setError(result.error || 'Identity verification failed');
       }
     } finally {
       setIsSubmitting(false);
@@ -37,148 +38,138 @@ export default function Login() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-slate-600" />
+      <div className="min-h-screen bg-obsidian flex items-center justify-center">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 border-2 border-accent-cyan/20 rounded-full"></div>
+          <div className="absolute inset-0 border-t-2 border-accent-cyan rounded-full animate-spin"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-14">
-            <Link to="/" className="flex items-center">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+      {/* Background Decor */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[120px] -z-10 animate-glow-pulse"></div>
+
+      <div className="w-full max-w-[420px] stagger-load">
+        {/* Monolith Card */}
+        <div className="glass-panel p-10 rounded-[2.5rem] border-white/10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent-cyan to-transparent opacity-50"></div>
+
+          <div className="text-center mb-10">
+            <Link to="/" className="inline-flex mb-8 group">
               <img
                 src="/logo-black.svg"
                 alt="Saigon Technology"
-                className="h-7 w-auto"
+                className="h-10 w-auto brightness-0 invert group-hover:drop-shadow-[0_0_12px_rgba(6,241,255,0.4)] transition-all duration-300"
               />
             </Link>
+
+            <h1 className="text-3xl font-black tracking-tight text-white mb-2">
+              {isLogin ? 'ACCESS_TERMINAL' : 'RECRUIT_INIT'}
+            </h1>
+            <p className="text-slate-500 font-mono text-[10px] uppercase tracking-widest">
+              {isLogin ? 'Provide secure credentials' : 'Initialize new user profile'}
+            </p>
           </div>
-        </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm">
-          {/* Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6">
-            <div className="text-center mb-6">
-              <h1 className="text-xl font-semibold text-slate-900">
-                {isLogin ? 'Sign in' : 'Create account'}
-              </h1>
-              <p className="text-slate-500 text-sm mt-1">
-                {isLogin ? 'Access the admin panel' : 'Register for a new account'}
-              </p>
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-xs font-mono uppercase tracking-wider text-center" role="alert">
+              [ERROR]: {error}
             </div>
+          )}
 
-            {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm" role="alert">
-                {error}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {!isLogin && (
+              <div className="group">
+                <label htmlFor="name" className="block text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-2 group-focus-within:text-accent-cyan transition-colors">
+                  Identity Core Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="DESIGNATOR"
+                  required={!isLogin}
+                  className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/10 focus:outline-none focus:border-accent-cyan/50 transition-all font-mono text-sm"
+                />
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
-                    Name
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name"
-                    required={!isLogin}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  autoComplete="email"
-                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  required
-                  autoComplete={isLogin ? 'current-password' : 'new-password'}
-                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-2 px-4 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    {isLogin ? 'Signing in…' : 'Creating account…'}
-                  </span>
-                ) : (
-                  isLogin ? 'Sign in' : 'Create account'
-                )}
-              </button>
-            </form>
-
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError('');
-                }}
-                className="text-sm text-slate-500 hover:text-slate-700"
-              >
-                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-              </button>
+            <div className="group">
+              <label htmlFor="email" className="block text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-2 group-focus-within:text-accent-cyan transition-colors">
+                Communication Uplink
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="EMAIL_ADDRESS"
+                required
+                autoComplete="email"
+                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/10 focus:outline-none focus:border-accent-cyan/50 transition-all font-mono text-sm"
+              />
             </div>
 
-            {/* Demo Credentials */}
-            {/* {isLogin && (
-              <div className="mt-6 pt-4 border-t border-slate-200">
-                <p className="text-xs text-slate-500 text-center mb-2">Demo credentials:</p>
-                <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-600 font-mono">
-                  <p>Email: admin@saigontechnology.com</p>
-                  <p>Password: admin123</p>
-                </div>
-              </div>
-            )} */}
-          </div>
+            <div className="group">
+              <label htmlFor="password" className="block text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-2 group-focus-within:text-accent-cyan transition-colors">
+                Security Passcode
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="********"
+                required
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
+                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/10 focus:outline-none focus:border-accent-cyan/50 transition-all font-mono text-sm"
+              />
+            </div>
 
-          {/* Back link */}
-          <p className="text-center mt-4">
-            <Link to="/" className="text-sm text-slate-500 hover:text-slate-700">
-              Back to home
-            </Link>
-          </p>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-5 px-6 bg-white text-obsidian font-black rounded-2xl hover:bg-accent-cyan transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-obsidian/20 border-t-obsidian rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {isLogin ? 'Authorize Access' : 'Create Profile'}
+                  <ArrowIcon className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center pt-8 border-t border-white/5">
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError('');
+              }}
+              className="text-[10px] font-mono uppercase tracking-widest text-slate-500 hover:text-accent-cyan transition-colors"
+            >
+              {isLogin ? "Join the network" : 'Return to terminal'}
+            </button>
+          </div>
         </div>
-      </main>
+
+        {/* Outer Back Link */}
+        <p className="text-center mt-10">
+          <Link to="/" className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-600 hover:text-white transition-all">
+            [ ABORT_PROCESS ]
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

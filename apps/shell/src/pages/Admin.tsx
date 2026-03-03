@@ -181,7 +181,7 @@ const Admin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
+    <div className="min-h-screen flex">
       {/* Mobile backdrop */}
       {mobileMenuOpen && (
         <div
@@ -193,9 +193,8 @@ const Admin: React.FC = () => {
 
       {/* Sidebar wrapper – overlay on mobile, sticky column on desktop */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 md:sticky md:top-0 md:h-screen md:z-auto md:inset-auto md:flex-shrink-0 transition-transform duration-300 ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 md:sticky md:top-0 md:h-screen md:z-auto md:inset-auto md:flex-shrink-0 transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          }`}
       >
         <Sidebar
           activeSection={activeSection}
@@ -212,8 +211,8 @@ const Admin: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-auto min-w-0">
         {/* Top Bar */}
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <header className="sticky top-0 z-10 glass-panel border-b border-white/10">
+          <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               {/* Hamburger – mobile only */}
               <button
@@ -223,7 +222,7 @@ const Admin: React.FC = () => {
               >
                 <MenuIcon className="w-5 h-5" aria-hidden="true" />
               </button>
-              <h1 className="text-base sm:text-xl font-semibold text-slate-900 capitalize">
+              <h1 className="text-xl font-bold tracking-tight text-white capitalize">
                 {activeSection === 'apps' ? 'Applications' : activeSection}
               </h1>
             </div>
@@ -299,11 +298,10 @@ const Admin: React.FC = () => {
         <div
           role="alert"
           aria-live="polite"
-          className={`fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-slide-up ${
-            message.type === 'success'
+          className={`fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-slide-up ${message.type === 'success'
               ? 'bg-green-600 text-white'
               : 'bg-red-600 text-white'
-          }`}
+            }`}
         >
           {message.type === 'success' ? (
             <CheckCircleIcon className="w-5 h-5" aria-hidden="true" />
