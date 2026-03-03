@@ -69,7 +69,7 @@ export const ScreenshotCarousel: React.FC<ScreenshotCarouselProps> = ({
           {/* Navigation */}
           <button
             onClick={onPrevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-obsidian transition-all opacity-0 group-hover/carousel:opacity-100"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-accent-cyan hover:text-obsidian transition-all opacity-0 group-hover/carousel:opacity-100"
             aria-label="Previous screenshot"
           >
             <ChevronLeftIcon className="w-6 h-6" />
@@ -89,8 +89,8 @@ export const ScreenshotCarousel: React.FC<ScreenshotCarouselProps> = ({
                 key={index}
                 onClick={() => onGoToSlide(index)}
                 className={`h-1 rounded-full transition-all ${index === currentSlide
-                    ? 'w-10 bg-accent-cyan shadow-[0_0_10px_rgba(6,241,255,0.5)]'
-                    : 'w-4 bg-white/10 hover:bg-white/20'
+                  ? 'w-10 bg-accent-cyan shadow-[0_0_10px_rgba(132,175,72,0.5)]'
+                  : 'w-4 bg-white/10 hover:bg-white/20'
                   }`}
                 aria-label={`Go to slide ${index + 1}`}
               />

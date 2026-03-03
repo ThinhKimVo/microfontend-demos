@@ -67,7 +67,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
           </div>
           <button
             onClick={onCancel}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-accent-cyan hover:bg-white/5 rounded-lg transition-colors"
           >
             <CloseIcon className="w-6 h-6" />
           </button>
@@ -79,11 +79,10 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
-                activeTab === tab.id
-                  ? 'border-emerald-600 text-emerald-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab.id
+                ? 'border-accent-cyan text-accent-cyan'
+                : 'border-transparent text-slate-500 hover:text-accent-cyan'
+                }`}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -108,7 +107,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="text"
                         value={app.name}
                         onChange={(e) => updateField('name', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                        className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-r-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
                         placeholder="My Awesome App"
                       />
                     </div>
@@ -154,7 +153,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       <select
                         value={app.framework}
                         onChange={(e) => updateField('framework', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
                       >
                         <optgroup label="Web">
                           <option value="React">React</option>
@@ -176,7 +175,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="number"
                         value={app.port}
                         onChange={(e) => updateField('port', parseInt(e.target.value) || 3100)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
                       />
                     </div>
                     <div>
@@ -185,7 +184,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="text"
                         value={app.version}
                         onChange={(e) => updateField('version', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
                         placeholder="1.0.0"
                       />
                     </div>
@@ -266,7 +265,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         onChange={(e) => updateField('integrated', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-14 h-8 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+                      <div className="w-14 h-8 bg-slate-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent-cyan/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-obsidian after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent-cyan"></div>
                     </div>
                     <div>
                       <span className="font-medium text-slate-900">Integrated & Deployed</span>
@@ -312,11 +311,10 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                     <button
                       key={preset.name}
                       onClick={() => applyGradientPreset(preset)}
-                      className={`relative group p-1 rounded-xl transition-all ${
-                        app.gradient === preset.gradient
-                          ? 'ring-2 ring-emerald-500 ring-offset-2'
-                          : 'hover:scale-105'
-                      }`}
+                      className={`relative group p-1 rounded-xl transition-all ${app.gradient === preset.gradient
+                        ? 'ring-2 ring-accent-cyan ring-offset-2 ring-offset-obsidian'
+                        : 'hover:scale-105'
+                        }`}
                     >
                       <div className={`h-12 rounded-lg bg-gradient-to-br ${preset.gradient}`}></div>
                       <p className="text-xs font-medium text-slate-600 mt-1.5 text-center truncate">{preset.name}</p>
@@ -389,11 +387,10 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                     <button
                       type="button"
                       onClick={() => setEditorMode('visual')}
-                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-                        editorMode === 'visual'
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'visual'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                        }`}
                       title="Visual Editor - Edit like a document"
                     >
                       <span className="flex items-center gap-1.5">
@@ -404,11 +401,10 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                     <button
                       type="button"
                       onClick={() => setEditorMode('html')}
-                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-                        editorMode === 'html'
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'html'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                        }`}
                       title="HTML Editor - Edit raw HTML code"
                     >
                       <span className="flex items-center gap-1.5">
@@ -419,11 +415,10 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                     <button
                       type="button"
                       onClick={() => setEditorMode('preview')}
-                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-                        editorMode === 'preview'
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'preview'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                        }`}
                       title="Preview - See how it will look"
                     >
                       <span className="flex items-center gap-1.5">
@@ -517,13 +512,13 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
         <div className="sticky bottom-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <button
             onClick={onCancel}
-            className="min-w-[120px] py-2.5 text-slate-600 hover:text-slate-800 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            className="min-w-[120px] py-2.5 text-slate-400 hover:text-white text-sm font-medium rounded-lg border border-white/10 hover:bg-accent-cyan/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="min-w-[120px] py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+            className="min-w-[120px] py-2.5 bg-white text-obsidian text-sm font-black rounded-lg hover:bg-accent-cyan transition-colors shadow-[0_10px_30px_-10px_rgba(132,175,72,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2"
           >
             {isNew ? 'Create App' : 'Save Changes'}
           </button>
@@ -599,12 +594,12 @@ const MobileIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const AppleIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
   </svg>
 );
 
 const AndroidIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.37-.59-2.88-.92-4.47-.92s-3.1.33-4.47.92L5.65 5.67c-.19-.29-.55-.38-.84-.22-.3.16-.42.54-.26.85L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25S6.31 12.75 7 12.75s1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/>
+    <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.37-.59-2.88-.92-4.47-.92s-3.1.33-4.47.92L5.65 5.67c-.19-.29-.55-.38-.84-.22-.3.16-.42.54-.26.85L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25S6.31 12.75 7 12.75s1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z" />
   </svg>
 );

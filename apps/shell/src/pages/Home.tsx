@@ -59,7 +59,7 @@ export default function Home() {
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-accent-cyan transition-colors"
               >
                 <ClearIcon className="w-5 h-5" />
               </button>
@@ -161,7 +161,7 @@ export default function Home() {
             href="https://saigontechnology.com/contact/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-4 px-10 py-5 bg-white text-obsidian font-black rounded-full hover:bg-accent-cyan transition-all duration-500 uppercase tracking-widest text-sm"
+            className="inline-flex items-center gap-4 px-10 py-5 bg-white text-obsidian font-black rounded-full hover:bg-accent-cyan transition-all duration-500 uppercase tracking-widest text-sm shadow-[0_10px_40px_-10px_rgba(132,175,72,0.2)]"
           >
             Initiate Contact
             <ArrowIcon className="w-5 h-5 transition-transform group-hover:translate-x-2" />

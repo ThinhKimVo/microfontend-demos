@@ -32,7 +32,7 @@ export default function Shell({ children }: ShellProps) {
                 <img
                   src="/logo-black.svg"
                   alt="Saigon Technology"
-                  className="h-8 w-auto brightness-0 invert group-hover:drop-shadow-[0_0_8px_rgba(6,241,255,0.5)] transition-all duration-300"
+                  className="h-8 w-auto brightness-0 invert group-hover:drop-shadow-[0_0_8px_rgba(132,175,72,0.5)] transition-all duration-300"
                 />
               </Link>
             </div>
@@ -58,7 +58,7 @@ export default function Shell({ children }: ShellProps) {
                   <div className="w-8 h-8 rounded-full bg-accent-cyan/20 border border-accent-cyan/30 flex items-center justify-center text-accent-cyan font-bold text-sm">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xs font-bold tracking-tight text-slate-300 group-hover:text-white transition-colors">
+                  <span className="text-xs font-bold tracking-tight text-slate-300 group-hover:text-accent-cyan transition-colors">
                     {user?.name}
                   </span>
                 </Link>

@@ -62,7 +62,7 @@ export default function Login() {
               <img
                 src="/logo-black.svg"
                 alt="Saigon Technology"
-                className="h-10 w-auto brightness-0 invert group-hover:drop-shadow-[0_0_12px_rgba(6,241,255,0.4)] transition-all duration-300"
+                className="h-10 w-auto brightness-0 invert group-hover:drop-shadow-[0_0_12px_rgba(132,175,72,0.4)] transition-all duration-300"
               />
             </Link>
 
@@ -133,7 +133,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-5 px-6 bg-white text-obsidian font-black rounded-2xl hover:bg-accent-cyan transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3"
+              className="w-full py-5 px-6 bg-white text-obsidian font-black rounded-2xl hover:bg-accent-cyan transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-[0_10px_30px_-10px_rgba(132,175,72,0.15)]"
             >
               {isSubmitting ? (
                 <>
@@ -165,7 +165,7 @@ export default function Login() {
 
         {/* Outer Back Link */}
         <p className="text-center mt-10">
-          <Link to="/" className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-600 hover:text-white transition-all">
+          <Link to="/" className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-600 hover:text-accent-cyan transition-all">
             [ ABORT_PROCESS ]
           </Link>
         </p>

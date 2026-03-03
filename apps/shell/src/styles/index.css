@@ -6,7 +6,7 @@
 
 :root {
   --bg-obsidian: #0A0A0B;
-  --accent-cyan: #06F1FF;
+  --accent-cyan: #84AF48;
   --accent-emerald: #00FF9C;
 }
 
@@ -14,7 +14,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  cursor: crosshair; /* Distinctive touch */
+  cursor: crosshair;
+  /* Distinctive touch */
 }
 
 body {
@@ -32,8 +33,8 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    radial-gradient(circle at 0% 0%, rgba(6, 241, 255, 0.05) 0%, transparent 40%),
+  background:
+    radial-gradient(circle at 0% 0%, rgba(132, 175, 72, 0.05) 0%, transparent 40%),
     radial-gradient(circle at 100% 100%, rgba(0, 255, 156, 0.05) 0%, transparent 40%),
     linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
@@ -42,7 +43,10 @@ body::before {
   pointer-events: none;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   @apply font-outfit font-extrabold tracking-tight text-white;
 }
 
@@ -54,7 +58,7 @@ h1, h2, h3, h4 {
   @apply glass-panel transition-all duration-500 hover:border-accent-cyan/40 hover:bg-white/[0.05] hover:-translate-y-1;
 }
 
-.stagger-load > * {
+.stagger-load>* {
   @apply opacity-0;
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -64,6 +68,7 @@ h1, h2, h3, h4 {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -74,9 +79,11 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   @apply bg-transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }

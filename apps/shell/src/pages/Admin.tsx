@@ -217,7 +217,7 @@ const Admin: React.FC = () => {
               {/* Hamburger – mobile only */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                className="md:hidden p-2 text-slate-500 hover:text-accent-cyan hover:bg-white/5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                 aria-label="Open navigation menu"
               >
                 <MenuIcon className="w-5 h-5" aria-hidden="true" />
@@ -229,14 +229,14 @@ const Admin: React.FC = () => {
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={handleRefresh}
-                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="p-2 text-slate-500 hover:text-accent-cyan hover:bg-white/5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                 aria-label="Refresh data"
               >
                 <RefreshIcon className="w-5 h-5" aria-hidden="true" />
               </button>
               <button
                 onClick={handleExport}
-                className="hidden sm:flex px-4 py-2 text-slate-600 hover:text-slate-800 border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="hidden sm:flex px-4 py-2 text-slate-400 hover:text-white border border-white/10 rounded-xl hover:bg-accent-cyan/10 transition-colors items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
               >
                 <DownloadIcon className="w-4 h-4" aria-hidden="true" />
                 Export
@@ -244,7 +244,7 @@ const Admin: React.FC = () => {
               {/* Mobile export icon-only button */}
               <button
                 onClick={handleExport}
-                className="sm:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="sm:hidden p-2 text-slate-500 hover:text-accent-cyan hover:bg-white/5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                 aria-label="Export data"
               >
                 <DownloadIcon className="w-5 h-5" aria-hidden="true" />
@@ -299,8 +299,8 @@ const Admin: React.FC = () => {
           role="alert"
           aria-live="polite"
           className={`fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-slide-up ${message.type === 'success'
-              ? 'bg-green-600 text-white'
-              : 'bg-red-600 text-white'
+            ? 'bg-accent-cyan text-obsidian font-bold'
+            : 'bg-red-600 text-white'
             }`}
         >
           {message.type === 'success' ? (
@@ -398,7 +398,7 @@ const Settings: React.FC<{ onExport: () => void }> = ({ onExport }) => {
             </div>
             <button
               onClick={onExport}
-              className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-white/5 text-white border border-white/10 font-bold rounded-xl hover:bg-accent-cyan hover:text-obsidian hover:border-accent-cyan transition-colors"
             >
               Export JSON
             </button>

@@ -139,7 +139,7 @@ export default function AppDetail() {
                                 className="w-24 h-24 grayscale group-hover:grayscale-0 transition-all"
                               />
                             </div>
-                            <div className="flex items-center gap-2 mt-3 text-[10px] font-mono text-slate-400 group-hover:text-white uppercase tracking-widest">
+                            <div className="flex items-center gap-2 mt-3 text-[10px] font-mono text-slate-400 group-hover:text-accent-cyan uppercase tracking-widest">
                               <AppleIcon className="w-4 h-4" />
                               <span>iOS</span>
                             </div>
@@ -154,7 +154,7 @@ export default function AppDetail() {
                                 className="w-24 h-24 grayscale group-hover:grayscale-0 transition-all"
                               />
                             </div>
-                            <div className="flex items-center gap-2 mt-3 text-[10px] font-mono text-slate-400 group-hover:text-white uppercase tracking-widest">
+                            <div className="flex items-center gap-2 mt-3 text-[10px] font-mono text-slate-400 group-hover:text-accent-cyan uppercase tracking-widest">
                               <AndroidIcon className="w-4 h-4" />
                               <span>Android</span>
                             </div>
@@ -264,7 +264,7 @@ export default function AppDetail() {
             href={app.path}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center w-16 h-16 bg-white text-obsidian rounded-full shadow-[0_10px_40px_-10px_rgba(255,255,255,0.2)] hover:bg-accent-cyan transition-all"
+            className="flex items-center justify-center w-16 h-16 bg-white text-obsidian rounded-full shadow-[0_10px_40px_-10px_rgba(132,175,72,0.2)] hover:bg-accent-cyan transition-all"
             aria-label="Launch Module"
           >
             <ArrowIcon className="w-6 h-6" />

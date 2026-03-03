@@ -38,14 +38,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`bg-slate-900 h-full flex flex-col transition-all duration-300 relative border-r border-slate-800 ${
-        collapsed ? 'w-[72px]' : 'w-60'
-      }`}
+      className={`bg-slate-900 h-full flex flex-col transition-all duration-300 relative border-r border-slate-800 ${collapsed ? 'w-[72px]' : 'w-60'
+        }`}
     >
       {/* Toggle Button - On border between sidebar and main (desktop only) */}
       <button
         onClick={onToggleCollapse}
-        className="hidden md:flex absolute top-[88px] -right-3 z-50 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        className="hidden md:flex absolute top-[88px] -right-3 z-50 w-6 h-6 bg-obsidian border border-white/10 rounded-full items-center justify-center text-slate-500 hover:text-accent-cyan hover:border-accent-cyan/50 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         <CollapseIcon className={`w-3 h-3 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} aria-hidden="true" />
@@ -53,8 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Header with Logo */}
       <div className={`border-b border-slate-800 p-4 h-[72px] flex items-center ${collapsed ? 'justify-center' : 'justify-between'}`}>
-        <Link to="/" className={`flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg ${collapsed ? 'justify-center' : ''}`} aria-label="Go to home page">
-          <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Link to="/" className={`flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan rounded-lg ${collapsed ? 'justify-center' : ''}`} aria-label="Go to home page">
+          <div className="w-10 h-10 bg-accent-cyan rounded-lg flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(132,175,72,0.4)]">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
@@ -70,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onMobileClose && (
           <button
             onClick={onMobileClose}
-            className="md:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            className="md:hidden p-1.5 text-slate-400 hover:text-accent-cyan hover:bg-white/5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
             aria-label="Close navigation"
           >
             <CloseIcon className="w-5 h-5" />
@@ -85,27 +84,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <li key={item.id} className="relative">
               <button
                 onClick={() => onSectionChange(item.id)}
-                className={`w-full flex items-center gap-3 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-                  collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2.5'
-                } ${
-                  activeSection === item.id
+                className={`w-full flex items-center gap-3 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan ${collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2.5'
+                  } ${activeSection === item.id
                     ? 'bg-slate-800 text-white'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
-                }`}
+                    : 'text-slate-400 hover:bg-accent-cyan/10 hover:text-accent-cyan'
+                  }`}
                 aria-label={collapsed ? item.label : undefined}
                 aria-current={activeSection === item.id ? 'page' : undefined}
               >
                 {activeSection === item.id && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-500 rounded-r-full" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-accent-cyan rounded-r-full shadow-[0_0_10px_rgba(132,175,72,0.8)]" />
                 )}
                 <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                 {!collapsed && (
                   <>
                     <span className="flex-1 text-left text-sm font-medium whitespace-nowrap">{item.label}</span>
                     {item.badge !== undefined && (
-                      <span className={`min-w-[20px] h-5 px-1.5 text-xs font-medium rounded flex items-center justify-center ${
-                        activeSection === item.id ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300'
-                      }`}>
+                      <span className={`min-w-[20px] h-5 px-1.5 text-xs font-bold rounded flex items-center justify-center ${activeSection === item.id ? 'bg-accent-cyan text-obsidian' : 'bg-slate-700 text-slate-300'
+                        }`}>
                         {item.badge}
                       </span>
                     )}
@@ -113,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
               </button>
               {collapsed && item.badge !== undefined && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-emerald-600 text-white text-[10px] font-medium rounded flex items-center justify-center">
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-accent-cyan text-obsidian text-[10px] font-bold rounded flex items-center justify-center">
                   {item.badge}
                 </span>
               )}
@@ -126,14 +122,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <footer className={`border-t border-slate-800 ${collapsed ? 'p-2 space-y-1' : 'p-3 space-y-1'}`}>
         {/* DB connection status */}
         {collapsed ? (
-          <div className="flex justify-center py-2" title="Database Connected">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
+            <div className="w-2 h-2 bg-accent-cyan rounded-full animate-pulse flex-shrink-0 shadow-[0_0_5px_rgba(132,175,72,0.8)]" />
+            <div className="flex-1 min-w-0">
+              <p className="text-accent-cyan text-xs font-bold leading-none">Connected</p>
+              <p className="text-slate-500 text-[10px] mt-0.5">PostgreSQL</p>
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse flex-shrink-0" />
+            <div className="w-2 h-2 bg-accent-cyan rounded-full animate-pulse flex-shrink-0 shadow-[0_0_5px_rgba(132,175,72,0.8)]" />
             <div className="flex-1 min-w-0">
-              <p className="text-slate-300 text-xs font-medium leading-none">Connected</p>
+              <p className="text-accent-cyan text-xs font-bold leading-none">Connected</p>
               <p className="text-slate-500 text-[10px] mt-0.5">PostgreSQL</p>
             </div>
           </div>
@@ -180,9 +180,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className={user ? '' : 'border-t border-slate-800/60 pt-1 mt-1'}>
           <Link
             to="/"
-            className={`flex items-center gap-3 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-              collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2'
-            }`}
+            className={`flex items-center gap-3 text-slate-400 hover:text-accent-cyan hover:bg-white/5 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan ${collapsed ? 'px-3 py-2.5 justify-center' : 'px-3 py-2'
+              }`}
             aria-label={collapsed ? 'Back to Site' : undefined}
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

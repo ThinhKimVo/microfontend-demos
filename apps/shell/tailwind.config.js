@@ -7,7 +7,8 @@ module.exports = {
         obsidian: '#0A0A0B',
         surface: '#151516',
         accent: {
-          cyan: '#06F1FF',
+          primary: '#84AF48', // R: 132, G: 175, B: 72
+          cyan: '#84AF48',
           emerald: '#00FF9C',
           magenta: '#FF00E5',
         },

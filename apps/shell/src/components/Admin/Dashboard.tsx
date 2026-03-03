@@ -13,8 +13,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
   const frameworks = [...new Set(apps.map(app => app.framework))];
 
   const stats = [
-    { label: 'Total Apps', value: apps.length, icon: AppsIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Deployed', value: deployedApps.length, icon: CheckIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Total Apps', value: apps.length, icon: AppsIcon, color: 'text-accent-cyan', bg: 'bg-accent-cyan/10' },
+    { label: 'Deployed', value: deployedApps.length, icon: CheckIcon, color: 'text-accent-cyan', bg: 'bg-accent-cyan/10' },
     { label: 'Screenshots', value: totalScreenshots, icon: ImageIcon, color: 'text-violet-600', bg: 'bg-violet-50' },
     { label: 'Frameworks', value: frameworks.length, icon: CodeIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
@@ -28,14 +28,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
         <div className="flex gap-3">
           <button
             onClick={onAddApp}
-            className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-white text-obsidian text-sm font-black rounded-lg hover:bg-accent-cyan transition-colors flex items-center gap-2 shadow-[0_10px_20px_-10px_rgba(132,175,72,0.2)]"
           >
             <PlusIcon className="w-4 h-4" />
             Add New App
           </button>
           <button
             onClick={onGoToApps}
-            className="px-4 py-2 text-slate-600 text-sm font-medium border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-slate-400 text-sm font-medium border border-white/10 rounded-lg hover:bg-accent-cyan/10 transition-colors"
           >
             View All Apps
           </button>
@@ -63,29 +63,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
           <div className="space-y-2">
             <button
               onClick={onAddApp}
-              className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors text-left"
+              className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left"
             >
-              <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                <PlusIcon className="w-4 h-4 text-emerald-600" />
+              <div className="w-8 h-8 bg-accent-cyan/10 rounded-lg flex items-center justify-center">
+                <PlusIcon className="w-4 h-4 text-accent-cyan" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-900">Create New App</p>
+                <p className="text-sm font-medium text-slate-200">Create New App</p>
                 <p className="text-xs text-slate-500">Add a new application</p>
               </div>
             </button>
             <button
               onClick={onGoToApps}
-              className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors text-left"
+              className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left"
             >
-              <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                <AppsIcon className="w-4 h-4 text-emerald-600" />
+              <div className="w-8 h-8 bg-accent-cyan/10 rounded-lg flex items-center justify-center">
+                <AppsIcon className="w-4 h-4 text-accent-cyan" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-900">Manage Apps</p>
+                <p className="text-sm font-medium text-slate-200">Manage Apps</p>
                 <p className="text-xs text-slate-500">Edit or delete apps</p>
               </div>
             </button>
-            <button className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors text-left">
+            <button className="w-full flex items-center gap-3 p-3 hover:bg-accent-cyan/10 hover:text-accent-cyan group rounded-lg transition-colors text-left">
               <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
                 <DownloadIcon className="w-4 h-4 text-violet-600" />
               </div>
@@ -101,7 +101,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
         <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-slate-900">Recent Apps</h2>
-            <button onClick={onGoToApps} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+            <button onClick={onGoToApps} className="text-xs text-accent-cyan hover:text-accent-cyan/80 font-black uppercase tracking-widest">
               View All
             </button>
           </div>
@@ -123,8 +123,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
                     {app.framework}
                   </span>
                   {app.integrated ? (
-                    <span className="flex items-center gap-1 text-xs text-emerald-600">
-                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                    <span className="flex items-center gap-1 text-xs text-accent-cyan font-bold">
+                      <span className="w-1.5 h-1.5 bg-accent-cyan rounded-full animate-pulse" />
                       Live
                     </span>
                   ) : (

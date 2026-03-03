@@ -66,7 +66,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   href={app.path}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-10 py-4 bg-white text-obsidian text-xs font-black rounded-full hover:bg-accent-cyan transition-all uppercase tracking-widest shadow-[0_10px_30px_-10px_rgba(255,255,255,0.2)] hover:shadow-accent-cyan/30"
+                  className="inline-flex items-center gap-3 px-10 py-4 bg-white text-obsidian text-xs font-black rounded-full hover:bg-accent-cyan transition-all uppercase tracking-widest shadow-[0_10px_30px_-10px_rgba(132,175,72,0.2)] hover:shadow-accent-cyan/30"
                 >
                   Initiate Module
                   <ArrowIcon className="w-4 h-4" />
