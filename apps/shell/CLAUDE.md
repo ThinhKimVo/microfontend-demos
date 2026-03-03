@@ -209,6 +209,29 @@ import { EditAppModal, AppsTable, ScreenshotManager } from '../components/Admin'
 import { HeroSection, ScreenshotCarousel } from '../components/AppDetail';
 ```
 
+## Design System: Neo-Brutalist Kinetic
+
+The shell follows a high-impact **Neo-Brutalist Kinetic** aesthetic, characterized by bold typography, glassmorphism, and dynamic gradients.
+
+### Core Color Palette
+- **Primary / Accent**: `#84AF48` (Branded as `accent-cyan` or `accent.primary` in Tailwind)
+- **Background**: `#0A0A0B` (Obsidian / Deep Surface)
+- **Accents**: 
+  - Emerald: `#00FF9C`
+  - Magenta: `#FF00E5`
+- **Text**: `slate-300` (muted), `white` (prominent), `obsidian` (on primary backgrounds)
+
+### Typography
+- **Headings**: `Outfit` (sans-serif, bold/black weights)
+- **Monospace/Metadata**: `JetBrains Mono`
+- **Body**: Standard sans-serif (Inter/system fallback)
+
+### Key UI Patterns
+- **Glassmorphism**: Use the `.glass-panel` utility for containers.
+- **Micro-interactions**: Standardized hover transitions to `accent-cyan` (#84AF48).
+- **Animations**: Staggered reveals using `animate-fade-in-up` with progressive `animation-delay`.
+- **Glows**: Subtle radial glows using the primary brand color for high-visibility triggers.
+
 ## Key Files
 
 ### Core
@@ -383,6 +406,10 @@ The `webpack.config.prod.js` uses environment variables:
 3. Re-export from `src/services/appsService.ts` for backward compatibility
 
 ### CSS Organization
-- Global styles: `src/styles/index.css`
-- Component-specific styles: `src/styles/[componentName].css`
-- Import CSS files in components that use them
+- **Global Styles**: `src/styles/index.css` (Contains the design system tokens and base classes)
+- **Utility Classes**: Extends Tailwind with `accent-cyan`, `obsidian`, and custom keyframes (`glow-pulse`, `fade-in-up`).
+- **Component-specific**: `src/styles/[componentName].css` (e.g., `appDetail.css` for complex layout styles)
+- **Best Practices**:
+  - Prefer CSS variables from `:root` for brand alignment.
+  - Use `@apply` in `index.css` for reusable patterns like `.glass-panel`.
+  - Avoid hardcoded colors like `emerald-600` or `blue-500`; use `accent-cyan` instead.

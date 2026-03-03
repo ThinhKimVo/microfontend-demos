@@ -23,6 +23,7 @@ Shell (Host) - React                → http://localhost:3100
 - **Independent Deployment**: Each remote can be deployed separately
 - **Runtime Integration**: Components loaded dynamically at runtime
 - **Mount/Unmount Pattern**: Remotes expose mount functions with MemoryRouter for isolated routing
+- **Neo-Brutalist Design**: Premium, high-impact kinetic aesthetic with glassmorphism and custom typography
 - **Admin Panel**: Manage app metadata without code changes (`/admin`)
 - **Auto Availability Detection**: Automatically detects if remote apps are deployed
 - **CI/CD Pipeline**: GitHub Actions with self-hosted runner for automatic deployment
