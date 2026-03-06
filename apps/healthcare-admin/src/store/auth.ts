@@ -7,6 +7,8 @@ interface Admin {
   id: string;
   email: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   role: string;
 }
 
@@ -33,7 +35,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       rememberMe: false,
       lastActivity: null,
-      is2FAEnabled: true, // Mock: 2FA enabled by default
+      is2FAEnabled: false,
       is2FAVerified: false,
 
       setAuth: (admin, accessToken, rememberMe = false) => {
