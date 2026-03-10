@@ -4,14 +4,11 @@ const path = require('path');
 
 const deps = require('./package.json').dependencies;
 
-// Production host configuration
-const REMOTE_HOST = process.env.REMOTE_HOST || 'http://10.30.10.18';
-
 module.exports = {
   entry: './src/index.tsx',
   mode: 'production',
   output: {
-    publicPath: `${REMOTE_HOST}:3109/`,
+    publicPath: 'auto',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },

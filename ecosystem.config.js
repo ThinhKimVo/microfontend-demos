@@ -13,7 +13,7 @@ module.exports = {
         NODE_ENV: 'production',
         API_PORT: 3150,
         DB_HOST: 'localhost',
-        DB_PORT: 5432,
+        DB_PORT: 5433,
         DB_NAME: 'shell_apps',
         DB_USER: 'shell',
         DB_PASSWORD: 'shell123',
@@ -23,14 +23,16 @@ module.exports = {
       autorestart: true,
       max_memory_restart: '200M',
     },
-    // Shell Frontend
+    // Shell Frontend (Express static server with API proxy)
     {
       name: 'mfe-shell',
-      script: 'npx',
-      args: 'serve dist -p 3100 -s --cors',
+      script: 'node',
+      args: 'server/static.js',
       cwd: './apps/shell',
       env: {
         NODE_ENV: 'production',
+        PORT: 3100,
+        API_SERVER: 'http://localhost:3150',
       },
     },
     {

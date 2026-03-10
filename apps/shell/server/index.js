@@ -20,7 +20,7 @@ const generateToken = () => {
 // PostgreSQL connection
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
+  port: process.env.DB_PORT || 5433,
   database: process.env.DB_NAME || 'shell_apps',
   user: process.env.DB_USER || 'shell',
   password: process.env.DB_PASSWORD || 'shell123',
@@ -242,7 +242,7 @@ app.post('/api/auth/register', async (req, res) => {
 app.get('/api/check-upload', async (req, res) => {
   try {
     let screenshotsDir = path.join(__dirname, '..', 'public', 'screenshots');
-    
+
     if (!fs.existsSync(path.join(__dirname, '..', 'public'))) {
       screenshotsDir = path.join(__dirname, '../../public/screenshots');
     }

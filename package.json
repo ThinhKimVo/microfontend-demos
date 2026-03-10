@@ -11,7 +11,6 @@
     "build": "pnpm -r build",
     "build:prod": "pnpm -r build:prod",
     "clean": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:healthcare-admin": "pnpm --filter @mfe/healthcare-admin dev",
     "integrate": "node scripts/integrate-remote.js",
     "integrate:scan": "node scripts/integrate-remote.js --scan",
     "docker:build": "docker compose build",
@@ -33,6 +32,7 @@
     "dev:booking-host": "pnpm --filter @mfe/booking-host-portal dev",
     "dev:elearn-admin": "pnpm --filter @mfe/elearning-admin-portal dev",
     "dev:elearn-student": "pnpm --filter @mfe/elearning-student-portal dev",
+    "dev:healthcare-admin": "pnpm --filter @mfe/healthcare-admin dev",
     "dev:healthcare-marketing": "pnpm --filter @mfe/healthcare-marketing dev"
   },
   "devDependencies": {

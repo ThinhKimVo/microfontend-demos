@@ -107,7 +107,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="text"
                         value={app.name}
                         onChange={(e) => updateField('name', e.target.value)}
-                        className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-r-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
+                        className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-r-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
                         placeholder="My Awesome App"
                       />
                     </div>
@@ -153,7 +153,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       <select
                         value={app.framework}
                         onChange={(e) => updateField('framework', e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
                       >
                         <optgroup label="Web">
                           <option value="React">React</option>
@@ -175,7 +175,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="number"
                         value={app.port}
                         onChange={(e) => updateField('port', parseInt(e.target.value) || 3100)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
                       />
                     </div>
                     <div>
@@ -184,7 +184,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         type="text"
                         value={app.version}
                         onChange={(e) => updateField('version', e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
+                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
                         placeholder="1.0.0"
                       />
                     </div>
@@ -512,13 +512,13 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
         <div className="sticky bottom-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <button
             onClick={onCancel}
-            className="min-w-[120px] py-2.5 text-slate-400 hover:text-white text-sm font-medium rounded-lg border border-white/10 hover:bg-accent-cyan/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
+            className="min-w-[120px] py-2.5 text-slate-500 hover:text-slate-700 text-sm font-medium rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="min-w-[120px] py-2.5 bg-white text-obsidian text-sm font-black rounded-lg hover:bg-accent-cyan transition-colors shadow-[0_10px_30px_-10px_rgba(132,175,72,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2"
+            className="min-w-[120px] py-2.5 bg-accent-cyan text-white text-sm font-bold rounded-lg hover:bg-accent-cyan/90 transition-colors shadow-[0_10px_30px_-10px_rgba(132,175,72,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2"
           >
             {isNew ? 'Create App' : 'Save Changes'}
           </button>

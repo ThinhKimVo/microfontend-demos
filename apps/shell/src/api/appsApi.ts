@@ -7,7 +7,7 @@ import { AVAILABILITY_TIMEOUT_MS } from '../constants/config';
 function getRemoteBaseUrl(): string {
   const { hostname } = window.location;
   const isDev = hostname === 'localhost' || hostname === '127.0.0.1';
-  return `${'http'}//${isDev ? hostname : '127.0.0.1'}`;
+  return `http://${isDev ? hostname : '127.0.0.1'}`;
 }
 
 export async function checkAppAvailability(app: AppInfo): Promise<boolean> {

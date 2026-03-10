@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Star,
   Search,
@@ -17,225 +18,104 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { cn, formatDate, formatDateTime } from '../../lib/utils';
+import { getReviews, flagReview, unflagReview, toggleHideReview } from '../../services/admin';
 
-interface Feedback {
+interface Review {
   id: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  therapistId: string;
-  therapistName: string;
-  appointmentId: string;
-  appointmentDate: string;
   rating: number;
-  feedbackText: string;
-  submittedAt: string;
+  feedback: string | null;
+  tags: string[];
+  isAnonymous: boolean;
   isFlagged: boolean;
   isHidden: boolean;
   flagReason: string | null;
+  createdAt: string;
+  user: { id: string; firstName: string; lastName: string; email: string };
+  therapist: { id: string; user: { firstName: string; lastName: string } };
+  appointment: { id: string; scheduledAt: string };
 }
 
-// Generate mock feedback
-const generateMockFeedback = (): Feedback[] => {
-  const userNames = ['John Smith', 'Jane Doe', 'Michael Brown', 'Emily Chen', 'David Wilson', 'Sarah Johnson', 'Robert Taylor', 'Amanda White'];
-  const therapistNames = [
-    'Dr. Sarah Smith', 'Dr. Michael Brown', 'Dr. Emily Chen', 'Dr. James Wilson',
-    'Dr. Lisa Johnson', 'Dr. David Lee', 'Dr. Jennifer Garcia', 'Dr. Robert Miller',
-  ];
-  const feedbackTexts = [
-    'Great session! Dr. Smith was very understanding and helped me work through my anxiety. Highly recommend.',
-    'Very professional and attentive. The video call quality was excellent.',
-    'Good session overall. Would have liked more time to discuss coping strategies.',
-    'Excellent therapist! Made me feel comfortable from the start.',
-    'The session was helpful but felt a bit rushed at the end.',
-    'Amazing experience. Dr. Chen really listens and provides valuable insights.',
-    'Decent session. Some technical issues with the video but the therapist handled it well.',
-    'Very supportive and non-judgmental. Exactly what I needed.',
-    'Helpful advice on managing stress at work. Will definitely book again.',
-    'The therapist was late to the session which was disappointing.',
-    'Wonderful session! Learned new techniques for dealing with depression.',
-    'Average experience. Expected more personalized advice.',
-    'Incredible support during a difficult time. Thank you!',
-    'Good listener but could improve on providing actionable steps.',
-    'Perfect session. Felt heard and understood throughout.',
-  ];
-  const inappropriateFeedback = [
-    'This therapist is useless and a waste of money! Complete scam!',
-    'Worst experience ever. The therapist seemed distracted and unprofessional.',
-  ];
-
-  const feedback: Feedback[] = [];
-
-  for (let i = 0; i < 100; i++) {
-    const isInappropriate = Math.random() < 0.05;
-    const rating = isInappropriate ? Math.floor(Math.random() * 2) + 1 : Math.floor(Math.random() * 3) + 3;
-    const appointmentDate = new Date(Date.now() - Math.floor(Math.random() * 60 * 24 * 60 * 60 * 1000));
-    const submittedAt = new Date(appointmentDate.getTime() + Math.floor(Math.random() * 3 * 24 * 60 * 60 * 1000));
-
-    feedback.push({
-      id: `FBK-${String(i + 1).padStart(5, '0')}`,
-      userId: `USR-${String(Math.floor(Math.random() * 150) + 1).padStart(3, '0')}`,
-      userName: userNames[Math.floor(Math.random() * userNames.length)],
-      userEmail: userNames[Math.floor(Math.random() * userNames.length)].toLowerCase().replace(/\s+/g, '.') + '@example.com',
-      therapistId: `THP-${String(Math.floor(Math.random() * 120) + 1).padStart(3, '0')}`,
-      therapistName: therapistNames[Math.floor(Math.random() * therapistNames.length)],
-      appointmentId: `APT-${String(Math.floor(Math.random() * 500) + 1).padStart(5, '0')}`,
-      appointmentDate: appointmentDate.toISOString(),
-      rating,
-      feedbackText: isInappropriate
-        ? inappropriateFeedback[Math.floor(Math.random() * inappropriateFeedback.length)]
-        : feedbackTexts[Math.floor(Math.random() * feedbackTexts.length)],
-      submittedAt: submittedAt.toISOString(),
-      isFlagged: isInappropriate,
-      isHidden: false,
-      flagReason: isInappropriate ? 'Inappropriate language' : null,
-    });
-  }
-
-  return feedback.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-};
-
-const mockFeedback = generateMockFeedback();
-
 export default function FeedbackManagement() {
-  const [feedbackList, setFeedbackList] = useState<Feedback[]>(mockFeedback);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
-  const [ratingFilter, setRatingFilter] = useState<string>('all');
-  const [therapistFilter, setTherapistFilter] = useState<string>('all');
+  const [searchInput, setSearchInput] = useState('');
+  const [ratingFilter, setRatingFilter] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [showFlaggedOnly, setShowFlaggedOnly] = useState(false);
-  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [flagReason, setFlagReason] = useState('');
-
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
 
-  // Get unique therapists for filter
-  const therapists = useMemo(() => {
-    const unique = [...new Set(feedbackList.map((f) => f.therapistName))];
-    return unique.sort();
-  }, [feedbackList]);
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-reviews', currentPage, search, ratingFilter, showFlaggedOnly, dateFrom, dateTo],
+    queryFn: () => getReviews({
+      page: currentPage,
+      limit: 20,
+      search: search || undefined,
+      rating: ratingFilter ? parseInt(ratingFilter) : undefined,
+      isFlagged: showFlaggedOnly ? true : undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    }),
+  });
 
-  // Filter feedback
-  const filteredFeedback = useMemo(() => {
-    let filtered = [...feedbackList];
+  const reviews: Review[] = data?.data || [];
+  const meta = data?.meta;
+  const stats = data?.stats;
 
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filtered = filtered.filter(
-        (f) =>
-          f.userName.toLowerCase().includes(searchLower) ||
-          f.therapistName.toLowerCase().includes(searchLower) ||
-          f.feedbackText.toLowerCase().includes(searchLower)
-      );
-    }
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });
 
-    if (ratingFilter !== 'all') {
-      filtered = filtered.filter((f) => f.rating === parseInt(ratingFilter));
-    }
+  const { mutate: doFlag } = useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => flagReview(id, reason),
+    onSuccess: () => { invalidate(); setSelectedReview(null); setFlagReason(''); },
+  });
 
-    if (therapistFilter !== 'all') {
-      filtered = filtered.filter((f) => f.therapistName === therapistFilter);
-    }
+  const { mutate: doUnflag } = useMutation({
+    mutationFn: unflagReview,
+    onSuccess: invalidate,
+  });
 
-    if (dateFrom) {
-      filtered = filtered.filter((f) => new Date(f.submittedAt) >= new Date(dateFrom));
-    }
+  const { mutate: doToggleHide } = useMutation({
+    mutationFn: toggleHideReview,
+    onSuccess: invalidate,
+  });
 
-    if (dateTo) {
-      filtered = filtered.filter((f) => new Date(f.submittedAt) <= new Date(dateTo + 'T23:59:59'));
-    }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearch(searchInput);
+    setCurrentPage(1);
+  };
 
-    if (showFlaggedOnly) {
-      filtered = filtered.filter((f) => f.isFlagged);
-    }
-
-    return filtered;
-  }, [feedbackList, search, ratingFilter, therapistFilter, dateFrom, dateTo, showFlaggedOnly]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredFeedback.length / itemsPerPage);
-  const paginatedFeedback = filteredFeedback.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const renderStars = (rating: number, size: 'sm' | 'md' = 'sm') => (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={cn(
+            size === 'sm' ? 'h-4 w-4' : 'h-5 w-5',
+            star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+          )}
+        />
+      ))}
+    </div>
   );
 
-  // Stats
-  const stats = useMemo(() => {
-    const total = feedbackList.length;
-    const avgRating = feedbackList.reduce((sum, f) => sum + f.rating, 0) / total;
-    const fiveStars = feedbackList.filter((f) => f.rating === 5).length;
-    const flagged = feedbackList.filter((f) => f.isFlagged).length;
-
-    return { total, avgRating, fiveStars, flagged };
-  }, [feedbackList]);
-
-  const renderStars = (rating: number, size: 'sm' | 'md' = 'sm') => {
-    return (
-      <div className="flex items-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={cn(
-              size === 'sm' ? 'h-4 w-4' : 'h-5 w-5',
-              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-            )}
-          />
-        ))}
-      </div>
-    );
-  };
-
-  const handleFlagFeedback = (feedbackId: string, reason: string) => {
-    setFeedbackList((prev) =>
-      prev.map((f) =>
-        f.id === feedbackId
-          ? { ...f, isFlagged: true, flagReason: reason }
-          : f
-      )
-    );
-    setSelectedFeedback(null);
-    setFlagReason('');
-  };
-
-  const handleToggleHidden = (feedbackId: string) => {
-    setFeedbackList((prev) =>
-      prev.map((f) =>
-        f.id === feedbackId
-          ? { ...f, isHidden: !f.isHidden }
-          : f
-      )
-    );
-  };
-
-  const handleUnflag = (feedbackId: string) => {
-    setFeedbackList((prev) =>
-      prev.map((f) =>
-        f.id === feedbackId
-          ? { ...f, isFlagged: false, flagReason: null }
-          : f
-      )
-    );
-  };
-
   const exportToCSV = () => {
-    const headers = ['Feedback ID', 'User Name', 'User Email', 'Therapist', 'Appointment Date', 'Rating', 'Feedback', 'Submitted At', 'Flagged', 'Hidden'];
-    const rows = filteredFeedback.map((f) => [
-      f.id,
-      f.userName,
-      f.userEmail,
-      f.therapistName,
-      formatDate(f.appointmentDate),
-      f.rating.toString(),
-      `"${f.feedbackText.replace(/"/g, '""')}"`,
-      formatDate(f.submittedAt),
-      f.isFlagged ? 'Yes' : 'No',
-      f.isHidden ? 'Yes' : 'No',
+    const headers = ['ID', 'User', 'Email', 'Therapist', 'Appointment Date', 'Rating', 'Feedback', 'Submitted', 'Flagged', 'Hidden'];
+    const rows = reviews.map((r) => [
+      r.id,
+      `${r.user.firstName} ${r.user.lastName}`,
+      r.user.email,
+      `Dr. ${r.therapist.user.firstName} ${r.therapist.user.lastName}`,
+      formatDate(r.appointment.scheduledAt),
+      r.rating.toString(),
+      `"${(r.feedback || '').replace(/"/g, '""')}"`,
+      formatDate(r.createdAt),
+      r.isFlagged ? 'Yes' : 'No',
+      r.isHidden ? 'Yes' : 'No',
     ]);
-
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -255,7 +135,7 @@ export default function FeedbackManagement() {
             <MessageSquare className="h-5 w-5 text-primary-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.total ?? 0}</p>
             <p className="text-sm text-gray-500">Total Feedback</p>
           </div>
         </div>
@@ -264,7 +144,7 @@ export default function FeedbackManagement() {
             <Star className="h-5 w-5 text-yellow-600 fill-yellow-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-gray-900">{stats.avgRating.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-gray-900">{(stats?.avgRating ?? 0).toFixed(1)}</p>
             <p className="text-sm text-gray-500">Average Rating</p>
           </div>
         </div>
@@ -273,7 +153,7 @@ export default function FeedbackManagement() {
             <Star className="h-5 w-5 text-green-600 fill-green-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-gray-900">{stats.fiveStars}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.fiveStarCount ?? 0}</p>
             <p className="text-sm text-gray-500">5-Star Reviews</p>
           </div>
         </div>
@@ -282,7 +162,7 @@ export default function FeedbackManagement() {
             <Flag className="h-5 w-5 text-red-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-gray-900">{stats.flagged}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.flaggedCount ?? 0}</p>
             <p className="text-sm text-gray-500">Flagged</p>
           </div>
         </div>
@@ -291,19 +171,16 @@ export default function FeedbackManagement() {
       {/* Filters */}
       <div className="card p-4 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+          <form className="relative flex-1" onSubmit={handleSearch}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by user name, therapist, or feedback text..."
+              placeholder="Search by user name or feedback text..."
               className="input pl-10 w-full"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
-          </div>
+          </form>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn('btn btn-secondary', showFilters && 'bg-gray-100')}
@@ -312,10 +189,7 @@ export default function FeedbackManagement() {
             Filters
           </button>
           <button
-            onClick={() => {
-              setShowFlaggedOnly(!showFlaggedOnly);
-              setCurrentPage(1);
-            }}
+            onClick={() => { setShowFlaggedOnly(!showFlaggedOnly); setCurrentPage(1); }}
             className={cn('btn', showFlaggedOnly ? 'btn-primary' : 'btn-secondary')}
           >
             <Flag className="h-4 w-4 mr-2" />
@@ -334,12 +208,9 @@ export default function FeedbackManagement() {
               <select
                 className="input"
                 value={ratingFilter}
-                onChange={(e) => {
-                  setRatingFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => { setRatingFilter(e.target.value); setCurrentPage(1); }}
               >
-                <option value="all">All Ratings</option>
+                <option value="">All Ratings</option>
                 <option value="5">5 Stars</option>
                 <option value="4">4 Stars</option>
                 <option value="3">3 Stars</option>
@@ -348,31 +219,12 @@ export default function FeedbackManagement() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Therapist</label>
-              <select
-                className="input"
-                value={therapistFilter}
-                onChange={(e) => {
-                  setTherapistFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="all">All Therapists</option>
-                {therapists.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-            <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">From Date</label>
               <input
                 type="date"
                 className="input"
                 value={dateFrom}
-                onChange={(e) => {
-                  setDateFrom(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => { setDateFrom(e.target.value); setCurrentPage(1); }}
               />
             </div>
             <div>
@@ -381,10 +233,7 @@ export default function FeedbackManagement() {
                 type="date"
                 className="input"
                 value={dateTo}
-                onChange={(e) => {
-                  setDateTo(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => { setDateTo(e.target.value); setCurrentPage(1); }}
               />
             </div>
           </div>
@@ -406,45 +255,47 @@ export default function FeedbackManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedFeedback.map((feedback) => (
+            {isLoading ? (
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
+            ) : reviews.length === 0 ? (
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">No feedback found</td></tr>
+            ) : reviews.map((review) => (
               <tr
-                key={feedback.id}
+                key={review.id}
                 className={cn(
                   'hover:bg-gray-50',
-                  feedback.isFlagged && 'bg-red-50/50',
-                  feedback.isHidden && 'opacity-50'
+                  review.isFlagged && 'bg-red-50/50',
+                  review.isHidden && 'opacity-50'
                 )}
               >
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-blue-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{feedback.userName}</p>
-                      <p className="text-xs text-gray-500">{feedback.userId}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {review.isAnonymous ? 'Anonymous' : `${review.user.firstName} ${review.user.lastName}`}
+                      </p>
+                      <p className="text-xs text-gray-500">{review.user.email}</p>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-2">
                     <Stethoscope className="h-4 w-4 text-green-600" />
-                    <div>
-                      <p className="text-sm text-gray-900">{feedback.therapistName}</p>
-                      <p className="text-xs text-gray-500">{feedback.therapistId}</p>
-                    </div>
+                    <p className="text-sm text-gray-900">
+                      Dr. {review.therapist.user.firstName} {review.therapist.user.lastName}
+                    </p>
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <div>
-                    <p className="text-sm font-mono text-gray-600">{feedback.appointmentId}</p>
-                    <p className="text-xs text-gray-500">{formatDate(feedback.appointmentDate)}</p>
-                  </div>
+                  <p className="text-xs text-gray-500">{formatDate(review.appointment.scheduledAt)}</p>
                 </td>
                 <td className="px-4 py-4">
-                  {renderStars(feedback.rating)}
+                  {renderStars(review.rating)}
                 </td>
                 <td className="px-4 py-4">
-                  <p className="text-sm text-gray-700 truncate max-w-xs">{feedback.feedbackText}</p>
-                  {feedback.isFlagged && (
+                  <p className="text-sm text-gray-700 truncate max-w-xs">{review.feedback || 'No comment'}</p>
+                  {review.isFlagged && (
                     <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">
                       <Flag className="h-3 w-3" />
                       Flagged
@@ -452,32 +303,32 @@ export default function FeedbackManagement() {
                   )}
                 </td>
                 <td className="px-4 py-4">
-                  <span className="text-sm text-gray-500">{formatDate(feedback.submittedAt)}</span>
+                  <span className="text-sm text-gray-500">{formatDate(review.createdAt)}</span>
                 </td>
                 <td className="px-4 py-4 text-right">
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      onClick={() => setSelectedFeedback(feedback)}
+                      onClick={() => setSelectedReview(review)}
                       className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg"
                       title="View Details"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleToggleHidden(feedback.id)}
+                      onClick={() => doToggleHide(review.id)}
                       className={cn(
                         'p-2 rounded-lg',
-                        feedback.isHidden
+                        review.isHidden
                           ? 'text-primary-600 bg-primary-50'
                           : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                       )}
-                      title={feedback.isHidden ? 'Show' : 'Hide'}
+                      title={review.isHidden ? 'Show' : 'Hide'}
                     >
-                      {feedback.isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      {review.isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </button>
-                    {!feedback.isFlagged ? (
+                    {!review.isFlagged ? (
                       <button
-                        onClick={() => setSelectedFeedback(feedback)}
+                        onClick={() => setSelectedReview(review)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                         title="Flag"
                       >
@@ -485,7 +336,7 @@ export default function FeedbackManagement() {
                       </button>
                     ) : (
                       <button
-                        onClick={() => handleUnflag(feedback.id)}
+                        onClick={() => doUnflag(review.id)}
                         className="p-2 text-red-600 bg-red-50 rounded-lg"
                         title="Unflag"
                       >
@@ -498,19 +349,13 @@ export default function FeedbackManagement() {
             ))}
           </tbody>
         </table>
-
-        {paginatedFeedback.length === 0 && (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No feedback found</p>
-          </div>
-        )}
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {meta && meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">
-            Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredFeedback.length)} of {filteredFeedback.length}
+            Page {meta.page} of {meta.totalPages} · {meta.total} total
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -520,10 +365,9 @@ export default function FeedbackManagement() {
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-sm text-gray-600">Page {currentPage} of {totalPages}</span>
             <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))}
+              disabled={currentPage === meta.totalPages}
               className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 hover:bg-gray-50"
             >
               <ChevronRight className="h-4 w-4" />
@@ -533,94 +377,86 @@ export default function FeedbackManagement() {
       )}
 
       {/* Feedback Detail Modal */}
-      {selectedFeedback && (
+      {selectedReview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl">
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-yellow-100 rounded-full">
                   <Star className="h-5 w-5 text-yellow-600 fill-yellow-600" />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Feedback Details</h2>
-                  <p className="text-sm text-gray-500">{selectedFeedback.id}</p>
-                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Feedback Details</h2>
               </div>
               <button
-                onClick={() => {
-                  setSelectedFeedback(null);
-                  setFlagReason('');
-                }}
+                onClick={() => { setSelectedReview(null); setFlagReason(''); }}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Content */}
             <div className="p-6 space-y-4">
-              {/* Rating */}
               <div className="flex items-center justify-center gap-2 p-4 bg-gray-50 rounded-lg">
-                {renderStars(selectedFeedback.rating, 'md')}
-                <span className="text-lg font-bold text-gray-900 ml-2">{selectedFeedback.rating}/5</span>
+                {renderStars(selectedReview.rating, 'md')}
+                <span className="text-lg font-bold text-gray-900 ml-2">{selectedReview.rating}/5</span>
               </div>
 
-              {/* User & Therapist */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
                     <User className="h-4 w-4 text-blue-600" />
                     <span className="text-xs text-gray-500">User</span>
                   </div>
-                  <p className="text-sm font-medium text-gray-900">{selectedFeedback.userName}</p>
-                  <p className="text-xs text-gray-500">{selectedFeedback.userEmail}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {selectedReview.isAnonymous ? 'Anonymous' : `${selectedReview.user.firstName} ${selectedReview.user.lastName}`}
+                  </p>
+                  <p className="text-xs text-gray-500">{selectedReview.user.email}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2 mb-1">
                     <Stethoscope className="h-4 w-4 text-green-600" />
                     <span className="text-xs text-gray-500">Therapist</span>
                   </div>
-                  <p className="text-sm font-medium text-gray-900">{selectedFeedback.therapistName}</p>
-                  <p className="text-xs text-gray-500">{selectedFeedback.therapistId}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Dr. {selectedReview.therapist.user.firstName} {selectedReview.therapist.user.lastName}
+                  </p>
                 </div>
               </div>
 
-              {/* Appointment Info */}
               <div className="p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <span className="text-xs text-gray-500">Appointment</span>
                 </div>
-                <p className="text-sm text-gray-900">
-                  {selectedFeedback.appointmentId} • {formatDate(selectedFeedback.appointmentDate)}
-                </p>
+                <p className="text-sm text-gray-900">{formatDate(selectedReview.appointment.scheduledAt)}</p>
               </div>
 
-              {/* Feedback Text */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Feedback</label>
                 <p className="text-sm text-gray-700 p-3 bg-gray-50 rounded-lg">
-                  {selectedFeedback.feedbackText}
+                  {selectedReview.feedback || 'No comment provided'}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">
-                  Submitted on {formatDateTime(selectedFeedback.submittedAt)}
-                </p>
+                {selectedReview.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {selectedReview.tags.map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 text-xs bg-primary-100 text-primary-700 rounded-full">{tag}</span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-2">Submitted on {formatDateTime(selectedReview.createdAt)}</p>
               </div>
 
-              {/* Flagged Status */}
-              {selectedFeedback.isFlagged && (
+              {selectedReview.isFlagged && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-red-600" />
                     <span className="text-sm font-medium text-red-800">Flagged</span>
                   </div>
-                  <p className="text-sm text-red-700 mt-1">Reason: {selectedFeedback.flagReason}</p>
+                  <p className="text-sm text-red-700 mt-1">Reason: {selectedReview.flagReason}</p>
                 </div>
               )}
 
-              {/* Flag Form */}
-              {!selectedFeedback.isFlagged && (
+              {!selectedReview.isFlagged && (
                 <div className="p-4 border border-gray-200 rounded-lg space-y-3">
                   <div className="flex items-center gap-2">
                     <Flag className="h-4 w-4 text-gray-500" />
@@ -640,7 +476,7 @@ export default function FeedbackManagement() {
                     <option value="Other">Other</option>
                   </select>
                   <button
-                    onClick={() => handleFlagFeedback(selectedFeedback.id, flagReason)}
+                    onClick={() => doFlag({ id: selectedReview.id, reason: flagReason })}
                     disabled={!flagReason}
                     className="btn bg-red-600 text-white hover:bg-red-700 w-full disabled:opacity-50"
                   >
@@ -651,29 +487,19 @@ export default function FeedbackManagement() {
               )}
             </div>
 
-            {/* Footer */}
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
               <button
-                onClick={() => handleToggleHidden(selectedFeedback.id)}
+                onClick={() => { doToggleHide(selectedReview.id); setSelectedReview(null); }}
                 className="btn btn-secondary"
               >
-                {selectedFeedback.isHidden ? (
-                  <>
-                    <Eye className="h-4 w-4 mr-2" />
-                    Show Feedback
-                  </>
+                {selectedReview.isHidden ? (
+                  <><Eye className="h-4 w-4 mr-2" />Show Feedback</>
                 ) : (
-                  <>
-                    <EyeOff className="h-4 w-4 mr-2" />
-                    Hide Feedback
-                  </>
+                  <><EyeOff className="h-4 w-4 mr-2" />Hide Feedback</>
                 )}
               </button>
               <button
-                onClick={() => {
-                  setSelectedFeedback(null);
-                  setFlagReason('');
-                }}
+                onClick={() => { setSelectedReview(null); setFlagReason(''); }}
                 className="btn btn-secondary"
               >
                 Close

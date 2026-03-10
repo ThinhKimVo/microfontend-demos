@@ -6,9 +6,10 @@
 # Server: demo (10.30.10.18)
 #
 # Services:
-#   - PostgreSQL: Docker container (port 5432)
+#   - PostgreSQL (shell):      Docker container (port 5433)
+#   - PostgreSQL (healthcare): Docker container (port 5434)
 #   - Shell API:  Express server via PM2 (port 3150)
-#   - Frontend:   Static servers via PM2 (ports 3100-3108)
+#   - Frontend:   Static servers via PM2 (ports 3100-3109)
 # ============================================================
 
 set -e
@@ -26,6 +27,8 @@ get_app_config() {
         shell)              echo "apps/shell:3100:mfe-shell" ;;
         shell-api)          echo "apps/shell/server:3150:mfe-shell-api" ;;
         healthcare-admin)   echo "apps/healthcare-admin:3101:mfe-healthcare-admin" ;;
+        healthcare-api)     echo "apps/healthcare-admin/api:3001:mfe-healthcare-api" ;;
+        healthcare-marketing) echo "apps/healthcare-marketing:3109:mfe-healthcare-marketing" ;;
         assest-management)  echo "apps/assest-management:3102:mfe-assest-management" ;;
         cmms)               echo "apps/cmms:3103:mfe-cmms" ;;
         family-fun)         echo "apps/FamilyFun/frontend:3104:mfe-family-fun" ;;
@@ -38,14 +41,21 @@ get_app_config() {
 }
 
 # All app names
-ALL_APPS="shell shell-api healthcare-admin assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
+ALL_APPS="shell shell-api healthcare-admin healthcare-api healthcare-marketing assest-management cmms family-fun booking-guest booking-host elearning-admin elearning-student"
 
-# Database configuration
+# Database configuration - Shell
 DB_CONTAINER="shell-postgres"
-DB_PORT="5432"
+DB_PORT="5433"
 DB_NAME="shell_apps"
 DB_USER="shell"
 DB_PASSWORD="shell123"
+
+# Database configuration - Healthcare
+HC_DB_CONTAINER="healthcare-postgres"
+HC_DB_PORT="5434"
+HC_DB_NAME="healthcare"
+HC_DB_USER="healthcare"
+HC_DB_PASSWORD="healthcare123"
 
 # Get app path
 get_app_path() {
@@ -141,14 +151,47 @@ else
     echo "WARNING: Database may not be ready yet"
 fi
 ENDSSH
-    print_success "Database started"
+    print_success "Shell database started"
+
+    # Start Healthcare PostgreSQL
+    print_status "Starting Healthcare PostgreSQL database..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
+if docker ps -a --format '{{.Names}}' | grep -q "^${HC_DB_CONTAINER}\$"; then
+    if docker ps --format '{{.Names}}' | grep -q "^${HC_DB_CONTAINER}\$"; then
+        echo "Healthcare database already running"
+    else
+        echo "Starting existing container..."
+        docker start ${HC_DB_CONTAINER}
+    fi
+else
+    echo "Creating new Healthcare PostgreSQL container..."
+    docker run -d \\
+        --name ${HC_DB_CONTAINER} \\
+        -e POSTGRES_USER=${HC_DB_USER} \\
+        -e POSTGRES_PASSWORD=${HC_DB_PASSWORD} \\
+        -e POSTGRES_DB=${HC_DB_NAME} \\
+        -p ${HC_DB_PORT}:5432 \\
+        --restart unless-stopped \\
+        postgres:15-alpine
+
+    echo "Waiting for database to be ready..."
+    sleep 5
+fi
+
+if docker exec ${HC_DB_CONTAINER} pg_isready -U ${HC_DB_USER} &>/dev/null; then
+    echo "Healthcare database is ready"
+else
+    echo "WARNING: Healthcare database may not be ready yet"
+fi
+ENDSSH
+    print_success "Healthcare database started"
 }
 
 # Stop database
 stop_database() {
-    print_status "Stopping PostgreSQL database..."
-    ssh "${SERVER_USER}@${SERVER_IP}" "docker stop ${DB_CONTAINER} 2>/dev/null || echo 'Database not running'"
-    print_success "Database stopped"
+    print_status "Stopping PostgreSQL databases..."
+    ssh "${SERVER_USER}@${SERVER_IP}" "docker stop ${DB_CONTAINER} 2>/dev/null || echo 'Shell database not running'; docker stop ${HC_DB_CONTAINER} 2>/dev/null || echo 'Healthcare database not running'"
+    print_success "Databases stopped"
 }
 
 # Initialize database schema
@@ -185,22 +228,29 @@ database_status() {
     print_status "Checking database status..."
     ssh "${SERVER_USER}@${SERVER_IP}" "bash -s" << ENDSSH
 echo "=== Docker Container Status ==="
-if docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep -E "(NAMES|${DB_CONTAINER})"; then
-    :
+docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep -E "(NAMES|${DB_CONTAINER}|${HC_DB_CONTAINER})" || echo "No database containers found"
+
+echo ""
+echo "=== Shell Database (${DB_CONTAINER}) ==="
+if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} 2>/dev/null; then
+    echo "PostgreSQL: READY (port ${DB_PORT})"
+    echo ""
+    echo "Tables:"
+    docker exec ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} -c "\\dt" 2>/dev/null || echo "No tables found"
+    echo ""
+    echo "App Count:"
+    docker exec ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} -c "SELECT COUNT(*) as apps FROM apps;" 2>/dev/null || echo "Could not query apps"
 else
-    echo "Container ${DB_CONTAINER} not found"
+    echo "PostgreSQL: NOT RUNNING"
 fi
 
 echo ""
-echo "=== Database Connection ==="
-if docker exec ${DB_CONTAINER} pg_isready -U ${DB_USER} 2>/dev/null; then
-    echo "PostgreSQL: READY"
+echo "=== Healthcare Database (${HC_DB_CONTAINER}) ==="
+if docker exec ${HC_DB_CONTAINER} pg_isready -U ${HC_DB_USER} 2>/dev/null; then
+    echo "PostgreSQL: READY (port ${HC_DB_PORT})"
     echo ""
-    echo "=== Tables ==="
-    docker exec ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} -c "\\dt" 2>/dev/null || echo "No tables found"
-    echo ""
-    echo "=== App Count ==="
-    docker exec ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} -c "SELECT COUNT(*) as apps FROM apps;" 2>/dev/null || echo "Could not query apps"
+    echo "Tables:"
+    docker exec ${HC_DB_CONTAINER} psql -U ${HC_DB_USER} -d ${HC_DB_NAME} -c "\\dt" 2>/dev/null || echo "No tables found"
 else
     echo "PostgreSQL: NOT RUNNING"
 fi
@@ -249,9 +299,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# Also check common paths
-export PATH="$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node 2>/dev/null | tail -1)/bin:$PATH" 2>/dev/null || true
-export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+# Force Node 20 AFTER nvm loads (nvm overrides PATH)
+export PATH="$HOME/.nvm/versions/node/v20.20.1/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 '
 
 # Check requirements
@@ -323,7 +372,7 @@ if [ -n "\$MISSING" ]; then
     echo ""
     echo "  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash"
     echo "  source ~/.bashrc"
-    echo "  nvm install 18"
+    echo "  nvm install 20"
     echo "  npm install -g pm2"
     echo ""
     exit 1
@@ -368,6 +417,23 @@ build_local() {
     # Build healthcare-admin
     print_status "Building healthcare-admin..."
     cd "apps/healthcare-admin"
+    if [ -f "webpack.config.prod.js" ]; then
+        npx webpack --config webpack.config.prod.js
+    else
+        npx webpack --mode production
+    fi
+    cd "$PROJECT_ROOT"
+
+    # Build healthcare-api (NestJS)
+    print_status "Building healthcare-api..."
+    cd "apps/healthcare-admin/api"
+    npm install
+    npm run build
+    cd "$PROJECT_ROOT"
+
+    # Build healthcare-marketing
+    print_status "Building healthcare-marketing..."
+    cd "apps/healthcare-marketing"
     if [ -f "webpack.config.prod.js" ]; then
         npx webpack --config webpack.config.prod.js
     else
@@ -448,7 +514,13 @@ build_single_app() {
     export REMOTE_HOST="http://${SERVER_IP}"
 
     cd "$app_path"
-    if [ -f "webpack.config.prod.js" ]; then
+    if [ "$app_name" = "shell-api" ]; then
+        # Plain Node.js server - no build needed, just install deps
+        npm install --production
+    elif [ "$app_name" = "healthcare-api" ]; then
+        npm install
+        npm run build
+    elif [ -f "webpack.config.prod.js" ]; then
         npx webpack --config webpack.config.prod.js
     else
         npx webpack --mode production
@@ -473,12 +545,42 @@ create_single_app_package() {
     TEMP_DIR=$(mktemp -d)
     DEPLOY_ARCHIVE="$TEMP_DIR/deploy-${app_name}.tar.gz"
 
-    tar -czf "$DEPLOY_ARCHIVE" \
-        --exclude='node_modules' \
-        --exclude='.git' \
-        --exclude='*.log' \
-        "${app_path}/dist" \
-        "${app_path}/package.json"
+    if [ "$app_name" = "healthcare-api" ]; then
+        tar -czf "$DEPLOY_ARCHIVE" \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            "${app_path}/dist" \
+            "${app_path}/prisma" \
+            "${app_path}/.env" \
+            "${app_path}/package.json" \
+            "${app_path}/package-lock.json" 2>/dev/null || \
+        tar -czf "$DEPLOY_ARCHIVE" \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            "${app_path}/dist" \
+            "${app_path}/prisma" \
+            "${app_path}/.env" \
+            "${app_path}/package.json"
+    elif [ "$app_name" = "shell" ]; then
+        # Shell needs server/static.js for API proxying
+        tar -czf "$DEPLOY_ARCHIVE" \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            "${app_path}/dist" \
+            "${app_path}/server/static.js" \
+            "${app_path}/server/package.json" \
+            "${app_path}/package.json"
+    else
+        tar -czf "$DEPLOY_ARCHIVE" \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            "${app_path}/dist" \
+            "${app_path}/package.json"
+    fi
 
     print_success "Package created for $app_name"
     echo "$DEPLOY_ARCHIVE"
@@ -519,12 +621,32 @@ fi
 tar -xzf deploy-${app_name}.tar.gz
 rm deploy-${app_name}.tar.gz
 
-# Install serve if needed
 cd ~/microfrontend/${app_path}
-npm install serve --save-dev 2>/dev/null || true
 
-# Restart only this app in PM2
-pm2 restart ${pm2_name} 2>/dev/null || pm2 start npx --name "${pm2_name}" -- serve dist -p ${app_port} -s --cors
+if [ "${app_name}" = "healthcare-api" ]; then
+    # NestJS API - install deps, generate prisma client, push schema, seed, start
+    npm install
+    npx prisma generate
+    npx prisma db push --skip-generate 2>/dev/null || true
+    npx prisma db seed 2>/dev/null || echo "Seeding skipped or already seeded"
+    pm2 delete ${pm2_name} 2>/dev/null || true
+    pm2 start dist/src/main.js --name "${pm2_name}"
+elif [ "${app_name}" = "shell-api" ]; then
+    # Express server - run directly with node
+    npm install --production
+    pm2 restart ${pm2_name} 2>/dev/null || DB_PORT=${DB_PORT} pm2 start index.js --name "${pm2_name}"
+elif [ "${app_name}" = "shell" ]; then
+    # Shell frontend - Express static server with API proxy
+    cd ~/microfrontend/apps/shell/server
+    npm install --production
+    cd ~/microfrontend/${app_path}
+    pm2 delete ${pm2_name} 2>/dev/null || true
+    PORT=${app_port} API_SERVER=http://localhost:3150 pm2 start server/static.js --name "${pm2_name}"
+else
+    # Static frontend - serve dist folder
+    npm install serve --save-dev 2>/dev/null || true
+    pm2 restart ${pm2_name} 2>/dev/null || pm2 start npx --name "${pm2_name}" -- serve dist -p ${app_port} -s --cors
+fi
 
 pm2 save
 
@@ -580,6 +702,11 @@ create_package() {
         apps/shell/db \
         apps/shell/public/screenshots \
         apps/healthcare-admin/dist \
+        apps/healthcare-admin/api/dist \
+        apps/healthcare-admin/api/prisma \
+        apps/healthcare-admin/api/.env \
+        apps/healthcare-admin/api/package.json \
+        apps/healthcare-marketing/dist \
         apps/assest-management/dist \
         apps/cmms/dist \
         apps/FamilyFun/frontend/dist \
@@ -589,6 +716,7 @@ create_package() {
         apps/elearning/student-portal/dist \
         apps/shell/package.json \
         apps/healthcare-admin/package.json \
+        apps/healthcare-marketing/package.json \
         apps/assest-management/package.json \
         apps/cmms/package.json \
         apps/FamilyFun/frontend/package.json \
@@ -631,7 +759,7 @@ cd ~/microfrontend
 pm2 delete all 2>/dev/null || true
 
 # Backup old dist folders
-for app in shell healthcare-admin assest-management cmms; do
+for app in shell healthcare-admin healthcare-marketing assest-management cmms; do
     if [ -d "apps/\${app}/dist" ]; then
         rm -rf "apps/\${app}/dist.backup" 2>/dev/null || true
         mv "apps/\${app}/dist" "apps/\${app}/dist.backup" 2>/dev/null || true
@@ -650,8 +778,8 @@ done
 tar -xzf deploy.tar.gz
 rm deploy.tar.gz
 
-# Install serve package for each app
-for app in shell healthcare-admin assest-management cmms; do
+# Install serve package for each app (except shell which uses its own server)
+for app in healthcare-admin healthcare-marketing assest-management cmms; do
     cd ~/microfrontend/apps/\${app}
     npm install serve --save-dev 2>/dev/null || true
 done
@@ -662,21 +790,35 @@ for nested_app in "FamilyFun/frontend" "BookingSystem/packages/guest-portal" "Bo
     npm install serve --save-dev 2>/dev/null || true
 done
 
-# Install API server dependencies
-echo "Installing API server dependencies..."
+# Install Shell server dependencies (API server + static server with proxy)
+echo "Installing Shell server dependencies..."
 cd ~/microfrontend/apps/shell/server
 npm install --production 2>/dev/null || true
 
+# Install Healthcare API dependencies
+echo "Installing Healthcare API dependencies..."
+cd ~/microfrontend/apps/healthcare-admin/api
+npm install 2>/dev/null || true
+npx prisma generate
+npx prisma db push --skip-generate 2>/dev/null || true
+npx prisma db seed 2>/dev/null || echo "Seeding skipped or already seeded"
+
 cd ~/microfrontend
 
-# Initialize database schema
-echo "Initializing database..."
+# Initialize shell database schema
+echo "Initializing shell database..."
 if [ -f "apps/shell/db/init.sql" ]; then
     docker exec -i ${DB_CONTAINER} psql -U ${DB_USER} -d ${DB_NAME} < apps/shell/db/init.sql 2>/dev/null || echo "Database init may have warnings (tables may already exist)"
 fi
 
 # Start with PM2
 pm2 start ecosystem.config.js
+
+# Start Healthcare API (uses .env file for config)
+echo "Starting Healthcare API..."
+cd ~/microfrontend/apps/healthcare-admin/api
+pm2 start dist/src/main.js --name "mfe-healthcare-api"
+cd ~/microfrontend
 
 # Setup Cloudflare Tunnel (no sudo required)
 echo ""
@@ -709,7 +851,7 @@ pm2 list
 
 echo ""
 echo "=== Checking ports ==="
-for port in 3100 3101 3102 3103 3104 3105 3106 3107 3108; do
+for port in 3001 3100 3101 3102 3103 3104 3105 3106 3107 3108 3109; do
     if netstat -tuln 2>/dev/null | grep -q ":\${port} " || ss -tuln 2>/dev/null | grep -q ":\${port} "; then
         echo "Port \${port}: OK"
     else
@@ -745,19 +887,22 @@ full_deploy() {
     echo "  Cloudflare:       Check tunnel URL with: ssh ${SERVER_USER}@${SERVER_IP} 'pm2 logs cloudflare-tunnel --lines 10 --nostream | grep trycloudflare'"
     echo ""
     echo "Backend Services:"
-    echo "  PostgreSQL:         localhost:5432 (container: ${DB_CONTAINER})"
-    echo "  Shell API:          http://${SERVER_IP}:3150"
+    echo "  Shell PostgreSQL:       localhost:${DB_PORT} (container: ${DB_CONTAINER})"
+    echo "  Healthcare PostgreSQL:  localhost:${HC_DB_PORT} (container: ${HC_DB_CONTAINER})"
+    echo "  Shell API:              http://${SERVER_IP}:3150"
+    echo "  Healthcare API:         http://${SERVER_IP}:3001"
     echo ""
-    echo "Frontend Apps (ports 3100-3108):"
-    echo "  Shell:              http://${SERVER_IP}:3100"
-    echo "  Healthcare Admin:   http://${SERVER_IP}:3101"
-    echo "  Asset Management:   http://${SERVER_IP}:3102"
-    echo "  CMMS:               http://${SERVER_IP}:3103"
-    echo "  FamilyFun:          http://${SERVER_IP}:3104"
-    echo "  Booking Guest:      http://${SERVER_IP}:3105"
-    echo "  Booking Host:       http://${SERVER_IP}:3106"
-    echo "  E-Learning Admin:   http://${SERVER_IP}:3107"
-    echo "  E-Learning Student: http://${SERVER_IP}:3108"
+    echo "Frontend Apps (ports 3100-3109):"
+    echo "  Shell:                  http://${SERVER_IP}:3100"
+    echo "  Healthcare Admin:       http://${SERVER_IP}:3101"
+    echo "  Asset Management:       http://${SERVER_IP}:3102"
+    echo "  CMMS:                   http://${SERVER_IP}:3103"
+    echo "  FamilyFun:              http://${SERVER_IP}:3104"
+    echo "  Booking Guest:          http://${SERVER_IP}:3105"
+    echo "  Booking Host:           http://${SERVER_IP}:3106"
+    echo "  E-Learning Admin:       http://${SERVER_IP}:3107"
+    echo "  E-Learning Student:     http://${SERVER_IP}:3108"
+    echo "  Healthcare Marketing:   http://${SERVER_IP}:3109"
     echo ""
     echo "Database Commands:"
     echo "  $0 db:status       # Check database status"
@@ -800,8 +945,10 @@ check_port() {
     fi
 }
 
-check_port 5432 "PostgreSQL"
+check_port ${DB_PORT} "Shell PostgreSQL"
+check_port ${HC_DB_PORT} "Healthcare PostgreSQL"
 check_port 3150 "Shell API"
+check_port 3001 "Healthcare API"
 check_port 3100 "Shell"
 check_port 3101 "Healthcare Admin"
 check_port 3102 "Asset Management"
@@ -811,6 +958,7 @@ check_port 3105 "Booking Guest"
 check_port 3106 "Booking Host"
 check_port 3107 "E-Learning Admin"
 check_port 3108 "E-Learning Student"
+check_port 3109 "Healthcare Marketing"
 ENDSSH
 }
 
@@ -899,10 +1047,10 @@ setup_instructions() {
     echo "   sudo usermod -aG docker \$USER"
     echo "   newgrp docker"
     echo ""
-    echo "2. Install nvm and Node.js 18 (no sudo required):"
+    echo "2. Install nvm and Node.js 20 (no sudo required):"
     echo "   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash"
     echo "   source ~/.bashrc"
-    echo "   nvm install 18"
+    echo "   nvm install 20"
     echo ""
     echo "3. Install PM2 globally:"
     echo "   npm install -g pm2"

@@ -5,9 +5,6 @@ const path = require('path');
 
 const deps = require('./package.json').dependencies;
 
-// Production host configuration
-const REMOTE_HOST = process.env.REMOTE_HOST || 'http://127.0.0.1';
-
 module.exports = {
   entry: './src/index.tsx',
   mode: 'production',
@@ -46,15 +43,15 @@ module.exports = {
       name: 'shell',
       filename: 'remoteEntry.js',
       remotes: {
-        healthcareAdmin: `healthcareAdmin@${REMOTE_HOST}:3101/remoteEntry.js`,
-        healthcareMarketing: `healthcareMarketing@${REMOTE_HOST}:3109/remoteEntry.js`,
-        assestManagement: `assestManagement@${REMOTE_HOST}:3102/remoteEntry.js`,
-        cmms: `cmms@${REMOTE_HOST}:3103/remoteEntry.js`,
-        familyFun: `familyFun@${REMOTE_HOST}:3104/remoteEntry.js`,
-        bookingGuestPortal: `bookingGuestPortal@${REMOTE_HOST}:3105/remoteEntry.js`,
-        bookingHostPortal: `bookingHostPortal@${REMOTE_HOST}:3106/remoteEntry.js`,
-        elearningAdminPortal: `elearningAdminPortal@${REMOTE_HOST}:3107/remoteEntry.js`,
-        elearningStudentPortal: `elearningStudentPortal@${REMOTE_HOST}:3108/remoteEntry.js`,
+        healthcareAdmin: 'healthcareAdmin@/mfe/3101/remoteEntry.js',
+        healthcareMarketing: 'healthcareMarketing@/mfe/3109/remoteEntry.js',
+        assestManagement: 'assestManagement@/mfe/3102/remoteEntry.js',
+        cmms: 'cmms@/mfe/3103/remoteEntry.js',
+        familyFun: 'familyFun@/mfe/3104/remoteEntry.js',
+        bookingGuestPortal: 'bookingGuestPortal@/mfe/3105/remoteEntry.js',
+        bookingHostPortal: 'bookingHostPortal@/mfe/3106/remoteEntry.js',
+        elearningAdminPortal: 'elearningAdminPortal@/mfe/3107/remoteEntry.js',
+        elearningStudentPortal: 'elearningStudentPortal@/mfe/3108/remoteEntry.js',
       },
       shared: {
         react: {

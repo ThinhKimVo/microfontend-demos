@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
   Send,
@@ -11,13 +12,13 @@ import {
   User,
   Target,
   Clock,
-  CheckCircle,
   X,
   Smartphone,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { cn, formatDateTime } from '../../lib/utils';
+import { getPushNotifications, createPushNotification, sendPushNotification } from '../../services/admin';
 
 interface PushNotification {
   id: string;
@@ -25,72 +26,17 @@ interface PushNotification {
   message: string;
   imageUrl: string | null;
   deepLink: string | null;
-  targetAudience: 'all_users' | 'all_therapists' | 'all' | 'specific' | 'custom';
+  targetAudience: string;
+  targetUserId: string | null;
   targetCount: number;
   scheduledAt: string | null;
   sentAt: string | null;
-  status: 'draft' | 'scheduled' | 'sent' | 'failed';
+  status: string;
   deliveredCount: number;
-  openedCount: number;
-  createdAt: string;
+  failedCount: number;
   createdBy: string;
+  createdAt: string;
 }
-
-// Generate mock notification history
-const generateMockNotifications = (): PushNotification[] => {
-  const titles = [
-    'New Feature: Video Sessions!',
-    'Holiday Hours Notice',
-    'App Update Available',
-    'Your Weekly Summary',
-    'Special Offer: 20% Off',
-    'Maintenance Notice',
-    'New Therapist Available',
-    'Feedback Request',
-  ];
-  const messages = [
-    'We\'ve added video session support. Try it now!',
-    'Our offices will be closed on December 25th.',
-    'Update to the latest version for new features.',
-    'Check out your wellness journey this week.',
-    'Limited time offer for premium sessions.',
-    'Scheduled maintenance on Sunday 2-4 AM.',
-    'A new therapist has joined our platform.',
-    'How was your last session? Let us know!',
-  ];
-  const audiences: PushNotification['targetAudience'][] = ['all_users', 'all_therapists', 'all', 'custom'];
-  const statuses: PushNotification['status'][] = ['sent', 'sent', 'sent', 'sent', 'scheduled', 'draft'];
-
-  const notifications: PushNotification[] = [];
-
-  for (let i = 0; i < 25; i++) {
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const audience = audiences[Math.floor(Math.random() * audiences.length)];
-    const targetCount = audience === 'all' ? 5000 : audience === 'all_users' ? 4000 : audience === 'all_therapists' ? 500 : Math.floor(Math.random() * 1000) + 100;
-    const createdAt = new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000));
-
-    notifications.push({
-      id: `NOTIF-${String(i + 1).padStart(5, '0')}`,
-      title: titles[Math.floor(Math.random() * titles.length)],
-      message: messages[Math.floor(Math.random() * messages.length)],
-      imageUrl: Math.random() > 0.7 ? 'https://example.com/image.jpg' : null,
-      deepLink: Math.random() > 0.5 ? '/appointments' : null,
-      targetAudience: audience,
-      targetCount,
-      scheduledAt: status === 'scheduled' ? new Date(Date.now() + Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString() : null,
-      sentAt: status === 'sent' ? createdAt.toISOString() : null,
-      status,
-      deliveredCount: status === 'sent' ? Math.floor(targetCount * (0.85 + Math.random() * 0.1)) : 0,
-      openedCount: status === 'sent' ? Math.floor(targetCount * (0.2 + Math.random() * 0.3)) : 0,
-      createdAt: createdAt.toISOString(),
-      createdBy: 'Admin User',
-    });
-  }
-
-  return notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-};
-
-const mockNotifications = generateMockNotifications();
 
 const deepLinkOptions = [
   { value: '', label: 'None' },
@@ -104,65 +50,66 @@ const deepLinkOptions = [
 ];
 
 export default function PushNotifications() {
-  const [notifications, setNotifications] = useState<PushNotification[]>(mockNotifications);
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Form state
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [deepLink, setDeepLink] = useState('');
-  const [targetAudience, setTargetAudience] = useState<'all_users' | 'all_therapists' | 'all' | 'specific' | 'custom'>('all_users');
+  const [targetAudience, setTargetAudience] = useState<string>('all_users');
   const [specificUserId, setSpecificUserId] = useState('');
   const [scheduleType, setScheduleType] = useState<'immediate' | 'scheduled'>('immediate');
   const [scheduledDateTime, setScheduledDateTime] = useState('');
-  const [isSending, setIsSending] = useState(false);
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const { data, isLoading } = useQuery({
+    queryKey: ['push-notifications', currentPage],
+    queryFn: () => getPushNotifications({ page: currentPage, limit: 10 }),
+  });
 
-  const totalPages = Math.ceil(notifications.length / itemsPerPage);
-  const paginatedNotifications = notifications.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const notifications: PushNotification[] = data?.data || [];
+  const meta = data?.meta;
 
-  const getTargetCount = () => {
-    switch (targetAudience) {
-      case 'all':
-        return 5000;
-      case 'all_users':
-        return 4500;
-      case 'all_therapists':
-        return 500;
-      case 'specific':
-        return 1;
-      case 'custom':
-        return 1200;
-    }
-  };
+  const { mutate: create, isPending: isCreating } = useMutation({
+    mutationFn: createPushNotification,
+    onSuccess: async (created) => {
+      if (scheduleType === 'immediate') {
+        await send(created.id);
+      }
+      queryClient.invalidateQueries({ queryKey: ['push-notifications'] });
+      resetForm();
+    },
+  });
 
-  const getAudienceLabel = (audience: PushNotification['targetAudience']) => {
-    const labels = {
+  const { mutateAsync: send, isPending: isSending } = useMutation({
+    mutationFn: sendPushNotification,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['push-notifications'] });
+    },
+  });
+
+  const getAudienceLabel = (audience: string) => {
+    const labels: Record<string, string> = {
       all: 'All (Users + Therapists)',
       all_users: 'All Users',
       all_therapists: 'All Therapists',
       specific: 'Specific User',
-      custom: 'Custom Segment',
     };
-    return labels[audience];
+    return labels[audience] || audience;
   };
 
-  const getStatusBadge = (status: PushNotification['status']) => {
-    const config = {
+  const getStatusBadge = (status: string) => {
+    const config: Record<string, { bg: string; text: string; label: string }> = {
       draft: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Draft' },
       scheduled: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Scheduled' },
+      sending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Sending' },
       sent: { bg: 'bg-green-100', text: 'text-green-700', label: 'Sent' },
       failed: { bg: 'bg-red-100', text: 'text-red-700', label: 'Failed' },
     };
-    const { bg, text, label } = config[status];
+    const { bg, text, label } = config[status] || config.draft;
     return (
       <span className={cn('px-2 py-1 text-xs font-medium rounded-full', bg, text)}>
         {label}
@@ -170,38 +117,17 @@ export default function PushNotifications() {
     );
   };
 
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!title.trim() || !message.trim()) return;
-    setIsSending(true);
-    await new Promise((r) => setTimeout(r, 1500));
-
-    const newNotification: PushNotification = {
-      id: `NOTIF-${String(notifications.length + 1).padStart(5, '0')}`,
+    create({
       title,
       message,
-      imageUrl: imageUrl || null,
-      deepLink: deepLink || null,
+      imageUrl: imageUrl || undefined,
+      deepLink: deepLink || undefined,
       targetAudience,
-      targetCount: getTargetCount(),
-      scheduledAt: scheduleType === 'scheduled' ? scheduledDateTime : null,
-      sentAt: scheduleType === 'immediate' ? new Date().toISOString() : null,
-      status: scheduleType === 'immediate' ? 'sent' : 'scheduled',
-      deliveredCount: scheduleType === 'immediate' ? Math.floor(getTargetCount() * 0.92) : 0,
-      openedCount: scheduleType === 'immediate' ? Math.floor(getTargetCount() * 0.35) : 0,
-      createdAt: new Date().toISOString(),
-      createdBy: 'Admin User',
-    };
-
-    setNotifications((prev) => [newNotification, ...prev]);
-    setTitle('');
-    setMessage('');
-    setImageUrl('');
-    setDeepLink('');
-    setTargetAudience('all_users');
-    setScheduleType('immediate');
-    setScheduledDateTime('');
-    setShowForm(false);
-    setIsSending(false);
+      targetUserId: targetAudience === 'specific' ? specificUserId : undefined,
+      scheduledAt: scheduleType === 'scheduled' ? scheduledDateTime : undefined,
+    });
   };
 
   const resetForm = () => {
@@ -210,11 +136,14 @@ export default function PushNotifications() {
     setImageUrl('');
     setDeepLink('');
     setTargetAudience('all_users');
+    setSpecificUserId('');
     setScheduleType('immediate');
     setScheduledDateTime('');
     setShowForm(false);
     setShowPreview(false);
   };
+
+  const isSubmitting = isCreating || isSending;
 
   return (
     <div className="space-y-6">
@@ -224,7 +153,7 @@ export default function PushNotifications() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Push Notification Log</h2>
-              <p className="text-sm text-gray-500">{notifications.length} notifications sent</p>
+              <p className="text-sm text-gray-500">{meta?.total ?? 0} notifications total</p>
             </div>
             <button onClick={() => setShowForm(true)} className="btn btn-primary">
               <Send className="h-4 w-4 mr-2" />
@@ -245,7 +174,11 @@ export default function PushNotifications() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedNotifications.map((notification) => (
+                {isLoading ? (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
+                ) : notifications.length === 0 ? (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">No notifications yet</td></tr>
+                ) : notifications.map((notification) => (
                   <tr key={notification.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4">
                       <div className="flex items-start gap-3">
@@ -304,9 +237,11 @@ export default function PushNotifications() {
                           <p className="text-gray-900">
                             {notification.deliveredCount.toLocaleString()} delivered
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {notification.openedCount.toLocaleString()} opened ({Math.round(notification.openedCount / notification.deliveredCount * 100)}%)
-                          </p>
+                          {notification.failedCount > 0 && (
+                            <p className="text-xs text-red-500">
+                              {notification.failedCount.toLocaleString()} failed
+                            </p>
+                          )}
                         </div>
                       ) : (
                         <span className="text-sm text-gray-400">-</span>
@@ -322,10 +257,10 @@ export default function PushNotifications() {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
+          {meta && meta.totalPages > 1 && (
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-500">
-                Page {currentPage} of {totalPages}
+                Page {meta.page} of {meta.totalPages}
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -336,8 +271,8 @@ export default function PushNotifications() {
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))}
+                  disabled={currentPage === meta.totalPages}
                   className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 hover:bg-gray-50"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -439,11 +374,10 @@ export default function PushNotifications() {
                 </label>
                 <div className="space-y-2">
                   {[
-                    { value: 'all_users', label: 'All Users', icon: Users, count: '~4,500' },
-                    { value: 'all_therapists', label: 'All Therapists', icon: Stethoscope, count: '~500' },
-                    { value: 'all', label: 'Everyone', icon: Users, count: '~5,000' },
-                    { value: 'specific', label: 'Specific User', icon: User, count: '1' },
-                    { value: 'custom', label: 'Custom Segment', icon: Target, count: 'Varies' },
+                    { value: 'all_users', label: 'All Users', icon: Users },
+                    { value: 'all_therapists', label: 'All Therapists', icon: Stethoscope },
+                    { value: 'all', label: 'Everyone', icon: Users },
+                    { value: 'specific', label: 'Specific User', icon: User },
                   ].map((opt) => (
                     <label
                       key={opt.value}
@@ -459,7 +393,7 @@ export default function PushNotifications() {
                         name="targetAudience"
                         value={opt.value}
                         checked={targetAudience === opt.value}
-                        onChange={(e) => setTargetAudience(e.target.value as any)}
+                        onChange={(e) => setTargetAudience(e.target.value)}
                         className="sr-only"
                       />
                       <opt.icon className={cn(
@@ -469,7 +403,6 @@ export default function PushNotifications() {
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">{opt.label}</p>
                       </div>
-                      <span className="text-xs text-gray-500">{opt.count}</span>
                     </label>
                   ))}
                 </div>
@@ -479,7 +412,7 @@ export default function PushNotifications() {
                     <input
                       type="text"
                       className="input w-full"
-                      placeholder="Enter user ID (e.g., USR-001)"
+                      placeholder="Enter user ID"
                       value={specificUserId}
                       onChange={(e) => setSpecificUserId(e.target.value)}
                     />
@@ -555,10 +488,10 @@ export default function PushNotifications() {
                 </button>
                 <button
                   onClick={handleSend}
-                  disabled={isSending || !title.trim() || !message.trim() || (scheduleType === 'scheduled' && !scheduledDateTime)}
+                  disabled={isSubmitting || !title.trim() || !message.trim() || (scheduleType === 'scheduled' && !scheduledDateTime)}
                   className="btn btn-primary flex-1"
                 >
-                  {isSending ? (
+                  {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -584,7 +517,6 @@ export default function PushNotifications() {
                   Notification Preview
                 </h3>
                 <div className="bg-gray-900 rounded-3xl p-4 max-w-sm mx-auto">
-                  {/* Phone mockup */}
                   <div className="bg-gray-800 rounded-2xl p-3">
                     <div className="flex items-center justify-between text-white text-xs mb-3">
                       <span>9:41</span>
@@ -593,7 +525,6 @@ export default function PushNotifications() {
                         <span>100%</span>
                       </div>
                     </div>
-                    {/* Notification card */}
                     <div className="bg-white rounded-xl p-3 shadow-lg">
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-primary-100 rounded-lg flex-shrink-0">
@@ -622,17 +553,12 @@ export default function PushNotifications() {
                 </div>
               </div>
 
-              {/* Summary */}
               <div className="card p-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-3">Summary</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Target Audience</span>
                     <span className="font-medium text-gray-900">{getAudienceLabel(targetAudience)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Recipients</span>
-                    <span className="font-medium text-gray-900">~{getTargetCount().toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Schedule</span>

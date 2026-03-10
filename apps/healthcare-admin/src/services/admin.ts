@@ -64,3 +64,41 @@ export const getSupportTickets = (params: { page?: number; limit?: number; searc
 
 export const updateSupportTicket = (id: string, data: { status?: string }) =>
   api.patch(`/admin/support/${id}`, data).then((r) => r.data);
+
+// ─── Push Notifications ───────────────────────────────────────────────────────
+export const getPushNotifications = (params: { page?: number; limit?: number; status?: string }) =>
+  api.get('/admin/push-notifications', { params }).then((r) => r.data);
+
+export const createPushNotification = (data: {
+  title: string;
+  message: string;
+  imageUrl?: string;
+  deepLink?: string;
+  targetAudience: string;
+  targetUserId?: string;
+  scheduledAt?: string;
+}) => api.post('/admin/push-notifications', data).then((r) => r.data);
+
+export const sendPushNotification = (id: string) =>
+  api.post(`/admin/push-notifications/${id}/send`).then((r) => r.data);
+
+// ─── Reviews / Feedback ───────────────────────────────────────────────────────
+export const getReviews = (params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  rating?: number;
+  isFlagged?: boolean;
+  therapistId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}) => api.get('/admin/reviews', { params }).then((r) => r.data);
+
+export const flagReview = (id: string, reason: string) =>
+  api.patch(`/admin/reviews/${id}/flag`, { reason }).then((r) => r.data);
+
+export const unflagReview = (id: string) =>
+  api.patch(`/admin/reviews/${id}/unflag`).then((r) => r.data);
+
+export const toggleHideReview = (id: string) =>
+  api.patch(`/admin/reviews/${id}/toggle-hide`).then((r) => r.data);

@@ -203,7 +203,7 @@ docker run -d \
   -e POSTGRES_USER=shell \
   -e POSTGRES_PASSWORD=shell123 \
   -e POSTGRES_DB=shell_apps \
-  -p 5432:5432 \
+  -p 5433:5432 \
   -v shell_postgres_data:/var/lib/postgresql/data \
   --restart unless-stopped \
   postgres:15-alpine
@@ -235,7 +235,7 @@ REMOTE_HOST=http://your-server-ip
 
 # Database (defaults shown)
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=5433
 DB_NAME=shell_apps
 DB_USER=shell
 DB_PASSWORD=shell123

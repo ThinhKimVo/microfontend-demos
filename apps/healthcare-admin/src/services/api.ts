@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
       if (state?.accessToken) {
         config.headers.Authorization = `Bearer ${state.accessToken}`;
       }
-    } catch {}
+    } catch { }
   }
   return config;
 });
@@ -22,7 +22,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('healthcare-admin-auth');
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   },

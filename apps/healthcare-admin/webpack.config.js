@@ -15,6 +15,13 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    ],
   },
   output: {
     publicPath: 'auto',
@@ -76,7 +83,7 @@ module.exports = {
       template: './public/index.html',
     }),
     new webpack.DefinePlugin({
-      'process.env.API_URL': JSON.stringify(process.env.API_URL || 'http://localhost:3001/api/v1'),
+      'process.env.API_URL': JSON.stringify(process.env.API_URL || '/api/v1'),
     }),
   ],
 };
