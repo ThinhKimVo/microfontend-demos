@@ -1,5 +1,5 @@
 {
-  "name": "shell-api",
+  "name": "@mfe/shell-api",
   "version": "1.0.0",
   "description": "API server for shell app",
   "main": "index.js",

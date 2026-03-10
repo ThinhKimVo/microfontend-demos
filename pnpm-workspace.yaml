@@ -7,3 +7,6 @@ packages:
   - 'apps/FamilyFun/frontend'
   - 'apps/BookingSystem/packages/*'
   - 'apps/elearning/*'
+  # Backend servers
+  - 'apps/shell/server'
+  - 'apps/healthcare-admin/api'

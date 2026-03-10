@@ -82,9 +82,11 @@ src/
 
 ## API Layer
 
-- **Base URL**: Configured via `process.env.API_URL`, defaults to `http://localhost:3001/api/v1`
+- **Base URL**: Configured via `process.env.API_URL`
+  - Development: defaults to `/api/v1` (proxied by webpack devServer to `localhost:3001`)
+  - Production: defaults to `/mfe/3001/api/v1` (proxied by shell's Express static server)
 - **Auth**: JWT token stored in Zustand persist (`localStorage` key: `healthcare-admin-auth`), auto-attached via Axios request interceptor
-- **401 handling**: Axios response interceptor clears auth and redirects to `/login`
+- **401 handling**: Axios response interceptor clears auth state (stays on current page, no redirect)
 - All service functions are in `services/admin.ts`, grouped by domain (auth, dashboard, users, therapists, appointments, payments, categories, settings, support)
 
 ## Auth Flow
@@ -101,4 +103,4 @@ Custom `primary` color scale (indigo-based, 50-900) defined in `tailwind.config.
 
 ## Production Config
 
-`webpack.config.prod.js` sets `publicPath` to `${REMOTE_HOST}:3101/` where `REMOTE_HOST` defaults to `http://10.30.10.18`. The `API_URL` env var is only injected in the dev webpack config via `DefinePlugin`.
+`webpack.config.prod.js` uses `publicPath: 'auto'` so chunks resolve correctly from any origin. The `API_URL` is set to `/mfe/3001/api/v1` in production (proxied through the shell's Express static server to `localhost:3001`). Both dev and prod configs inject `API_URL` via `DefinePlugin`.

@@ -6,14 +6,17 @@ A demonstration of microfrontends using Webpack 5 Module Federation with multipl
 
 ```
 Shell (Host) - React                → http://localhost:3100
-├── Healthcare Admin                  → http://localhost:3101
+├── Healthcare Admin                → http://localhost:3101
 ├── Asset Management                → http://localhost:3102
 ├── CMMS                            → http://localhost:3103
 ├── FamilyFun                       → http://localhost:3104
 ├── Booking Guest Portal            → http://localhost:3105
 ├── Booking Host Portal             → http://localhost:3106
 ├── E-Learning Admin Portal         → http://localhost:3107
-└── E-Learning Student Portal       → http://localhost:3108
+├── E-Learning Student Portal       → http://localhost:3108
+├── Healthcare Marketing            → http://localhost:3109
+├── Shell API (Express/PostgreSQL)  → http://localhost:3150
+└── Healthcare API (NestJS/Prisma)  → http://localhost:3001
 ```
 
 ## Features
@@ -77,6 +80,7 @@ pnpm dev:elearn-student     # E-Learning Student
 | Booking Host | http://localhost:3106 | Host property management |
 | E-Learning Admin | http://localhost:3107 | E-Learning admin portal |
 | E-Learning Student | http://localhost:3108 | E-Learning student portal |
+| Healthcare Marketing | http://localhost:3109 | Healthcare marketing site |
 
 ## Project Structure
 
@@ -84,7 +88,10 @@ pnpm dev:elearn-student     # E-Learning Student
 microfrontend/
 ├── apps/
 │   ├── shell/                  # Host application (React)
-│   ├── healthcare-admin/         # Healthcare Admin dashboard
+│   │   └── server/             # Shell API (Express) + static server with proxy
+│   ├── healthcare-admin/       # Healthcare Admin dashboard
+│   │   └── api/                # Healthcare API (NestJS/Prisma)
+│   ├── healthcare-marketing/   # Healthcare Marketing site
 │   ├── assest-management/      # Asset Management system
 │   ├── cmms/                   # CMMS application
 │   ├── FamilyFun/              # Family events platform
@@ -111,11 +118,18 @@ microfrontend/
 
 ```
 Production Services:
-├── PostgreSQL Database     → Docker container (port 5432)
-├── Shell API Server        → PM2 process (port 3150)
-├── Shell Frontend          → PM2 static server (port 3100)
-└── Remote Apps (8)         → PM2 static servers (ports 3101-3108)
+├── PostgreSQL (Shell)         → Docker container (port 5433)
+├── PostgreSQL (Healthcare)    → Docker container (port 5434)
+├── Shell API Server           → PM2/Express (port 3150)
+├── Healthcare API Server      → PM2/NestJS (port 3001)
+├── Shell Frontend             → PM2/Express static server with proxy (port 3100)
+│   ├── /api/**               → proxied to localhost:3150
+│   ├── /screenshots/**       → proxied to localhost:3150
+│   └── /mfe/:port/**         → proxied to localhost:port (avoids mixed content)
+└── Remote Apps (10)           → PM2 static servers (ports 3101-3109)
 ```
+
+The shell frontend uses an Express static server (`server/static.js`) instead of `serve` to proxy API and remote app requests. This allows both `http://10.30.10.18:3100` and `https://demo.saigontechnology.vn` to work without mixed content issues.
 
 ### Option 1: PM2 with Docker PostgreSQL (Recommended)
 
@@ -165,9 +179,12 @@ Deploy individual apps without affecting others:
 
 ```bash
 # Deploy specific apps
-./scripts/deploy-pm2.sh deploy:app shell        # Frontend only
-./scripts/deploy-pm2.sh deploy:app shell-api    # API server only
-./scripts/deploy-pm2.sh deploy:app cmms         # Single remote
+./scripts/deploy-pm2.sh deploy:app shell              # Frontend + proxy
+./scripts/deploy-pm2.sh deploy:app shell-api           # Shell API server
+./scripts/deploy-pm2.sh deploy:app healthcare-admin    # Healthcare frontend
+./scripts/deploy-pm2.sh deploy:app healthcare-api      # Healthcare API
+./scripts/deploy-pm2.sh deploy:app healthcare-marketing # Healthcare marketing
+./scripts/deploy-pm2.sh deploy:app cmms                # Single remote
 
 # Restart specific apps
 ./scripts/deploy-pm2.sh restart:app shell-api
@@ -179,13 +196,15 @@ Deploy individual apps without affecting others:
 ### Option 2: Local Development with Database
 
 ```bash
+# Install all dependencies (including backend servers via pnpm workspace)
+pnpm install
+
 # Start PostgreSQL locally
 cd apps/shell
 docker-compose up -d
 
 # Start API server (in one terminal)
 cd apps/shell/server
-npm install
 npm run dev
 
 # Start all frontends (in another terminal)
@@ -228,11 +247,7 @@ pm2 save
 
 ### Environment Variables
 
-Create `.env` file based on `.env.example`:
-
 ```bash
-REMOTE_HOST=http://your-server-ip
-
 # Database (defaults shown)
 DB_HOST=localhost
 DB_PORT=5433
@@ -242,15 +257,20 @@ DB_PASSWORD=shell123
 
 # API Server
 API_PORT=3150
+
+# Shell static server (production)
+PORT=3100
+API_SERVER=http://localhost:3150
 ```
 
 ### Port Reference
 
 | Service | Port | Description |
 |---------|------|-------------|
-| PostgreSQL | 5432 | Database |
-| Shell API | 3150 | Backend API server |
-| Shell | 3100 | Host application |
+| PostgreSQL (Shell) | 5433 | Shell database |
+| PostgreSQL (Healthcare) | 5434 | Healthcare database |
+| Healthcare API | 3001 | NestJS API server |
+| Shell | 3100 | Host application (Express static + proxy) |
 | Healthcare Admin | 3101 | Remote app |
 | Asset Management | 3102 | Remote app |
 | CMMS | 3103 | Remote app |
@@ -259,6 +279,8 @@ API_PORT=3150
 | Booking Host | 3106 | Remote app |
 | E-Learning Admin | 3107 | Remote app |
 | E-Learning Student | 3108 | Remote app |
+| Healthcare Marketing | 3109 | Remote app |
+| Shell API | 3150 | Express API server |
 
 ## Integrating New Remotes
 
@@ -325,21 +347,26 @@ new ModuleFederationPlugin({
 The shell consumes these remotes:
 
 ```javascript
-// Shell webpack.config.js
+// Shell webpack.config.js (development - absolute localhost URLs)
 new ModuleFederationPlugin({
   name: 'shell',
   remotes: {
     healthcareAdmin: 'healthcareAdmin@http://localhost:3101/remoteEntry.js',
-    assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
-    cmms: 'cmms@http://localhost:3103/remoteEntry.js',
-    familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',
-    bookingGuestPortal: 'bookingGuestPortal@http://localhost:3105/remoteEntry.js',
-    bookingHostPortal: 'bookingHostPortal@http://localhost:3106/remoteEntry.js',
-    elearningAdminPortal: 'elearningAdminPortal@http://localhost:3107/remoteEntry.js',
-    elearningStudentPortal: 'elearningStudentPortal@http://localhost:3108/remoteEntry.js',
+    // ... other remotes at localhost:PORT
+  },
+})
+
+// Shell webpack.config.prod.js (production - relative URLs via proxy)
+new ModuleFederationPlugin({
+  name: 'shell',
+  remotes: {
+    healthcareAdmin: 'healthcareAdmin@/mfe/3101/remoteEntry.js',
+    // ... all remotes use /mfe/PORT/ paths
   },
 })
 ```
+
+In production, the shell's Express static server proxies `/mfe/:port/*` to `localhost:port`, so remotes work over both HTTP and HTTPS without mixed content.
 
 ### Mount/Unmount Pattern
 
@@ -394,6 +421,23 @@ const RemoteWrapper: React.FC = () => {
 | **Booking Host Portal** | Property management for hosts |
 | **E-Learning Admin** | Course and student management for educators |
 | **E-Learning Student** | Learning interface for students |
+| **Healthcare Marketing** | Healthcare marketing and landing pages |
+
+## pnpm Workspace
+
+All packages are managed by pnpm workspace (`pnpm-workspace.yaml`), including backend servers:
+
+```yaml
+packages:
+  - 'apps/*'
+  - 'apps/FamilyFun/frontend'
+  - 'apps/BookingSystem/packages/*'
+  - 'apps/elearning/*'
+  - 'apps/shell/server'          # @mfe/shell-api (Express)
+  - 'apps/healthcare-admin/api'  # @hopefull/api (NestJS)
+```
+
+A single `pnpm install` at the root installs dependencies for all 17 workspace packages.
 
 ## Admin Panel
 

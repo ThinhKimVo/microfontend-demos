@@ -92,7 +92,9 @@ src/
 | App | Port | Framework | Role |
 |-----|------|-----------|------|
 | shell | 3100 | React 18 | Host application with routing and layout |
+| shell-api | 3150 | Express | Backend API server (PostgreSQL) |
 | healthcare-admin | 3101 | React 18 | Healthcare Admin dashboard |
+| healthcare-api | 3001 | NestJS | Healthcare API (PostgreSQL/Prisma) |
 | assest-management | 3102 | React 18 | Asset Management app |
 | cmms | 3103 | React 18 | CMMS app |
 | family-fun | 3104 | React 18 | Family events platform |
@@ -100,22 +102,28 @@ src/
 | booking-host-portal | 3106 | React 18 | Host property management |
 | elearning-admin-portal | 3107 | React 18 | E-Learning admin portal |
 | elearning-student-portal | 3108 | React 18 | E-Learning student portal |
+| healthcare-marketing | 3109 | React 18 | Healthcare Marketing site |
 
 ### Module Federation Pattern
 
 **Shell consumes remotes via webpack config:**
+
+Development (`webpack.config.js`):
 ```javascript
 remotes: {
   healthcareAdmin: 'healthcareAdmin@http://localhost:3101/remoteEntry.js',
-  assestManagement: 'assestManagement@http://localhost:3102/remoteEntry.js',
-  cmms: 'cmms@http://localhost:3103/remoteEntry.js',
-  familyFun: 'familyFun@http://localhost:3104/remoteEntry.js',
-  bookingGuestPortal: 'bookingGuestPortal@http://localhost:3105/remoteEntry.js',
-  bookingHostPortal: 'bookingHostPortal@http://localhost:3106/remoteEntry.js',
-  elearningAdminPortal: 'elearningAdminPortal@http://localhost:3107/remoteEntry.js',
-  elearningStudentPortal: 'elearningStudentPortal@http://localhost:3108/remoteEntry.js',
+  // ... other remotes at localhost:PORT
 }
 ```
+
+Production (`webpack.config.prod.js`):
+```javascript
+remotes: {
+  healthcareAdmin: 'healthcareAdmin@/mfe/3101/remoteEntry.js',
+  // ... all remotes use relative /mfe/PORT paths
+}
+```
+In production, the shell's Express static server (`server/static.js`) proxies `/mfe/:port/*` requests to `localhost:port`, avoiding mixed content issues when served via HTTPS.
 
 **Remote type declarations:** `src/federation/types.d.ts`
 
@@ -298,9 +306,11 @@ React, ReactDOM, and React Router are configured as singletons to prevent duplic
 ### PM2 with Docker PostgreSQL
 
 The deployment script manages:
-- **PostgreSQL database** via Docker container (port 5432)
+- **PostgreSQL databases** via Docker containers (ports 5433, 5434)
 - **Shell API server** via PM2 (port 3150)
-- **Frontend apps** via PM2 static servers (ports 3100-3108)
+- **Healthcare API server** via PM2 (port 3001)
+- **Shell frontend** via Express static server with API proxy (port 3100)
+- **Remote apps** via PM2 static servers (ports 3101-3109)
 
 ```bash
 # Deploy all apps with database
@@ -363,8 +373,8 @@ ssh user@server "pm2 logs cloudflare-tunnel --lines 10 --nostream | grep tryclou
 cd apps/shell
 docker-compose up -d
 
-# Start API server
-cd server && npm install && npm run dev
+# Start API server (pnpm manages deps via workspace)
+cd server && npm run dev
 
 # Start shell frontend (in another terminal)
 pnpm dev:shell
@@ -380,10 +390,32 @@ pnpm build:prod
 pnpm --filter @mfe/shell build:prod
 ```
 
-### Production Webpack Config
+### Production Architecture
 
-The `webpack.config.prod.js` uses environment variables:
-- `REMOTE_HOST` - Base URL for remote apps (default: `http://10.30.10.18`)
+In production, the shell frontend runs via an Express static server (`server/static.js`) on port 3100 that:
+- Serves the built `dist/` files with SPA fallback
+- Proxies `/api` and `/screenshots` requests to the shell API server (port 3150)
+- Proxies `/mfe/:port/*` requests to remote app ports (avoiding mixed content over HTTPS)
+
+The `webpack.config.prod.js` uses relative URLs (`/mfe/PORT/remoteEntry.js`) for Module Federation remotes instead of hardcoded host/port URLs. All remote apps use `publicPath: 'auto'` so chunks resolve correctly regardless of the serving origin.
+
+This means both `http://10.30.10.18:3100` and `https://demo.saigontechnology.vn` work without mixed content issues.
+
+### pnpm Workspace
+
+All packages are managed by pnpm workspace, including backend servers:
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - 'apps/*'
+  - 'apps/FamilyFun/frontend'
+  - 'apps/BookingSystem/packages/*'
+  - 'apps/elearning/*'
+  - 'apps/shell/server'          # @mfe/shell-api
+  - 'apps/healthcare-admin/api'  # @hopefull/api
+```
+
+A single `pnpm install` at the root installs dependencies for all workspace packages.
 
 ## Refactoring Guidelines
 
