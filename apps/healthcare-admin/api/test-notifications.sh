@@ -3,7 +3,7 @@
 # Test script for booking notification cases
 # Make sure API is running on localhost:3001
 
-API_URL="http://localhost:3001/api/v1"
+API_URL="http://10.30.10.18:3001/api/v1"
 # Use unicode escape for ! to avoid shell interpretation issues
 PASSWORD='Password123\u0021'
 

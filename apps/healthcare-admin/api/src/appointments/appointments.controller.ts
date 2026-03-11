@@ -155,17 +155,57 @@ export class AppointmentsController {
   }
 
   @Post(':id/test-reminder')
-  @ApiOperation({ summary: 'DEV ONLY: trigger a reminder in ~10 seconds' })
+  @ApiOperation({ summary: 'DEV ONLY: send a reminder notification immediately' })
   @ApiQuery({ name: 'type', required: false, enum: ['24H', '1H', '15MIN'] })
-  async testReminder(@Param('id') id: string, @Query('type') type = '15MIN') {
-    await this.prisma.appointmentReminder.create({
-      data: {
-        appointmentId: id,
-        reminderType: type,
-        scheduledFor: new Date(Date.now() + 10_000),
+  async testReminder(@Request() req: any, @Param('id') id: string, @Query('type') type = '15MIN') {
+    const appointment = await this.prisma.appointment.findUniqueOrThrow({
+      where: { id },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, timezone: true } },
+        therapist: {
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true } },
+          },
+        },
       },
     });
-    return { ok: true, firesIn: '~10 seconds', reminderType: type };
+
+    const therapistName = `Dr. ${appointment.therapist.user.firstName} ${appointment.therapist.user.lastName}`.trim();
+    const patientName = `${appointment.user.firstName} ${appointment.user.lastName}`.trim();
+    const dateTime = appointment.scheduledAt.toLocaleString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true,
+    });
+
+    // Send to the requesting user (patient or therapist)
+    const isTherapist = req.user.id === appointment.therapist.user.id;
+
+    switch (type) {
+      case '24H':
+        if (isTherapist) {
+          await this.notificationsService.sendTherapistReminder24H(req.user.id, id, patientName, dateTime);
+        } else {
+          await this.notificationsService.sendReminder24H(req.user.id, id, therapistName, dateTime);
+        }
+        break;
+      case '1H':
+        if (isTherapist) {
+          await this.notificationsService.sendTherapistReminder1H(req.user.id, id, patientName);
+        } else {
+          await this.notificationsService.sendReminder1H(req.user.id, id, therapistName);
+        }
+        break;
+      case '15MIN':
+      default:
+        if (isTherapist) {
+          await this.notificationsService.sendTherapistReminder15Min(req.user.id, id, patientName);
+        } else {
+          await this.notificationsService.sendReminder15Min(req.user.id, id, therapistName);
+        }
+        break;
+    }
+
+    return { ok: true, sentImmediately: true, reminderType: type, sentTo: req.user.id };
   }
 
   @Patch(':id/admin-cancel')

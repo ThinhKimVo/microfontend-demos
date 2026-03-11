@@ -133,6 +133,12 @@ export class NotificationsService {
 
           const message: any = {
             token: dt.token,
+            // Top-level notification ensures display on both platforms
+            // and populates remoteMessage.notification in onMessage handler
+            notification: {
+              title: params.title,
+              body: params.body,
+            },
             data: {
               ...params.data,
               badgeCount: String(unreadCount),
@@ -140,10 +146,7 @@ export class NotificationsService {
           };
 
           if (isIos) {
-            // For iOS via @react-native-firebase/messaging:
-            // - Use apns payload directly so APNs displays the notification natively
-            // - Do NOT set top-level `notification` — it can conflict with apns.payload.aps.alert
-            // - FCM forwards the apns payload to Apple's APNs service
+            // APNs-specific payload — takes precedence over top-level notification for iOS
             message.apns = {
               headers: {
                 'apns-priority': '10',
@@ -151,10 +154,6 @@ export class NotificationsService {
               },
               payload: {
                 aps: {
-                  alert: {
-                    title: params.title,
-                    body: params.body,
-                  },
                   badge: unreadCount,
                   sound: 'default',
                   'mutable-content': 1,
@@ -164,13 +163,6 @@ export class NotificationsService {
               },
             };
           } else {
-            // Android via @react-native-firebase/messaging:
-            // - Use top-level notification for display
-            // - Android-specific config for priority, sound, channel
-            message.notification = {
-              title: params.title,
-              body: params.body,
-            };
             message.android = {
               priority: 'high' as const,
               notification: {
