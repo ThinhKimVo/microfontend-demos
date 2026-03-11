@@ -2,17 +2,14 @@ import { AppInfo } from '../data/apps';
 import { get, post, put, del, withApiResult } from './httpClient';
 import { AVAILABILITY_TIMEOUT_MS } from '../constants/config';
 
-// Get base URL for remote app availability checks
-// REMOTE_HOST is injected at build time via webpack DefinePlugin
-function getRemoteBaseUrl(): string {
+export async function checkAppAvailability(app: AppInfo): Promise<boolean> {
+  // In dev, check directly on localhost:port
+  // In prod, check via /mfe/:port proxy (avoids mixed content on HTTPS)
   const { hostname } = window.location;
   const isDev = hostname === 'localhost' || hostname === '127.0.0.1';
-  return `http://${isDev ? hostname : '127.0.0.1'}`;
-}
-
-export async function checkAppAvailability(app: AppInfo): Promise<boolean> {
-  const baseUrl = getRemoteBaseUrl();
-  const remoteEntryUrl = `${baseUrl}:${app.port}/remoteEntry.js`;
+  const remoteEntryUrl = isDev
+    ? `http://${hostname}:${app.port}/remoteEntry.js`
+    : `/mfe/${app.port}/remoteEntry.js`;
 
   try {
     const controller = new AbortController();

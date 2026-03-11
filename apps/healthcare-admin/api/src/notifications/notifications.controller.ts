@@ -100,6 +100,11 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Send push notification for a new chat message' })
   @ApiResponse({ status: 201, description: 'Chat message notification sent' })
   async sendChatMessage(@Request() req: any, @Body() dto: SendChatMessageDto) {
+    console.log(`[Notifications] Chat message push request from user ${req.user.id}:`, {
+      recipientId: dto.recipientId,
+      senderName: dto.senderName,
+      appointmentId: dto.appointmentId,
+    });
     await this.notificationsService.sendChatMessage(
       dto.recipientId,
       dto.senderName,

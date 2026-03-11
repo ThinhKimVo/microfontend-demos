@@ -23,7 +23,7 @@ export class NotificationsService {
   constructor(
     private prisma: PrismaService,
     private firebaseService: FirebaseService,
-  ) {}
+  ) { }
 
   async findAll(userId: string, page = 1, limit = 20) {
     const [notifications, total] = await Promise.all([
@@ -113,65 +113,116 @@ export class NotificationsService {
     });
 
     if (deviceTokens.length === 0) {
-      console.log(`No device tokens found for user ${params.userId}`);
+      console.log(`[Push] No device tokens found for user ${params.userId}`);
       return;
     }
 
-    const tokens = deviceTokens.map((dt) => dt.token);
+    const unreadCount = await this.getUnreadCount(params.userId);
 
     try {
       const messaging = this.firebaseService.getMessaging();
-      const unreadCount = await this.getUnreadCount(params.userId);
 
-      const response = await messaging.sendEachForMulticast({
-        tokens,
-        notification: {
-          title: params.title,
-          body: params.body,
-        },
-        data: {
-          ...params.data,
-          badgeCount: String(unreadCount), // Include badge count in data for all platforms
-        },
-        apns: {
-          payload: {
-            aps: {
-              badge: unreadCount,
-              sound: 'default',
+      // Build platform-specific messages for each device token
+      // All tokens are FCM registration tokens from @react-native-firebase/messaging
+      // iOS: FCM wraps APNs delivery automatically when APNs key is configured in Firebase
+      const results = await Promise.allSettled(
+        deviceTokens.map((dt) => {
+          const isIos = dt.platform?.toLowerCase() === 'ios';
+
+          console.log(`[Push] Sending to ${dt.platform} device (${dt.token.substring(0, 8)}...)`);
+
+          const message: any = {
+            token: dt.token,
+            data: {
+              ...params.data,
+              badgeCount: String(unreadCount),
             },
-          },
-        },
-        android: {
-          priority: 'high',
-          notification: {
-            sound: 'default',
-            channelId: 'default',
-            notificationCount: unreadCount, // Android notification count
-          },
-        },
+          };
+
+          if (isIos) {
+            // For iOS via @react-native-firebase/messaging:
+            // - Use apns payload directly so APNs displays the notification natively
+            // - Do NOT set top-level `notification` — it can conflict with apns.payload.aps.alert
+            // - FCM forwards the apns payload to Apple's APNs service
+            message.apns = {
+              headers: {
+                'apns-priority': '10',
+                'apns-push-type': 'alert',
+              },
+              payload: {
+                aps: {
+                  alert: {
+                    title: params.title,
+                    body: params.body,
+                  },
+                  badge: unreadCount,
+                  sound: 'default',
+                  'mutable-content': 1,
+                  'content-available': 1,
+                  'thread-id': params.data?.type || 'default',
+                },
+              },
+            };
+          } else {
+            // Android via @react-native-firebase/messaging:
+            // - Use top-level notification for display
+            // - Android-specific config for priority, sound, channel
+            message.notification = {
+              title: params.title,
+              body: params.body,
+            };
+            message.android = {
+              priority: 'high' as const,
+              notification: {
+                sound: 'default',
+                channelId: 'default',
+                notificationCount: unreadCount,
+              },
+            };
+          }
+
+          return messaging.send(message);
+        }),
+      );
+
+      const invalidTokens: string[] = [];
+      let successCount = 0;
+      let failCount = 0;
+
+      results.forEach((result, idx) => {
+        if (result.status === 'fulfilled') {
+          successCount++;
+        } else {
+          failCount++;
+          const error = result.reason;
+          const errorCode = error?.code || error?.errorInfo?.code || '';
+          const errorMsg = error?.message || String(error);
+          console.error(`[Push] Failed for ${deviceTokens[idx].platform} token (${deviceTokens[idx].token.substring(0, 8)}...):`, {
+            code: errorCode,
+            message: errorMsg,
+          });
+
+          // Remove tokens that are definitely invalid
+          if (
+            errorCode === 'messaging/registration-token-not-registered' ||
+            errorCode === 'messaging/invalid-registration-token' ||
+            errorCode === 'messaging/invalid-argument'
+          ) {
+            invalidTokens.push(deviceTokens[idx].token);
+          }
+        }
       });
 
-      // Handle failed tokens (remove invalid ones)
-      if (response.failureCount > 0) {
-        const failedTokens: string[] = [];
-        response.responses.forEach((resp: { success: boolean; error?: { message: string } }, idx: number) => {
-          if (!resp.success) {
-            failedTokens.push(tokens[idx]);
-            console.error(`Failed to send to token: ${resp.error?.message}`);
-          }
+      if (invalidTokens.length > 0) {
+        await this.prisma.deviceToken.deleteMany({
+          where: { token: { in: invalidTokens } },
         });
-
-        // Remove invalid tokens
-        if (failedTokens.length > 0) {
-          await this.prisma.deviceToken.deleteMany({
-            where: { token: { in: failedTokens } },
-          });
-        }
+        console.log(`[Push] Removed ${invalidTokens.length} invalid tokens`);
       }
 
-      console.log(`Push sent: ${response.successCount} success, ${response.failureCount} failed`);
+      console.log(`[Push] Sent: ${successCount} success, ${failCount} failed`);
     } catch (error) {
-      console.error('Error sending push notification:', error);
+      console.error('[Push] Error sending push notification:', error);
     }
   }
 
@@ -338,16 +389,34 @@ export class NotificationsService {
 
   // Chat message - push only, no DB record
   async sendChatMessage(recipientId: string, senderName: string, appointmentId: string) {
-    await this.sendPushNotification({
-      userId: recipientId,
-      title: 'New Message',
-      body: `${senderName} sent you a message.`,
-      data: {
-        type: 'THERAPIST_MESSAGE',
-        screen: 'chat',
-        appointmentId,
-      },
+    console.log(`[Chat Push] Sending chat notification: recipient=${recipientId}, sender=${senderName}, appointment=${appointmentId}`);
+
+    // Verify recipient has device tokens before sending
+    const tokenCount = await this.prisma.deviceToken.count({
+      where: { userId: recipientId },
     });
+    console.log(`[Chat Push] Recipient ${recipientId} has ${tokenCount} device token(s)`);
+
+    if (tokenCount === 0) {
+      console.warn(`[Chat Push] No device tokens for recipient ${recipientId}, skipping push`);
+      return;
+    }
+
+    try {
+      await this.sendPushNotification({
+        userId: recipientId,
+        title: 'Healthcare - New Message',
+        body: `${senderName} sent you a message.`,
+        data: {
+          type: 'THERAPIST_MESSAGE',
+          screen: 'chat',
+          appointmentId,
+        },
+      });
+      console.log(`[Chat Push] Push notification sent successfully`);
+    } catch (error) {
+      console.error(`[Chat Push] Failed to send push notification:`, error);
+    }
   }
 
   // Booking Request - notify therapist of new booking request
