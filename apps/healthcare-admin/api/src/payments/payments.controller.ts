@@ -66,10 +66,22 @@ export class PaymentsController {
     return this.paymentsService.createSetupIntent(req.user.id);
   }
 
+  @Post('payment-intent')
+  @ApiOperation({ summary: 'Create a Stripe PaymentIntent for booking payment' })
+  async createPaymentIntent(
+    @Request() req: any,
+    @Body() body: { amount: number; paymentMethodId: string },
+  ) {
+    return this.paymentsService.createPaymentIntent(req.user.id, body);
+  }
+
   @Post('methods/:id/verify')
   @ApiOperation({ summary: 'Verify card with $0.01 authorization charge' })
   async verifyCard(@Request() req: any, @Param('id') id: string) {
-    return this.paymentsService.verifyCard(req.user.id, id);
+    console.log('[PaymentsController] POST /methods/:id/verify', { userId: req.user.id, paymentMethodId: id });
+    const result = await this.paymentsService.verifyCard(req.user.id, id);
+    console.log('[PaymentsController] Verify result', result);
+    return result;
   }
 
   @Get('history')

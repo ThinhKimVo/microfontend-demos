@@ -624,11 +624,10 @@ rm deploy-${app_name}.tar.gz
 cd ~/microfrontend/${app_path}
 
 if [ "${app_name}" = "healthcare-api" ]; then
-    # NestJS API - install deps, generate prisma client, push schema, seed, start
+    # NestJS API - install deps, generate prisma client,push schema, start
     npm install
     npx prisma generate
     npx prisma db push --skip-generate 2>/dev/null || true
-    npx prisma db seed 2>/dev/null || echo "Seeding skipped or already seeded"
     pm2 delete ${pm2_name} 2>/dev/null || true
     pm2 start dist/src/main.js --name "${pm2_name}"
 elif [ "${app_name}" = "shell-api" ]; then
@@ -801,7 +800,7 @@ cd ~/microfrontend/apps/healthcare-admin/api
 npm install 2>/dev/null || true
 npx prisma generate
 npx prisma db push --skip-generate 2>/dev/null || true
-npx prisma db seed 2>/dev/null || echo "Seeding skipped or already seeded"
+
 
 cd ~/microfrontend
 

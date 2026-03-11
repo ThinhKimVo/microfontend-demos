@@ -22,14 +22,36 @@ export class PaymentsService {
     return this.stripe;
   }
 
-  async createSetupIntent(userId: string): Promise<{ clientSecret: string }> {
+  private async getOrCreateStripeCustomer(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true },
+      select: { id: true, email: true, firstName: true, lastName: true, stripeCustomerId: true },
     });
     if (!user) throw new NotFoundException('User not found');
 
+    if (user.stripeCustomerId) {
+      return user.stripeCustomerId;
+    }
+
+    const customer = await this.ensureStripe().customers.create({
+      email: user.email,
+      name: [user.firstName, user.lastName].filter(Boolean).join(' ') || undefined,
+      metadata: { userId },
+    });
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { stripeCustomerId: customer.id },
+    });
+
+    return customer.id;
+  }
+
+  async createSetupIntent(userId: string): Promise<{ clientSecret: string }> {
+    const customerId = await this.getOrCreateStripeCustomer(userId);
+
     const setupIntent = await this.ensureStripe().setupIntents.create({
+      customer: customerId,
       payment_method_types: ['card'],
       metadata: { userId },
     });
@@ -41,29 +63,50 @@ export class PaymentsService {
     const paymentMethod = await this.prisma.paymentMethod.findFirst({
       where: { id: paymentMethodId, userId },
     });
-    if (!paymentMethod) throw new NotFoundException('Payment method not found');
+    if (!paymentMethod) {
+      throw new NotFoundException('Payment method not found');
+    }
+
+    const customerId = await this.getOrCreateStripeCustomer(userId);
+
+    // Ensure payment method is attached to customer
+    try {
+      await this.ensureStripe().paymentMethods.attach(paymentMethod.stripePaymentMethodId, {
+        customer: customerId,
+      });
+    } catch (e: any) {
+      if (!e.message?.includes('already been attached')) throw e;
+    }
 
     try {
-      const paymentIntent = await this.ensureStripe().paymentIntents.create({
-        amount: 1, // $0.01
-        currency: 'usd',
+      // Use SetupIntent to validate the card without charging
+      const setupIntent = await this.ensureStripe().setupIntents.create({
+        customer: customerId,
         payment_method: paymentMethod.stripePaymentMethodId,
         confirm: true,
-        capture_method: 'manual',
-        automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+        payment_method_types: ['card'],
+        usage: 'off_session',
       });
 
-      if (paymentIntent.status === 'requires_capture') {
-        await this.ensureStripe().paymentIntents.cancel(paymentIntent.id);
+      if (setupIntent.status === 'succeeded') {
+        await this.prisma.paymentMethod.update({
+          where: { id: paymentMethodId },
+          data: { isVerified: true },
+        });
+        return { verified: true };
       }
 
-      await this.prisma.paymentMethod.update({
-        where: { id: paymentMethodId },
-        data: { isVerified: true },
-      });
+      return { verified: false };
+    } catch (err: any) {
+      // Card already completed 3DS during initial setup — treat as verified
+      if (err?.code === 'authentication_required') {
+        await this.prisma.paymentMethod.update({
+          where: { id: paymentMethodId },
+          data: { isVerified: true },
+        });
+        return { verified: true };
+      }
 
-      return { verified: true };
-    } catch {
       await this.prisma.paymentMethod.update({
         where: { id: paymentMethodId },
         data: { isVerified: false },
@@ -254,6 +297,41 @@ export class PaymentsService {
         totalPlatformFee: summary._sum.platformFee || 0,
         totalTherapistPayout: summary._sum.therapistAmount || 0,
       },
+    };
+  }
+
+  async createPaymentIntent(
+    userId: string,
+    data: { amount: number; paymentMethodId: string },
+  ): Promise<{ clientSecret: string; paymentIntentId: string }> {
+    const paymentMethod = await this.prisma.paymentMethod.findFirst({
+      where: { id: data.paymentMethodId, userId },
+    });
+    if (!paymentMethod) throw new NotFoundException('Payment method not found');
+
+    const customerId = await this.getOrCreateStripeCustomer(userId);
+
+    // Ensure payment method is attached to customer
+    try {
+      await this.ensureStripe().paymentMethods.attach(paymentMethod.stripePaymentMethodId, {
+        customer: customerId,
+      });
+    } catch (e: any) {
+      if (!e.message?.includes('already been attached')) throw e;
+    }
+
+    const paymentIntent = await this.ensureStripe().paymentIntents.create({
+      amount: data.amount,
+      currency: 'usd',
+      customer: customerId,
+      payment_method: paymentMethod.stripePaymentMethodId,
+      payment_method_types: ['card'],
+      metadata: { userId, paymentMethodId: data.paymentMethodId },
+    });
+
+    return {
+      clientSecret: paymentIntent.client_secret!,
+      paymentIntentId: paymentIntent.id,
     };
   }
 

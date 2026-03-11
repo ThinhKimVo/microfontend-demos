@@ -41,6 +41,8 @@ export class AppointmentsController {
       timezone: string;
       bookingNotes?: string;
       amount: number;
+      paymentMethodId?: string;
+      stripePaymentIntentId?: string;
     },
   ) {
     return this.appointmentsService.create({
@@ -51,6 +53,8 @@ export class AppointmentsController {
       timezone: body.timezone,
       bookingNotes: body.bookingNotes,
       amount: body.amount,
+      paymentMethodId: body.paymentMethodId,
+      stripePaymentIntentId: body.stripePaymentIntentId,
     });
   }
 

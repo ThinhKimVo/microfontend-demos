@@ -7,7 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { RemindersService } from '../reminders/reminders.service';
-import { AppointmentStatus, AppointmentType, Prisma } from '@prisma/client';
+import { AppointmentStatus, AppointmentType, PaymentStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class AppointmentsService {
@@ -26,6 +26,8 @@ export class AppointmentsService {
     type?: AppointmentType;
     bookingNotes?: string;
     amount: number;
+    paymentMethodId?: string;
+    stripePaymentIntentId?: string;
   }) {
     // Verify therapist exists and is available
     const therapist = await this.prisma.therapist.findUnique({
@@ -82,6 +84,25 @@ export class AppointmentsService {
         },
       },
     });
+
+    // Create payment record if payment was made
+    if (data.stripePaymentIntentId && data.amount > 0) {
+      const platformFee = Math.round(data.amount * 0.1); // 10% platform fee
+      const therapistAmount = data.amount - platformFee;
+
+      await this.prisma.payment.create({
+        data: {
+          userId: data.userId,
+          appointmentId: appointment.id,
+          amount: data.amount,
+          platformFee,
+          therapistAmount,
+          stripePaymentIntentId: data.stripePaymentIntentId,
+          status: PaymentStatus.SUCCESS,
+          paidAt: new Date(),
+        },
+      });
+    }
 
     // Notify therapist of new booking request
     const patientName = `${patient?.firstName || ''} ${patient?.lastName || ''}`.trim() || 'A patient';
