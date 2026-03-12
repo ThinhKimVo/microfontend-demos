@@ -340,15 +340,15 @@ const MediaLibrary: React.FC<{ apps: AppInfo[] }> = ({ apps }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Media Library</h1>
+        <h1 className="text-2xl font-bold text-white">Media Library</h1>
         <p className="text-slate-500">All screenshots from your applications</p>
       </div>
 
       {allScreenshots.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {allScreenshots.map((screenshot, index) => (
-            <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 group">
-              <div className="aspect-video bg-slate-100 relative overflow-hidden">
+            <div key={index} className="glass-panel rounded-xl overflow-hidden group">
+              <div className="aspect-video bg-white/5 relative overflow-hidden">
                 <img
                   src={screenshot.url}
                   alt={screenshot.alt}
@@ -357,21 +357,21 @@ const MediaLibrary: React.FC<{ apps: AppInfo[] }> = ({ apps }) => {
                   className="w-full h-full object-cover"
                   loading="lazy"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23f1f5f9" width="100" height="100"/><text x="50%" y="50%" fill="%2394a3b8" font-size="12" text-anchor="middle" dy=".3em">No image</text></svg>';
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%230A0A0B" width="100" height="100"/><text x="50%" y="50%" fill="%2394a3b8" font-size="12" text-anchor="middle" dy=".3em">No image</text></svg>';
                   }}
                 />
               </div>
               <div className="p-3">
-                <p className="text-sm font-medium text-slate-900 truncate">{screenshot.alt || 'Screenshot'}</p>
+                <p className="text-sm font-medium text-white truncate">{screenshot.alt || 'Screenshot'}</p>
                 <p className="text-xs text-slate-500">{screenshot.appName}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
-          <ImageIcon className="w-16 h-16 mx-auto text-slate-300 mb-4" aria-hidden="true" />
-          <h3 className="text-lg font-medium text-slate-900 mb-2">No media yet</h3>
+        <div className="glass-panel rounded-2xl p-12 text-center">
+          <ImageIcon className="w-16 h-16 mx-auto text-slate-600 mb-4" aria-hidden="true" />
+          <h3 className="text-lg font-medium text-white mb-2">No media yet</h3>
           <p className="text-slate-500">Upload screenshots to your apps to see them here</p>
         </div>
       )}
@@ -384,16 +384,16 @@ const Settings: React.FC<{ onExport: () => void }> = ({ onExport }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
         <p className="text-slate-500">Configure your admin panel</p>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Data Management</h2>
+      <div className="glass-panel rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Data Management</h2>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+          <div className="flex items-center justify-between p-4 bg-white/[0.03] rounded-xl border border-white/5">
             <div>
-              <p className="font-medium text-slate-900">Export Apps Data</p>
+              <p className="font-medium text-white">Export Apps Data</p>
               <p className="text-sm text-slate-500">Download all apps as JSON file</p>
             </div>
             <button
@@ -406,31 +406,31 @@ const Settings: React.FC<{ onExport: () => void }> = ({ onExport }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Database</h2>
-        <div className="flex items-center gap-4 p-4 bg-green-50 rounded-xl border border-green-200">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+      <div className="glass-panel rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Database</h2>
+        <div className="flex items-center gap-4 p-4 bg-accent-cyan/10 rounded-xl border border-accent-cyan/20">
+          <div className="w-3 h-3 bg-accent-cyan rounded-full animate-pulse"></div>
           <div>
-            <p className="font-medium text-green-800">PostgreSQL Connected</p>
-            <p className="text-sm text-green-600">Database is running and connected</p>
+            <p className="font-medium text-accent-cyan">PostgreSQL Connected</p>
+            <p className="text-sm text-accent-cyan/70">Database is running and connected</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">About</h2>
+      <div className="glass-panel rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">About</h2>
         <div className="space-y-3 text-sm">
-          <div className="flex justify-between py-2 border-b border-slate-100">
+          <div className="flex justify-between py-2 border-b border-white/5">
             <span className="text-slate-500">Version</span>
-            <span className="font-medium text-slate-900">1.0.0</span>
+            <span className="font-medium text-white">1.0.0</span>
           </div>
-          <div className="flex justify-between py-2 border-b border-slate-100">
+          <div className="flex justify-between py-2 border-b border-white/5">
             <span className="text-slate-500">Admin Panel</span>
-            <span className="font-medium text-slate-900">Demos Admin CMS</span>
+            <span className="font-medium text-white">Demos Admin CMS</span>
           </div>
           <div className="flex justify-between py-2">
             <span className="text-slate-500">API Server</span>
-            <span className="font-medium text-slate-900">Port 3150</span>
+            <span className="font-medium text-white">Port 3150</span>
           </div>
         </div>
       </div>

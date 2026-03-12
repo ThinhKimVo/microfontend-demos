@@ -49,15 +49,15 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50">
       {/* Full Page Modal */}
-      <div className="w-full h-full bg-white flex flex-col animate-fade-in">
+      <div className="w-full h-full bg-obsidian flex flex-col animate-fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-200 bg-slate-50">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-white/10 bg-white/[0.03]">
           <div className="flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
               {app.name?.charAt(0) || 'A'}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-white">
                 {isNew ? 'Create New App' : 'Edit App'}
               </h2>
               <p className="text-sm text-slate-500">
@@ -74,7 +74,7 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-200 px-4 sm:px-6 bg-white overflow-x-auto scrollbar-none">
+        <div className="flex border-b border-white/10 px-4 sm:px-6 bg-white/[0.02] overflow-x-auto scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -96,48 +96,48 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column */}
               <div className="space-y-6">
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                  <h3 className="font-semibold text-slate-900 mb-4">Basic Information</h3>
+                <div className="glass-panel rounded-xl p-5">
+                  <h3 className="font-semibold text-white mb-4">Basic Information</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
                         App Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         value={app.name}
                         onChange={(e) => updateField('name', e.target.value)}
-                        className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-r-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white placeholder-slate-500"
                         placeholder="My Awesome App"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
                         URL Path <span className="text-red-500">*</span>
                       </label>
                       <div className="flex">
-                        <span className="inline-flex items-center px-4 py-3 bg-slate-100 border border-r-0 border-slate-300 rounded-l-xl text-slate-500 text-sm">
+                        <span className="inline-flex items-center px-4 py-3 bg-white/5 border border-r-0 border-white/10 rounded-l-xl text-slate-500 text-sm">
                           /
                         </span>
                         <input
                           type="text"
                           value={app.path.replace(/^\//, '')}
                           onChange={(e) => updateField('path', '/' + e.target.value.replace(/^\//, ''))}
-                          className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-r-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-r-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white placeholder-slate-500"
                           placeholder="my-app"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
                         Description <span className="text-red-500">*</span>
                       </label>
                       <textarea
                         value={app.description}
                         onChange={(e) => updateField('description', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all resize-none text-white placeholder-slate-500"
                         rows={4}
                         placeholder="A brief description of what this app does..."
                       />
@@ -145,15 +145,15 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                  <h3 className="font-semibold text-slate-900 mb-4">Technical Details</h3>
+                <div className="glass-panel rounded-xl p-5">
+                  <h3 className="font-semibold text-white mb-4">Technical Details</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Framework</label>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">Framework</label>
                       <select
                         value={app.framework}
                         onChange={(e) => updateField('framework', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
                       >
                         <optgroup label="Web">
                           <option value="React">React</option>
@@ -170,21 +170,21 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Port</label>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">Port</label>
                       <input
                         type="number"
                         value={app.port}
                         onChange={(e) => updateField('port', parseInt(e.target.value) || 3100)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Version</label>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">Version</label>
                       <input
                         type="text"
                         value={app.version}
                         onChange={(e) => updateField('version', e.target.value)}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-slate-900"
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-white placeholder-slate-500"
                         placeholder="1.0.0"
                       />
                     </div>
@@ -193,8 +193,8 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
 
                 {/* Mobile App QR Code Section - shown when framework is mobile */}
                 {isMobileApp(app.framework) && (
-                  <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                    <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <div className="glass-panel rounded-xl p-5">
+                    <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
                       <MobileIcon className="w-5 h-5" />
                       Mobile App Install
                     </h3>
@@ -202,18 +202,18 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       {/* iOS App */}
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <AppleIcon className="w-5 h-5 text-slate-700" />
-                          <label className="text-sm font-medium text-slate-700">iOS App Store URL</label>
+                          <AppleIcon className="w-5 h-5 text-slate-300" />
+                          <label className="text-sm font-medium text-slate-300">iOS App Store URL</label>
                         </div>
                         <input
                           type="url"
                           value={app.iosAppUrl || ''}
                           onChange={(e) => updateField('iosAppUrl', e.target.value)}
-                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-sm text-white placeholder-slate-500"
                           placeholder="https://apps.apple.com/app/..."
                         />
                         {app.iosAppUrl && (
-                          <div className="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                          <div className="p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(app.iosAppUrl)}`}
                               alt="iOS QR Code"
@@ -227,18 +227,18 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       {/* Android App */}
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <AndroidIcon className="w-5 h-5 text-green-600" />
-                          <label className="text-sm font-medium text-slate-700">Google Play Store URL</label>
+                          <AndroidIcon className="w-5 h-5 text-accent-cyan" />
+                          <label className="text-sm font-medium text-slate-300">Google Play Store URL</label>
                         </div>
                         <input
                           type="url"
                           value={app.androidAppUrl || ''}
                           onChange={(e) => updateField('androidAppUrl', e.target.value)}
-                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all text-sm text-white placeholder-slate-500"
                           placeholder="https://play.google.com/store/apps/..."
                         />
                         {app.androidAppUrl && (
-                          <div className="p-3 bg-white rounded-xl border border-slate-200 text-center">
+                          <div className="p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(app.androidAppUrl)}`}
                               alt="Android QR Code"
@@ -255,9 +255,9 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
 
               {/* Right Column */}
               <div className="space-y-6">
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                  <h3 className="font-semibold text-slate-900 mb-4">Deployment Status</h3>
-                  <label className="flex items-center gap-4 cursor-pointer p-4 bg-white rounded-xl border border-slate-200 hover:border-emerald-300 transition-colors">
+                <div className="glass-panel rounded-xl p-5">
+                  <h3 className="font-semibold text-white mb-4">Deployment Status</h3>
+                  <label className="flex items-center gap-4 cursor-pointer p-4 bg-white/[0.03] rounded-xl border border-white/10 hover:border-accent-cyan/30 transition-colors">
                     <div className="relative">
                       <input
                         type="checkbox"
@@ -265,32 +265,32 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         onChange={(e) => updateField('integrated', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-14 h-8 bg-slate-800 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent-cyan/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-obsidian after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent-cyan"></div>
+                      <div className="w-14 h-8 bg-white/10 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent-cyan/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-obsidian after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent-cyan"></div>
                     </div>
                     <div>
-                      <span className="font-medium text-slate-900">Integrated & Deployed</span>
+                      <span className="font-medium text-white">Integrated & Deployed</span>
                       <p className="text-sm text-slate-500">Enable when app is ready and deployed to production</p>
                     </div>
                   </label>
                 </div>
 
                 {/* Preview Card */}
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                  <h3 className="font-semibold text-slate-900 mb-4">Preview</h3>
-                  <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <div className="glass-panel rounded-xl p-5">
+                  <h3 className="font-semibold text-white mb-4">Preview</h3>
+                  <div className="bg-white/[0.03] rounded-xl p-6 border border-white/10">
                     <div className="flex items-start gap-4">
                       <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${app.gradient} flex items-center justify-center text-white font-bold text-2xl shadow-lg flex-shrink-0`}>
                         {app.name?.charAt(0) || 'A'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-slate-900 text-lg truncate">{app.name || 'App Name'}</h4>
+                        <h4 className="font-bold text-white text-lg truncate">{app.name || 'App Name'}</h4>
                         <p className="text-slate-500 text-sm mt-1 line-clamp-2">{app.description || 'App description will appear here'}</p>
                         <div className="flex items-center gap-2 mt-3">
                           <span className={`px-2 py-1 text-xs font-medium rounded-full bg-gradient-to-r ${app.gradient} text-white`}>
                             {app.framework}
                           </span>
-                          <span className="text-xs text-slate-400">Port {app.port}</span>
-                          <span className="text-xs text-slate-400">v{app.version}</span>
+                          <span className="text-xs text-slate-500">Port {app.port}</span>
+                          <span className="text-xs text-slate-500">v{app.version}</span>
                         </div>
                       </div>
                     </div>
@@ -303,8 +303,8 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
           {activeTab === 'appearance' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Color Theme Selection */}
-              <div className="lg:col-span-2 bg-slate-50 rounded-xl p-5 border border-slate-200">
-                <h3 className="font-semibold text-slate-900 mb-2">Color Theme</h3>
+              <div className="lg:col-span-2 glass-panel rounded-xl p-5">
+                <h3 className="font-semibold text-white mb-2">Color Theme</h3>
                 <p className="text-sm text-slate-500 mb-4">Choose a color theme for your app's branding</p>
                 <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3">
                   {gradientPresets.map((preset) => (
@@ -317,24 +317,24 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                         }`}
                     >
                       <div className={`h-12 rounded-lg bg-gradient-to-br ${preset.gradient}`}></div>
-                      <p className="text-xs font-medium text-slate-600 mt-1.5 text-center truncate">{preset.name}</p>
+                      <p className="text-xs font-medium text-slate-500 mt-1.5 text-center truncate">{preset.name}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Preview */}
-              <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                <h3 className="font-semibold text-slate-900 mb-4">Preview</h3>
+              <div className="glass-panel rounded-xl p-5">
+                <h3 className="font-semibold text-white mb-4">Preview</h3>
                 <div className="space-y-4">
                   {/* Card Preview */}
-                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                  <div className="bg-white/[0.03] rounded-xl p-4 border border-white/10">
                     <div className="flex items-center gap-3">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
                         {app.name?.charAt(0) || 'A'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-slate-900 truncate">{app.name || 'App Name'}</h4>
+                        <h4 className="font-bold text-white truncate">{app.name || 'App Name'}</h4>
                         <p className="text-slate-500 text-sm truncate">{app.description || 'Description'}</p>
                       </div>
                     </div>
@@ -361,8 +361,8 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
 
           {activeTab === 'media' && (
             <div className="space-y-6">
-              <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                <h3 className="font-semibold text-slate-900 mb-2">Screenshots</h3>
+              <div className="glass-panel rounded-xl p-5">
+                <h3 className="font-semibold text-white mb-2">Screenshots</h3>
                 <p className="text-sm text-slate-500 mb-4">Add screenshots to showcase your app. Images will be auto-resized and compressed.</p>
                 <ScreenshotManager
                   screenshots={app.screenshots || []}
@@ -376,20 +376,20 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
           {activeTab === 'advanced' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
               {/* Editor Area - Takes 2/3 of the space */}
-              <div className="lg:col-span-2 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col">
+              <div className="lg:col-span-2 glass-panel rounded-xl p-5 flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold text-slate-900">Detail Content</h3>
+                    <h3 className="font-semibold text-white">Detail Content</h3>
                     <p className="text-sm text-slate-500">Add content for the app detail page</p>
                   </div>
                   {/* Editor Mode Toggle */}
-                  <div className="flex items-center bg-slate-200 rounded-lg p-1">
+                  <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/10">
                     <button
                       type="button"
                       onClick={() => setEditorMode('visual')}
                       className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'visual'
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white/10 text-accent-cyan'
+                        : 'text-slate-500 hover:text-white'
                         }`}
                       title="Visual Editor - Edit like a document"
                     >
@@ -402,8 +402,8 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       type="button"
                       onClick={() => setEditorMode('html')}
                       className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'html'
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white/10 text-accent-cyan'
+                        : 'text-slate-500 hover:text-white'
                         }`}
                       title="HTML Editor - Edit raw HTML code"
                     >
@@ -416,8 +416,8 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                       type="button"
                       onClick={() => setEditorMode('preview')}
                       className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'preview'
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white/10 text-accent-cyan'
+                        : 'text-slate-500 hover:text-white'
                         }`}
                       title="Preview - See how it will look"
                     >
@@ -448,14 +448,14 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
                   )}
 
                   {editorMode === 'preview' && (
-                    <div className="h-full overflow-auto bg-white rounded-lg border border-slate-300 p-6">
+                    <div className="h-full overflow-auto bg-white/[0.03] rounded-lg border border-white/10 p-6">
                       {app.detailContent ? (
                         <div
-                          className="prose prose-slate max-w-none app-detail-content"
+                          className="prose prose-invert max-w-none app-detail-content"
                           dangerouslySetInnerHTML={{ __html: app.detailContent }}
                         />
                       ) : (
-                        <div className="flex items-center justify-center h-full text-slate-400">
+                        <div className="flex items-center justify-center h-full text-slate-500">
                           <div className="text-center">
                             <EyeIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
                             <p>No content to preview</p>
@@ -470,36 +470,36 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
 
               {/* Tips Sidebar */}
               <div className="space-y-4">
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                <div className="bg-accent-cyan/10 rounded-xl p-4 border border-accent-cyan/20">
                   <div className="flex gap-3">
-                    <EditIcon className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <EditIcon className="w-5 h-5 text-accent-cyan flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-green-800">Visual Editor</h4>
-                      <p className="text-sm text-green-700 mt-1">
+                      <h4 className="font-medium text-accent-cyan">Visual Editor</h4>
+                      <p className="text-sm text-accent-cyan/80 mt-1">
                         Edit like a document. Select text and use the toolbar to format.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
                   <div className="flex gap-3">
-                    <CodeIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CodeIcon className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-800">HTML Editor</h4>
-                      <p className="text-sm text-blue-700 mt-1">
+                      <h4 className="font-medium text-blue-400">HTML Editor</h4>
+                      <p className="text-sm text-blue-400/80 mt-1">
                         For advanced users. Edit raw HTML with Tailwind CSS classes.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                  <h4 className="font-medium text-slate-800 mb-2">Formatting Tips</h4>
-                  <ul className="text-xs text-slate-600 space-y-1">
-                    <li>• <strong>Ctrl+B</strong> for bold</li>
-                    <li>• <strong>Ctrl+I</strong> for italic</li>
-                    <li>• <strong>Ctrl+U</strong> for underline</li>
+                <div className="glass-panel rounded-xl p-4">
+                  <h4 className="font-medium text-white mb-2">Formatting Tips</h4>
+                  <ul className="text-xs text-slate-500 space-y-1">
+                    <li>• <strong className="text-slate-300">Ctrl+B</strong> for bold</li>
+                    <li>• <strong className="text-slate-300">Ctrl+I</strong> for italic</li>
+                    <li>• <strong className="text-slate-300">Ctrl+U</strong> for underline</li>
                     <li>• Select text then click toolbar buttons</li>
                   </ul>
                 </div>
@@ -509,16 +509,16 @@ export const EditAppDrawer: React.FC<EditAppDrawerProps> = ({
         </div>
 
         {/* Footer - Sticky with shadow for visibility */}
-        <div className="sticky bottom-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="sticky bottom-0 flex items-center justify-end gap-3 px-6 py-4 border-t border-white/10 bg-obsidian/95 backdrop-blur-sm shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
           <button
             onClick={onCancel}
-            className="min-w-[120px] py-2.5 text-slate-500 hover:text-slate-700 text-sm font-medium rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
+            className="min-w-[120px] py-2.5 text-slate-400 hover:text-white text-sm font-medium rounded-lg border border-white/10 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="min-w-[120px] py-2.5 bg-accent-cyan text-white text-sm font-bold rounded-lg hover:bg-accent-cyan/90 transition-colors shadow-[0_10px_30px_-10px_rgba(132,175,72,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2"
+            className="min-w-[120px] py-2.5 bg-accent-cyan text-obsidian text-sm font-bold rounded-lg hover:bg-accent-cyan/90 transition-colors shadow-[0_10px_30px_-10px_rgba(132,175,72,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
           >
             {isNew ? 'Create App' : 'Save Changes'}
           </button>

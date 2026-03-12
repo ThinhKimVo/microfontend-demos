@@ -163,25 +163,25 @@ export const HtmlEditor: React.FC<HtmlEditorProps> = ({
     const templates: Record<string, string> = {
       section: `<section class="py-8">
   <h2 class="text-2xl font-bold mb-4">Section Title</h2>
-  <p class="text-gray-600">Your content here...</p>
+  <p class="text-slate-400">Your content here...</p>
 </section>`,
       features: `<section class="py-8">
   <h2 class="text-2xl font-bold mb-6">Key Features</h2>
   <div class="grid md:grid-cols-2 gap-6">
-    <div class="p-4 bg-gray-50 rounded-lg">
+    <div class="p-4 bg-white/5 rounded-lg border border-white/10">
       <h3 class="font-semibold mb-2">Feature 1</h3>
-      <p class="text-gray-600">Description of feature 1</p>
+      <p class="text-slate-400">Description of feature 1</p>
     </div>
-    <div class="p-4 bg-gray-50 rounded-lg">
+    <div class="p-4 bg-white/5 rounded-lg border border-white/10">
       <h3 class="font-semibold mb-2">Feature 2</h3>
-      <p class="text-gray-600">Description of feature 2</p>
+      <p class="text-slate-400">Description of feature 2</p>
     </div>
   </div>
 </section>`,
       cta: `<section class="py-8 text-center">
   <h2 class="text-2xl font-bold mb-4">Ready to Get Started?</h2>
-  <p class="text-gray-600 mb-6">Start using the app today.</p>
-  <a href="#" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+  <p class="text-slate-400 mb-6">Start using the app today.</p>
+  <a href="#" class="inline-block px-6 py-3 bg-accent-cyan text-obsidian font-bold rounded-lg hover:bg-accent-cyan/90">
     Get Started
   </a>
 </section>`,
@@ -191,22 +191,22 @@ export const HtmlEditor: React.FC<HtmlEditorProps> = ({
   }, [insertAtCursor]);
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden">
+    <div className="border border-white/10 rounded-lg overflow-hidden">
       {/* Toolbar */}
-      <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
+      <div className="bg-white/[0.03] border-b border-white/10 p-2 flex flex-wrap gap-1">
         {toolbarButtons.map((btn, i) => (
           <button
             key={i}
             type="button"
             onClick={() => handleAction(btn.action)}
-            className="px-2 py-1 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded transition-colors min-w-[28px]"
+            className="px-2 py-1 text-sm font-medium text-slate-400 hover:text-accent-cyan hover:bg-white/5 rounded transition-colors min-w-[28px]"
             title={btn.title}
           >
             {btn.icon}
           </button>
         ))}
 
-        <div className="w-px bg-gray-300 mx-1" />
+        <div className="w-px bg-white/10 mx-1" />
 
         {/* Templates dropdown */}
         <select
@@ -216,7 +216,7 @@ export const HtmlEditor: React.FC<HtmlEditorProps> = ({
               e.target.value = '';
             }
           }}
-          className="px-2 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+          className="px-2 py-1 text-sm text-slate-400 bg-white/5 border border-white/10 rounded hover:bg-white/10"
           defaultValue=""
         >
           <option value="" disabled>Templates</option>
@@ -231,15 +231,15 @@ export const HtmlEditor: React.FC<HtmlEditorProps> = ({
         ref={textareaRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 font-mono text-sm focus:outline-none resize-y min-h-[200px]"
+        className="w-full px-3 py-2 font-mono text-sm focus:outline-none resize-y min-h-[200px] bg-white/[0.02] text-white placeholder-slate-500"
         placeholder={placeholder}
         rows={10}
       />
 
-      {/* Preview toggle hint */}
-      <div className="bg-gray-50 border-t border-gray-300 px-3 py-1.5 text-xs text-gray-500 flex justify-between items-center">
+      {/* Footer */}
+      <div className="bg-white/[0.03] border-t border-white/10 px-3 py-1.5 text-xs text-slate-500 flex justify-between items-center">
         <span>HTML mode • Use toolbar to insert formatted elements</span>
-        <span className="text-gray-400">{value.length} chars</span>
+        <span className="text-slate-600">{value.length} chars</span>
       </div>
     </div>
   );

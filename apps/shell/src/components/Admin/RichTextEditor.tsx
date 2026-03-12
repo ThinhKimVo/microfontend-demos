@@ -84,7 +84,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [handleInput]);
 
   const handleDivider = useCallback(() => {
-    document.execCommand('insertHTML', false, '<hr class="my-4 border-slate-300" />');
+    document.execCommand('insertHTML', false, '<hr class="my-4 border-white/10" />');
     handleInput();
     editorRef.current?.focus();
   }, [handleInput]);
@@ -147,18 +147,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+    <div className="border border-white/10 rounded-lg overflow-hidden bg-white/[0.02]">
       {/* Toolbar */}
-      <div className="bg-slate-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+      <div className="bg-white/[0.03] border-b border-white/10 p-2 flex flex-wrap items-center gap-1">
         {toolbarGroups.map((group, groupIndex) => (
           <React.Fragment key={groupIndex}>
-            {groupIndex > 0 && <div className="w-px h-6 bg-gray-300 mx-1" />}
+            {groupIndex > 0 && <div className="w-px h-6 bg-white/10 mx-1" />}
             {group.map((btn, btnIndex) => (
               <button
                 key={btnIndex}
                 type="button"
                 onClick={() => handleToolbarClick(btn)}
-                className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors"
+                className="p-2 text-slate-500 hover:text-accent-cyan hover:bg-white/5 rounded transition-colors"
                 title={btn.title}
               >
                 {btn.icon}
@@ -174,7 +174,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         contentEditable
         onInput={handleInput}
         onBlur={handleInput}
-        className="min-h-[300px] max-h-[500px] overflow-y-auto p-4 focus:outline-none prose prose-slate max-w-none
+        className="min-h-[300px] max-h-[500px] overflow-y-auto p-4 focus:outline-none prose prose-invert max-w-none
           [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:mb-4
           [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:mb-3
           [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:mb-2
@@ -182,14 +182,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-3
           [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-3
           [&>img]:max-w-full [&>img]:rounded-lg [&>img]:my-4
-          [&>a]:text-blue-600 [&>a]:underline
+          [&>a]:text-accent-cyan [&>a]:underline
           [&_*]:outline-none"
         data-placeholder={placeholder}
         suppressContentEditableWarning
       />
 
       {/* Footer */}
-      <div className="bg-slate-50 border-t border-gray-300 px-3 py-1.5 text-xs text-slate-500 flex justify-between">
+      <div className="bg-white/[0.03] border-t border-white/10 px-3 py-1.5 text-xs text-slate-500 flex justify-between">
         <span>Visual editor • Select text to format</span>
         <span>{value.length} chars</span>
       </div>
@@ -198,7 +198,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <style>{`
         [contenteditable]:empty:before {
           content: attr(data-placeholder);
-          color: #94a3b8;
+          color: #64748b;
           pointer-events: none;
         }
       `}</style>

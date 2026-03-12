@@ -15,15 +15,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
   const stats = [
     { label: 'Total Apps', value: apps.length, icon: AppsIcon, color: 'text-accent-cyan', bg: 'bg-accent-cyan/10' },
     { label: 'Deployed', value: deployedApps.length, icon: CheckIcon, color: 'text-accent-cyan', bg: 'bg-accent-cyan/10' },
-    { label: 'Screenshots', value: totalScreenshots, icon: ImageIcon, color: 'text-violet-600', bg: 'bg-violet-50' },
-    { label: 'Frameworks', value: frameworks.length, icon: CodeIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Screenshots', value: totalScreenshots, icon: ImageIcon, color: 'text-violet-400', bg: 'bg-violet-500/10' },
+    { label: 'Frameworks', value: frameworks.length, icon: CodeIcon, color: 'text-amber-400', bg: 'bg-amber-500/10' },
   ];
 
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6">
-        <h1 className="text-xl font-semibold text-slate-900 mb-1">Welcome back</h1>
+      <div className="glass-panel rounded-xl p-6">
+        <h1 className="text-xl font-semibold text-white mb-1">Welcome back</h1>
         <p className="text-slate-500 text-sm mb-5">Manage your microfrontend applications from one place.</p>
         <div className="flex gap-3">
           <button
@@ -45,11 +45,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white border border-slate-200 rounded-xl p-4">
+          <div key={stat.label} className="glass-panel rounded-xl p-4">
             <div className={`w-9 h-9 ${stat.bg} rounded-lg flex items-center justify-center mb-3`}>
               <stat.icon className={`w-5 h-5 ${stat.color}`} />
             </div>
-            <p className="text-2xl font-semibold text-slate-900">{stat.value}</p>
+            <p className="text-2xl font-semibold text-white">{stat.value}</p>
             <p className="text-slate-500 text-sm">{stat.label}</p>
           </div>
         ))}
@@ -58,8 +58,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
       {/* Quick Actions & Recent Apps */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Quick Actions */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-slate-900 mb-4">Quick Actions</h2>
+        <div className="glass-panel rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-white mb-4">Quick Actions</h2>
           <div className="space-y-2">
             <button
               onClick={onAddApp}
@@ -85,12 +85,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
                 <p className="text-xs text-slate-500">Edit or delete apps</p>
               </div>
             </button>
-            <button className="w-full flex items-center gap-3 p-3 hover:bg-accent-cyan/10 hover:text-accent-cyan group rounded-lg transition-colors text-left">
-              <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
-                <DownloadIcon className="w-4 h-4 text-violet-600" />
+            <button className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left">
+              <div className="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center">
+                <DownloadIcon className="w-4 h-4 text-violet-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-900">Export Data</p>
+                <p className="text-sm font-medium text-slate-200">Export Data</p>
                 <p className="text-xs text-slate-500">Download as JSON</p>
               </div>
             </button>
@@ -98,9 +98,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
         </div>
 
         {/* Recent Apps */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
+        <div className="lg:col-span-2 glass-panel rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-900">Recent Apps</h2>
+            <h2 className="text-sm font-semibold text-white">Recent Apps</h2>
             <button onClick={onGoToApps} className="text-xs text-accent-cyan hover:text-accent-cyan/80 font-black uppercase tracking-widest">
               View All
             </button>
@@ -109,17 +109,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
             {apps.slice(0, 5).map((app) => (
               <div
                 key={app.id}
-                className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors"
+                className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 font-semibold text-sm">
+                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 font-semibold text-sm border border-white/10">
                   {app.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{app.name}</p>
+                  <p className="text-sm font-medium text-white truncate">{app.name}</p>
                   <p className="text-xs text-slate-500 truncate">{app.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                  <span className="text-xs text-slate-500 bg-white/5 px-2 py-0.5 rounded border border-white/5">
                     {app.framework}
                   </span>
                   {app.integrated ? (
@@ -128,8 +128,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
                       Live
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-xs text-slate-400">
-                      <span className="w-1.5 h-1.5 bg-slate-300 rounded-full" />
+                    <span className="flex items-center gap-1 text-xs text-slate-500">
+                      <span className="w-1.5 h-1.5 bg-slate-600 rounded-full" />
                       Draft
                     </span>
                   )}
@@ -137,7 +137,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
               </div>
             ))}
             {apps.length === 0 && (
-              <div className="text-center py-8 text-slate-400">
+              <div className="text-center py-8 text-slate-500">
                 <AppsIcon className="w-10 h-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No apps yet</p>
               </div>
@@ -148,21 +148,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ apps, onAddApp, onGoToApps
 
       {/* Framework Distribution */}
       {frameworks.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-slate-900 mb-4">Framework Distribution</h2>
+        <div className="glass-panel rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-white mb-4">Framework Distribution</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {frameworks.map((framework) => {
               const count = apps.filter(app => app.framework === framework).length;
               const percentage = Math.round((count / apps.length) * 100) || 0;
               return (
-                <div key={framework} className="p-3 bg-slate-50 rounded-lg">
+                <div key={framework} className="p-3 bg-white/[0.03] rounded-lg border border-white/5">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-slate-900">{framework}</span>
+                    <span className="text-sm font-medium text-white">{framework}</span>
                     <span className="text-xs text-slate-500">{count}</span>
                   </div>
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-slate-600 rounded-full transition-all"
+                      className="h-full bg-accent-cyan rounded-full transition-all"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
