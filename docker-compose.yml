@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   microfrontend:
     build:
@@ -10,15 +8,22 @@ services:
     container_name: mfe-demo
     restart: unless-stopped
     ports:
-      - "3100:3100"  # Shell (main app)
-      - "3101:3101"  # React Remote
-      - "3102:3102"  # Vue Remote
-      - "3103:3103"  # Angular Remote
-      - "3105:3105"  # Healthcare Admin
+      - "80:80"           # Reverse proxy (routes all apps via path)
+      - "3100:3100"       # Shell
+      - "3101:3101"       # Healthcare Admin
+      - "3102:3102"       # Asset Management
+      - "3103:3103"       # CMMS
+      - "3104:3104"       # Family Fun
+      - "3105:3105"       # Booking Guest Portal
+      - "3106:3106"       # Booking Host Portal
+      - "3107:3107"       # E-Learning Admin Portal
+      - "3108:3108"       # E-Learning Student Portal
+      - "3109:3109"       # Healthcare Marketing
+      - "3110:3110"       # Healthcare Mobile (web)
     networks:
       - mfe-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3

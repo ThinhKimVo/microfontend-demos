@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm rebuild *)",
+      "Bash(node_modules/.bin/node-pre-gyp rebuild *)",
+      "Bash(npx node-gyp *)"
+    ]
+  }
+}

@@ -5,13 +5,13 @@ import { getSettings, updateSettings } from '../../services/admin';
 
 const FIELDS = [
   { key: 'app_name', label: 'App Name', placeholder: 'Hopefull' },
-  { key: 'contact_email', label: 'Contact Email', placeholder: 'contact@hopefull.com', type: 'email' },
+  { key: 'contact_email', label: 'Contact Email', placeholder: 'contact@hopeful.com', type: 'email' },
   { key: 'contact_phone', label: 'Contact Phone', placeholder: '+1 (555) 000-0000', type: 'tel' },
   { key: 'commission_rate', label: 'Commission Rate (%)', placeholder: '15', type: 'number' },
   { key: 'min_payout', label: 'Minimum Payout ($)', placeholder: '50', type: 'number' },
   { key: 'session_default_duration', label: 'Default Session Duration (min)', placeholder: '60', type: 'number' },
   { key: 'max_advance_booking_days', label: 'Max Advance Booking (days)', placeholder: '30', type: 'number' },
-  { key: 'support_email', label: 'Support Email', placeholder: 'support@hopefull.com', type: 'email' },
+  { key: 'support_email', label: 'Support Email', placeholder: 'support@hopeful.com', type: 'email' },
   { key: 'timezone', label: 'Default Timezone', placeholder: 'America/New_York' },
   { key: 'currency', label: 'Currency', placeholder: 'USD' },
 ];

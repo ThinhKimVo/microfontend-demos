@@ -33,7 +33,9 @@
     "dev:elearn-admin": "pnpm --filter @mfe/elearning-admin-portal dev",
     "dev:elearn-student": "pnpm --filter @mfe/elearning-student-portal dev",
     "dev:healthcare-admin": "pnpm --filter @mfe/healthcare-admin dev",
-    "dev:healthcare-marketing": "pnpm --filter @mfe/healthcare-marketing dev"
+    "dev:healthcare-api": "pnpm --filter @hopeful/api dev",
+    "dev:healthcare-marketing": "pnpm --filter @mfe/healthcare-marketing dev",
+    "dev:healthcare-mobile": "pnpm --filter @hopeful/mobile dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

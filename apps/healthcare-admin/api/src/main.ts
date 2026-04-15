@@ -38,7 +38,7 @@ async function setupApp(app: INestApplication) {
   // Swagger documentation (only in dev or if explicitly enabled)
   if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
     const config = new DocumentBuilder()
-      .setTitle('Hopefull API')
+      .setTitle('Hopeful API')
       .setDescription('Telehealth therapy platform API')
       .setVersion('1.0')
       .addBearerAuth()

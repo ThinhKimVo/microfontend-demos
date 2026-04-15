@@ -1,51 +1,76 @@
 # Multi-stage build for all microfrontend apps
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
-# Install pnpm
-RUN npm install -g pnpm@8
+# Install pnpm and Expo CLI
+RUN npm install -g pnpm@9 @expo/cli
 
 WORKDIR /app
 
-# Copy package files
+# Copy manifests first for better layer caching
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/shell/package.json ./apps/shell/
-COPY apps/react-remote/package.json ./apps/react-remote/
-COPY apps/vue-remote/package.json ./apps/vue-remote/
-COPY apps/angular-remote/package.json ./apps/angular-remote/
-COPY apps/healthcare-admin/package.json ./apps/healthcare-admin/
+
+# Shared packages
 COPY packages/shared/package.json ./packages/shared/
 
-# Install dependencies
+# Web apps
+COPY apps/shell/package.json ./apps/shell/
+COPY apps/shell/server/package.json ./apps/shell/server/
+COPY apps/healthcare-admin/package.json ./apps/healthcare-admin/
+COPY apps/healthcare-admin/api/package.json ./apps/healthcare-admin/api/
+COPY apps/healthcare-marketing/package.json ./apps/healthcare-marketing/
+COPY apps/assest-management/package.json ./apps/assest-management/
+COPY apps/cmms/package.json ./apps/cmms/
+COPY apps/FamilyFun/frontend/package.json ./apps/FamilyFun/frontend/
+COPY apps/BookingSystem/packages/guest-portal/package.json ./apps/BookingSystem/packages/guest-portal/
+COPY apps/BookingSystem/packages/host-portal/package.json ./apps/BookingSystem/packages/host-portal/
+COPY apps/BookingSystem/packages/shared/package.json ./apps/BookingSystem/packages/shared/
+COPY apps/BookingSystem/packages/ui-components/package.json ./apps/BookingSystem/packages/ui-components/
+COPY apps/elearning/admin-portal/package.json ./apps/elearning/admin-portal/
+COPY apps/elearning/student-portal/package.json ./apps/elearning/student-portal/
+
+# Mobile app
+COPY apps/healthcare-mobile/package.json ./apps/healthcare-mobile/
+
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# Copy all source code
 COPY . .
 
-# Set the remote host for production builds
-ARG REMOTE_HOST=http://10.30.10.18
+ARG REMOTE_HOST=http://localhost
 ENV REMOTE_HOST=${REMOTE_HOST}
 
-# Build all apps with production webpack config
-RUN cd apps/shell && pnpm exec webpack --config webpack.config.prod.js
-RUN cd apps/react-remote && pnpm exec webpack --config webpack.config.prod.js
-RUN cd apps/vue-remote && pnpm exec webpack --config webpack.config.prod.js
-RUN cd apps/angular-remote && pnpm exec webpack --config webpack.config.prod.js
-RUN cd apps/healthcare-admin && pnpm exec webpack --config webpack.config.prod.js
+# Build all web apps
+RUN pnpm --filter @mfe/shell build:prod
+RUN pnpm --filter @mfe/healthcare-admin build:prod
+RUN pnpm --filter @mfe/healthcare-marketing build:prod
+RUN pnpm --filter @mfe/assest-management build
+RUN pnpm --filter @mfe/cmms build
+RUN pnpm --filter @mfe/family-fun build
+RUN pnpm --filter @mfe/booking-guest-portal build
+RUN pnpm --filter @mfe/booking-host-portal build
+RUN pnpm --filter @mfe/elearning-admin-portal build
+RUN pnpm --filter @mfe/elearning-student-portal build
 
-# Production stage with nginx
+# Build healthcare-mobile as a static web app
+RUN pnpm --filter @hopefull/mobile build:web
+
+# Production stage — serve all static builds with nginx
 FROM nginx:alpine AS production
 
-# Copy nginx configuration
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Copy built files from builder stage
-COPY --from=builder /app/apps/shell/dist /usr/share/nginx/html/shell
-COPY --from=builder /app/apps/react-remote/dist /usr/share/nginx/html/react-remote
-COPY --from=builder /app/apps/vue-remote/dist /usr/share/nginx/html/vue-remote
-COPY --from=builder /app/apps/angular-remote/dist /usr/share/nginx/html/angular-remote
-COPY --from=builder /app/apps/healthcare-admin/dist /usr/share/nginx/html/healthcare-admin
+COPY --from=builder /app/apps/shell/dist                              /usr/share/nginx/html/shell
+COPY --from=builder /app/apps/healthcare-admin/dist                   /usr/share/nginx/html/healthcare-admin
+COPY --from=builder /app/apps/healthcare-marketing/dist               /usr/share/nginx/html/healthcare-marketing
+COPY --from=builder /app/apps/assest-management/dist                  /usr/share/nginx/html/assest-management
+COPY --from=builder /app/apps/cmms/dist                               /usr/share/nginx/html/cmms
+COPY --from=builder /app/apps/FamilyFun/frontend/dist                 /usr/share/nginx/html/family-fun
+COPY --from=builder /app/apps/BookingSystem/packages/guest-portal/dist /usr/share/nginx/html/booking-guest-portal
+COPY --from=builder /app/apps/BookingSystem/packages/host-portal/dist  /usr/share/nginx/html/booking-host-portal
+COPY --from=builder /app/apps/elearning/admin-portal/dist             /usr/share/nginx/html/elearning-admin-portal
+COPY --from=builder /app/apps/elearning/student-portal/dist           /usr/share/nginx/html/elearning-student-portal
+COPY --from=builder /app/apps/healthcare-mobile/dist                  /usr/share/nginx/html/healthcare-mobile
 
-# Expose all ports
-EXPOSE 3100 3101 3102 3103 3105
+EXPOSE 80 3100 3101 3102 3103 3104 3105 3106 3107 3108 3109 3110
 
 CMD ["nginx", "-g", "daemon off;"]

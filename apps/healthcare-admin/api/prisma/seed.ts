@@ -63,12 +63,12 @@ async function main() {
   console.log('Creating admin user...');
   const adminUser = await prisma.user.create({
     data: {
-      email: 'admin@hopefull.com',
+      email: 'admin@hopeful.com',
       phone: '+1000000000',
       passwordHash,
       role: UserRole.ADMIN,
       firstName: 'Admin',
-      lastName: 'Hopefull',
+      lastName: 'Hopeful',
       displayName: 'Admin',
       emailVerified: true,
       phoneVerified: true,
@@ -860,7 +860,7 @@ async function main() {
   console.log('\n=== Seed completed successfully! ===\n');
   console.log('Created:');
   console.log(`  - ${specializations.length} Specializations`);
-  console.log('  - 1 Admin (admin@hopefull.com)');
+  console.log('  - 1 Admin (admin@hopeful.com)');
   console.log('  - 2 Test Patients (patient@test.com, patient2@test.com)');
   console.log('  - 3 Therapists (dr.sarah@test.com, dr.chen@test.com, dr.davis@test.com)');
   console.log('  - 3 Payment Methods');
